@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TwoDiskGarage</title>
-    <link rel="stylesheet" href="./styles.css?v=list-decouple-1" />
+    <link rel="stylesheet" href="./styles.css?v=panel-full-2" />
   </head>
   <body>
     <div class="home-transition-stage" id="home-transition-stage">
@@ -89,13 +89,38 @@
             </ol>
           </section>
 
-          <button class="index-link" id="index-about-button" type="button" data-debug-label="button#index-about-button">
+          <button class="index-link" id="index-about-button" type="button" aria-pressed="false" data-debug-label="button#index-about-button">
             <span class="index-link-label">关于我</span>
           </button>
         </nav>
       </aside>
 
-      <section class="archive-detail" aria-label="Archive detail grid" data-debug-label="section.archive-detail">
+      <nav class="archive-debug-controls" aria-label="Debug controls" data-debug-label="nav.archive-debug-controls">
+        <button class="debug-toggle" id="debug-toggle" type="button" aria-pressed="false">
+          OUTLINE
+        </button>
+        <button class="debug-toggle" id="label-toggle" type="button" aria-pressed="false">
+          LABELS
+        </button>
+      </nav>
+
+      <section class="archive-detail archive-detail--rolling" aria-label="Archive detail grid" data-debug-label="section.archive-detail">
+        <header class="archive-rolling-toolbar" data-debug-label="header.archive-rolling-toolbar">
+          <div class="detail-path" data-debug-label="div.detail-path">
+            <span>ARCHIVE /</span>
+            <span class="accent">01</span>
+          </div>
+        </header>
+
+        <div class="archive-rolling-panel" data-debug-label="div.archive-rolling-panel">
+          <iframe
+            class="archive-rolling-frame"
+            src="./rolling-stream.html?v=less-bounce-1&panel=1"
+            title="Rolling Stream"
+            loading="eager"
+          ></iframe>
+        </div>
+
         <header class="detail-toolbar" data-debug-label="header.detail-toolbar">
           <div class="detail-path" data-debug-label="div.detail-path">
             <span>ARCHIVE /</span>
@@ -103,10 +128,10 @@
           </div>
 
           <nav class="detail-views" aria-label="View mode" data-debug-label="nav.detail-views">
-            <button class="debug-toggle" id="debug-toggle" type="button" aria-pressed="false">
+            <button class="debug-toggle" type="button" aria-pressed="false">
               OUTLINE
             </button>
-            <button class="debug-toggle" id="label-toggle" type="button" aria-pressed="false">
+            <button class="debug-toggle" type="button" aria-pressed="false">
               LABELS
             </button>
           </nav>
@@ -339,10 +364,140 @@
             </article>
           </div>
         </div>
+
+        <section class="about-view" id="about-view" aria-label="About Felix" hidden>
+          <div class="about-sheet">
+            <div class="about-hero">
+              <p class="about-watermark" aria-hidden="true">Resume</p>
+              <h2 class="about-title">Resume.</h2>
+            </div>
+
+            <div class="about-grid">
+              <div class="about-column about-column--summary">
+                <section class="about-section">
+                  <h3 class="about-section-title">Education</h3>
+                  <div class="about-entry-list">
+                    <article class="about-entry">
+                      <div class="about-entry-link" aria-hidden="true">↗</div>
+                      <div class="about-entry-body">
+                        <h4>Strate School of Design</h4>
+                        <p class="about-entry-meta">2020 - 2025</p>
+                        <p class="about-entry-copy">Industrial design - Product design</p>
+                      </div>
+                    </article>
+
+                    <article class="about-entry">
+                      <div class="about-entry-link" aria-hidden="true">↗</div>
+                      <div class="about-entry-body">
+                        <h4>ESCP Business School</h4>
+                        <p class="about-entry-meta">Sep. - Dec. 2023</p>
+                        <p class="about-entry-copy">Entrepreneurship Program in Madrid</p>
+                      </div>
+                    </article>
+                  </div>
+                </section>
+
+                <section class="about-section">
+                  <h3 class="about-section-title">Skills</h3>
+                  <div class="about-skill-columns">
+                    <div class="about-skill-list">
+                      <div class="about-skill-item">
+                        <span class="about-skill-badge">Bl</span>
+                        <span>Blender</span>
+                      </div>
+                      <div class="about-skill-item">
+                        <span class="about-skill-badge">C4</span>
+                        <span>Cinema 4D</span>
+                      </div>
+                      <div class="about-skill-item">
+                        <span class="about-skill-badge">Rh</span>
+                        <span>Rhino 3D</span>
+                      </div>
+                      <div class="about-skill-item">
+                        <span class="about-skill-badge">Ks</span>
+                        <span>KeyShot</span>
+                      </div>
+                      <div class="about-skill-item">
+                        <span class="about-skill-badge">Ad</span>
+                        <span>Adobe : Ps | Ai | Lr | Pr | Id | Sa</span>
+                      </div>
+                      <div class="about-skill-item">
+                        <span class="about-skill-badge">Fg</span>
+                        <span>Figma</span>
+                      </div>
+                    </div>
+
+                    <div class="about-skill-list">
+                      <div class="about-skill-item">
+                        <span class="about-skill-badge">Fr</span>
+                        <span>Native</span>
+                      </div>
+                      <div class="about-skill-item">
+                        <span class="about-skill-badge">En</span>
+                        <span>English C1</span>
+                      </div>
+                      <div class="about-skill-item">
+                        <span class="about-skill-badge">Ph</span>
+                        <span>Photography</span>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+
+              <div class="about-column about-column--experience">
+                <section class="about-section">
+                  <h3 class="about-section-title">Experiences</h3>
+                  <div class="about-experience-list">
+                    <article class="about-role">
+                      <h4>CROIX ROUGE</h4>
+                      <p class="about-role-meta">Partnership Project &nbsp;|&nbsp; January - June 2024</p>
+                      <p class="about-role-copy">
+                        Designed sustainable furniture solutions using wood and recycled rope for the French Red Cross addressing poor housing conditions.
+                      </p>
+                    </article>
+
+                    <article class="about-role">
+                      <h4>ESCP BUSINESS SCHOOL</h4>
+                      <p class="about-role-meta">Entrepreneurship Program &nbsp;|&nbsp; September - December 2023</p>
+                      <p class="about-role-copy">
+                        Innovative business and startup development. Developed a healthcare startup to improve medical file management, earning the “Best Ready to Invest Project” award.
+                      </p>
+                    </article>
+
+                    <article class="about-role">
+                      <h4>SAFRAN SEATS</h4>
+                      <p class="about-role-meta">Internship &nbsp;|&nbsp; March - August 2023</p>
+                      <p class="about-role-copy">
+                        3D renderings of Business suits and First Class for Japan Airlines, Qatar Airways and Emirates within the Advanced Concept Team.
+                      </p>
+                    </article>
+
+                    <article class="about-role">
+                      <h4>CENTRALE LYON</h4>
+                      <p class="about-role-meta">EPSA Team &nbsp;|&nbsp; 2022 - 2024 Season</p>
+                      <p class="about-role-copy">
+                        Integration in the design department for EPSA team at Centrale Lyon. Designed the steering wheel, dashboard and vehicle wrapping for Formula Student competition.
+                      </p>
+                    </article>
+
+                    <article class="about-role">
+                      <h4>STRATE</h4>
+                      <p class="about-role-meta">Communication Team &nbsp;|&nbsp; 2021 - 2024</p>
+                      <p class="about-role-copy">
+                        Team member overseeing the 300 m² workshop at Strate, managing 3D printers, laser cutting and woodworking machines, while supporting project creation for external partners.
+                      </p>
+                    </article>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
       </section>
-      </main>
+    </main>
     </div>
 
-    <script src="./script.js?v=list-decouple-1"></script>
+    <script src="./script.js?v=panel-full-2"></script>
   </body>
 </html>

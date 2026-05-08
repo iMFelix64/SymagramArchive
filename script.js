@@ -5,11 +5,13 @@ const indexItems = Array.from(document.querySelectorAll(".index-item"));
 const currentProject = document.getElementById("current-project");
 const debugToggle = document.getElementById("debug-toggle");
 const labelToggle = document.getElementById("label-toggle");
+const rollingFrame = document.querySelector(".archive-rolling-frame");
 const homeTransitionStage = document.getElementById("home-transition-stage");
 const homeIntro = document.getElementById("home-intro");
 const homeIntroLetters = Array.from(document.querySelectorAll(".home-intro-letter"));
 const homeCursorAsset = "./Assets/Icons/Arrow.svg";
 const homeButton = document.getElementById("index-home-button");
+const aboutButton = document.getElementById("index-about-button");
 const projectGroup = document.getElementById("index-project-group");
 const projectToggle = document.getElementById("index-project-toggle");
 const expandToggles = Array.from(document.querySelectorAll(".panel-expand-toggle"));
@@ -19,6 +21,7 @@ const frameScrolls = Array.from(document.querySelectorAll(".panel-frame-scroll")
 const frameShells = Array.from(document.querySelectorAll(".panel-frame-shell"));
 const projectEmbedFrames = Array.from(document.querySelectorAll(".panel-project-embed-frame"));
 const projectEmbedWheelLayers = Array.from(document.querySelectorAll(".panel-project-embed-wheel-layer"));
+const aboutView = document.getElementById("about-view");
 const panelByProject = new Map(projectPanels.map((panel) => [panel.dataset.project, panel]));
 const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, item]));
 const PANEL_RESET_ANIMATION_MS = 420;
@@ -56,6 +59,7 @@ let panelOffsets = [];
 let visibleProjectId = "";
 let selectedProjectId = "";
 let expandedProjectId = "";
+let isAboutViewActive = false;
 let listNavigationTargetId = "";
 let ticking = false;
 let isHomeIntroPrepared = false;
@@ -688,11 +692,32 @@ function syncVisibleProject(visibleId) {
     syncSelectedProject(visibleId);
   }
 
-  if (currentProject) {
+  if (currentProject && !isAboutViewActive) {
     currentProject.textContent = visibleId;
   }
 
   visibleProjectId = visibleId;
+}
+
+function setAboutViewActive(active) {
+  if (isAboutViewActive === active) {
+    return;
+  }
+
+  isAboutViewActive = active;
+  archiveApp?.classList.toggle("is-about-active", active);
+  aboutButton?.classList.toggle("is-active", active);
+  aboutButton?.setAttribute("aria-pressed", String(active));
+  aboutView?.toggleAttribute("hidden", !active);
+
+  if (currentProject) {
+    currentProject.textContent = active ? "ABOUT" : visibleProjectId || selectedProjectId || "01";
+  }
+
+  if (active) {
+    hideArchiveFrameCursor();
+    hideProjectEmbedScrollCursor();
+  }
 }
 
 function deferPanelCopyUntilCollapseEnds(panel) {
@@ -948,7 +973,7 @@ function measureProjectOffsets() {
 }
 
 function updateActiveProject() {
-  if (!detailScroll || projectPanels.length === 0) {
+  if (isAboutViewActive || !detailScroll || projectPanels.length === 0) {
     return;
   }
 
@@ -1010,6 +1035,94 @@ function syncLabelToggle() {
   );
 }
 
+function getRollingFrameWindow() {
+  try {
+    return rollingFrame?.contentWindow || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function getRollingFrameDocument() {
+  try {
+    return rollingFrame?.contentDocument || getRollingFrameWindow()?.document || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function syncRollingFrameDebugState() {
+  const frameWindow = getRollingFrameWindow();
+  const frameDocument = getRollingFrameDocument();
+
+  if (!frameDocument?.body) {
+    return;
+  }
+
+  const outlinesActive = document.body.classList.contains("debug-outlines");
+  const labelsActive = document.body.classList.contains("debug-labels");
+
+  frameDocument.body.classList.toggle("debug-outlines", outlinesActive);
+  frameDocument.body.classList.toggle("debug-labels", labelsActive);
+
+  if (labelsActive && typeof frameWindow?.applyDebugLabels === "function") {
+    frameWindow.applyDebugLabels();
+  }
+
+  frameDocument.getElementById("debug-toggle")?.setAttribute("aria-pressed", String(outlinesActive));
+  frameDocument.getElementById("label-toggle")?.setAttribute("aria-pressed", String(labelsActive));
+}
+
+function setDebugOutlinesActive(active) {
+  document.body.classList.toggle("debug-outlines", active);
+  syncDebugToggle();
+  syncRollingFrameDebugState();
+}
+
+function setDebugLabelsActive(active) {
+  if (active) {
+    applyDebugLabels();
+  }
+
+  document.body.classList.toggle("debug-labels", active);
+  syncDebugLabelOverlay();
+  syncLabelToggle();
+  syncRollingFrameDebugState();
+}
+
+function bindRollingFrameDebugControls() {
+  const frameDocument = getRollingFrameDocument();
+
+  if (!frameDocument?.body || frameDocument.body.dataset.parentDebugBound === "true") {
+    syncRollingFrameDebugState();
+    return;
+  }
+
+  frameDocument.body.dataset.parentDebugBound = "true";
+
+  frameDocument.getElementById("debug-toggle")?.addEventListener(
+    "click",
+    (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      setDebugOutlinesActive(!document.body.classList.contains("debug-outlines"));
+    },
+    true,
+  );
+
+  frameDocument.getElementById("label-toggle")?.addEventListener(
+    "click",
+    (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      setDebugLabelsActive(!document.body.classList.contains("debug-labels"));
+    },
+    true,
+  );
+
+  syncRollingFrameDebugState();
+}
+
 function buildDebugLabel(element) {
   const tagName = element.tagName.toLowerCase();
   const idPart = element.id ? `#${element.id}` : "";
@@ -1020,10 +1133,119 @@ function buildDebugLabel(element) {
   return `${tagName}${idPart}${classPart}${projectPart}`;
 }
 
-function applyDebugLabels() {
-  const labelTargets = document.querySelectorAll(
+const DEBUG_LABEL_LAYER_ID = "debug-label-layer";
+let debugLabelFrame = 0;
+
+function getDebugLabelTargets() {
+  return Array.from(document.querySelectorAll(
     "[data-debug-label], main, aside, section, header, nav, article, div, ol, li, figure, button",
-  );
+  )).filter((element) => !element.closest(".debug-label-layer"));
+}
+
+function ensureDebugLabelLayer() {
+  let layer = document.getElementById(DEBUG_LABEL_LAYER_ID);
+
+  if (!layer) {
+    layer = document.createElement("div");
+    layer.id = DEBUG_LABEL_LAYER_ID;
+    layer.className = "debug-label-layer";
+    layer.setAttribute("aria-hidden", "true");
+    document.body.appendChild(layer);
+  }
+
+  return layer;
+}
+
+function clearDebugLabelOverlay() {
+  const layer = document.getElementById(DEBUG_LABEL_LAYER_ID);
+
+  if (debugLabelFrame) {
+    window.cancelAnimationFrame(debugLabelFrame);
+    debugLabelFrame = 0;
+  }
+
+  layer?.replaceChildren();
+}
+
+function isDebugLabelTargetVisible(element) {
+  let current = element;
+
+  while (current && current !== document.documentElement) {
+    const style = window.getComputedStyle(current);
+    const opacity = Number.parseFloat(style.opacity);
+
+    if (
+      style.display === "none" ||
+      style.visibility === "hidden" ||
+      (Number.isFinite(opacity) && opacity <= 0.03)
+    ) {
+      return false;
+    }
+
+    current = current.parentElement;
+  }
+
+  return true;
+}
+
+function renderDebugLabelOverlay() {
+  debugLabelFrame = 0;
+
+  if (!document.body.classList.contains("debug-labels")) {
+    clearDebugLabelOverlay();
+    return;
+  }
+
+  const layer = ensureDebugLabelLayer();
+  const fragment = document.createDocumentFragment();
+  const targets = getDebugLabelTargets();
+
+  targets.forEach((element) => {
+    if (!element.dataset.debugLabel) {
+      return;
+    }
+
+    if (!isDebugLabelTargetVisible(element)) {
+      return;
+    }
+
+    const rect = element.getBoundingClientRect();
+
+    if (
+      rect.width <= 0 ||
+      rect.height <= 0 ||
+      rect.bottom < 0 ||
+      rect.right < 0 ||
+      rect.top > window.innerHeight ||
+      rect.left > window.innerWidth
+    ) {
+      return;
+    }
+
+    const badge = document.createElement("span");
+    badge.className = "debug-name-badge";
+    badge.textContent = element.dataset.debugLabel;
+    badge.style.transform = `translate3d(${Math.max(0, rect.left).toFixed(1)}px, ${Math.max(0, rect.top).toFixed(1)}px, 0)`;
+    fragment.appendChild(badge);
+  });
+
+  layer.replaceChildren(fragment);
+  debugLabelFrame = window.requestAnimationFrame(renderDebugLabelOverlay);
+}
+
+function syncDebugLabelOverlay() {
+  if (document.body.classList.contains("debug-labels")) {
+    if (!debugLabelFrame) {
+      debugLabelFrame = window.requestAnimationFrame(renderDebugLabelOverlay);
+    }
+    return;
+  }
+
+  clearDebugLabelOverlay();
+}
+
+function applyDebugLabels() {
+  const labelTargets = getDebugLabelTargets();
 
   labelTargets.forEach((element) => {
     if (!element.dataset.debugLabel) {
@@ -1033,21 +1255,9 @@ function applyDebugLabels() {
 
       element.setAttribute("data-debug-label", buildDebugLabel(element));
     }
-
-    const hasBadge = Array.from(element.children).some(
-      (child) => child.classList.contains("debug-name-badge"),
-    );
-
-    if (hasBadge) {
-      return;
-    }
-
-    const badge = document.createElement("span");
-    badge.className = "debug-name-badge";
-    badge.setAttribute("aria-hidden", "true");
-    badge.textContent = element.dataset.debugLabel;
-    element.insertAdjacentElement("afterbegin", badge);
   });
+
+  syncDebugLabelOverlay();
 }
 
 function syncExpandedFrameWheel(event) {
@@ -1080,6 +1290,7 @@ indexItems.forEach((item) => {
   const scrollToPanel = () => {
     const targetProjectId = item.dataset.project;
 
+    setAboutViewActive(false);
     listNavigationTargetId = targetProjectId === visibleProjectId ? "" : targetProjectId;
     syncSelectedProject(targetProjectId);
     targetPanel.scrollIntoView({
@@ -1107,6 +1318,7 @@ window.addEventListener("blur", () => {
 });
 
 homeButton?.addEventListener("click", async () => {
+  setAboutViewActive(false);
   const firstProjectId = projectPanels[0]?.dataset.project || "01";
   let hasStartedHome = false;
 
@@ -1135,6 +1347,19 @@ homeButton?.addEventListener("click", async () => {
   startHomeReturn();
 });
 
+aboutButton?.addEventListener("click", async () => {
+  const nextState = !isAboutViewActive;
+
+  await syncExpandedProject("");
+  setAboutViewActive(nextState);
+
+  if (nextState) {
+    detailScroll?.scrollTo({ top: 0, behavior: "auto" });
+  } else {
+    requestActiveUpdate();
+  }
+});
+
 projectToggle?.addEventListener("click", () => {
   const isCollapsed = projectGroup?.classList.toggle("is-collapsed");
 
@@ -1142,15 +1367,14 @@ projectToggle?.addEventListener("click", () => {
 });
 
 debugToggle?.addEventListener("click", () => {
-  document.body.classList.toggle("debug-outlines");
-  syncDebugToggle();
+  setDebugOutlinesActive(!document.body.classList.contains("debug-outlines"));
 });
 
 labelToggle?.addEventListener("click", () => {
-  applyDebugLabels();
-  document.body.classList.toggle("debug-labels");
-  syncLabelToggle();
+  setDebugLabelsActive(!document.body.classList.contains("debug-labels"));
 });
+
+rollingFrame?.addEventListener("load", bindRollingFrameDebugControls);
 
 expandToggles.forEach((toggle) => {
   const parentPanel = toggle.closest(".project-panel");
@@ -1164,6 +1388,7 @@ expandToggles.forEach((toggle) => {
     const nextExpandedId = expandedProjectId === projectId ? "" : projectId;
     const isCollapsingCurrentProject = !nextExpandedId;
 
+    setAboutViewActive(false);
     listNavigationTargetId = "";
     syncSelectedProject(projectId);
     syncVisibleProject(projectId);
@@ -1192,6 +1417,7 @@ async function expandPanelFromOverview(parentPanel) {
 
   const projectId = parentPanel.dataset.project;
 
+  setAboutViewActive(false);
   listNavigationTargetId = "";
   syncSelectedProject(projectId);
   syncVisibleProject(projectId);
@@ -1266,3 +1492,4 @@ applyDebugLabels();
 refreshMeasurements();
 syncDebugToggle();
 syncLabelToggle();
+bindRollingFrameDebugControls();
