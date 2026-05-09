@@ -16,7 +16,7 @@ const projectCatalog = [
       "./Assets/Project 01/1-EARTH EXPLORER 07.jpg",
       "./Assets/Project 01/1-EARTH EXPLORER 08.jpg",
     ],
-    embedSrc: "./projects/project-01/?embed=1&v=rolling-stream",
+    embedSrc: "./projects/project-01/?embed=1&v=media-viewport-height-1",
   },
   {
     id: "02",
@@ -36,7 +36,7 @@ const projectCatalog = [
       "./Assets/Project 02/2-PinBridge 08.jpg",
       "./Assets/Project 02/2-PinBridge 09.jpg",
     ],
-    embedSrc: "./projects/project-02/?embed=1&v=rolling-stream",
+    embedSrc: "./projects/project-02/?embed=1&v=media-viewport-height-1",
   },
   {
     id: "03",
@@ -55,7 +55,7 @@ const projectCatalog = [
       "./Assets/Project 03/3-UTOPIA 07.jpg",
       "./Assets/Project 03/3-UTOPIA 08.jpg",
     ],
-    embedSrc: "./projects/project-03/?embed=1&v=rolling-stream",
+    embedSrc: "./projects/project-03/?embed=1&v=media-viewport-height-1",
   },
   {
     id: "04",
@@ -73,7 +73,7 @@ const projectCatalog = [
       "./Assets/Project 04/4-AeroSense 06.jpg",
       "./Assets/Project 04/4-AeroSense 07.jpg",
     ],
-    embedSrc: "./projects/project-04/?embed=1&v=rolling-stream",
+    embedSrc: "./projects/project-04/?embed=1&v=media-viewport-height-1",
   },
   {
     id: "05",
@@ -273,13 +273,16 @@ const labelToggle = document.getElementById("label-toggle");
 const sizeControl = document.getElementById("rolling-size-control");
 const sizeSlider = document.getElementById("rolling-size-slider");
 const sizeValue = document.getElementById("rolling-size-value");
+const detailMediaSlider = document.getElementById("rolling-detail-media-slider");
+const detailMediaValue = document.getElementById("rolling-detail-media-value");
 const followSlider = document.getElementById("rolling-follow-slider");
 const followValue = document.getElementById("rolling-follow-value");
 const delaySlider = document.getElementById("rolling-delay-slider");
 const delayValue = document.getElementById("rolling-delay-value");
 const FOCUS_BAND_STORAGE_KEY = "rolling-coverflow-center-top-ratio";
 const EXPANDED_SIZE_STORAGE_KEY = "rolling-coverflow-expanded-height-v2";
-const FOLLOW_STORAGE_KEY = "rolling-coverflow-follow-v3";
+const DETAIL_MEDIA_SCALE_STORAGE_KEY = "rolling-detail-media-scale-v3";
+const FOLLOW_STORAGE_KEY = "rolling-coverflow-follow-v4";
 const DELAY_STORAGE_KEY = "rolling-coverflow-delay-ms-v2";
 const FOCUS_BAND_HEIGHT_RATIO = 0.12;
 const DEFAULT_FOCUS_BAND_TOP_RATIO = 0.44;
@@ -287,7 +290,7 @@ const COVERFLOW_WHEEL_THRESHOLD = 60;
 const COVERFLOW_WHEEL_DELTA_LIMIT = 220;
 const COVERFLOW_IDLE_DECAY_DELAY_MS = 220;
 const COVERFLOW_TUG_DECAY = 0.92;
-const DEFAULT_FOLLOW = 0.06;
+const DEFAULT_FOLLOW = 0.07;
 const MIN_FOLLOW = 0.035;
 const MAX_FOLLOW = 0.12;
 const DEFAULT_SELECTED_DELAY_MS = 0;
@@ -297,6 +300,9 @@ const CARD_COLLAPSED_HEIGHT = 168;
 const DEFAULT_CARD_EXPANDED_HEIGHT = 680;
 const MIN_CARD_EXPANDED_HEIGHT = 480;
 const MAX_CARD_EXPANDED_HEIGHT = 720;
+const MIN_DETAIL_MEDIA_SCALE = 0;
+const MAX_DETAIL_MEDIA_SCALE = 2;
+const DEFAULT_DETAIL_MEDIA_SCALE = 1;
 const PROJECT_ROW_BOTTOM_PADDING = 0;
 const CARD_COLLAPSED_WIDTH = 150;
 const CARD_EXPANDED_WIDTH = 392;
@@ -316,6 +322,7 @@ const SEGMENT_BOUNDARY_GAP = Math.max(
 let focusBandTopRatio = DEFAULT_FOCUS_BAND_TOP_RATIO;
 let focusBandDragOffset = 0;
 let cardExpandedHeight = DEFAULT_CARD_EXPANDED_HEIGHT;
+let detailMediaScale = DEFAULT_DETAIL_MEDIA_SCALE;
 let motionFollow = DEFAULT_FOLLOW;
 let selectedTransitionDelayMs = DEFAULT_SELECTED_DELAY_MS;
 
@@ -660,6 +667,33 @@ function setCardExpandedHeight(nextHeight) {
   syncSizeControl();
 }
 
+function loadDetailMediaScale() {
+  const storedValue = Number.parseFloat(window.localStorage.getItem(DETAIL_MEDIA_SCALE_STORAGE_KEY) || "");
+
+  if (Number.isFinite(storedValue)) {
+    detailMediaScale = clamp(storedValue, MIN_DETAIL_MEDIA_SCALE, MAX_DETAIL_MEDIA_SCALE);
+  }
+}
+
+function syncDetailMediaControl() {
+  const sliderValue = Math.round(detailMediaScale * 100);
+
+  if (detailMediaSlider) {
+    detailMediaSlider.value = String(sliderValue);
+  }
+
+  if (detailMediaValue) {
+    detailMediaValue.value = String(sliderValue);
+    detailMediaValue.textContent = String(sliderValue);
+  }
+}
+
+function setDetailMediaScale(nextScale) {
+  detailMediaScale = clamp(nextScale, MIN_DETAIL_MEDIA_SCALE, MAX_DETAIL_MEDIA_SCALE);
+  window.localStorage.setItem(DETAIL_MEDIA_SCALE_STORAGE_KEY, String(detailMediaScale));
+  syncDetailMediaControl();
+}
+
 function loadMotionFollow() {
   const storedValue = Number.parseFloat(window.localStorage.getItem(FOLLOW_STORAGE_KEY) || "");
 
@@ -836,12 +870,7 @@ function getSegmentGroupTop(range) {
 }
 
 function getSegmentGroupBottom(range) {
-  const rangeIndex = segmentRanges.indexOf(range);
-  const nextRange = segmentRanges[rangeIndex + 1];
-
-  return nextRange
-    ? getSegmentGroupTop(nextRange)
-    : getSegmentLastProjectBottom(range);
+  return getSegmentLastProjectBottom(range);
 }
 
 function getSegmentLabelHeight(label) {
@@ -858,10 +887,13 @@ function syncSegmentDividers() {
   segmentDividers.forEach((divider) => {
     const dividerRange = segmentRanges.find((range) => range.id === divider.dataset.segmentDivider);
     const y = getSegmentDividerY(dividerRange);
-    const isVisible = Number.isFinite(y) && y > -80 && y < window.innerHeight + 80;
+    const isReady = Number.isFinite(y);
 
-    divider.style.setProperty("--divider-y", `${isVisible ? y.toFixed(2) : 0}px`);
-    divider.style.setProperty("--divider-opacity", isVisible ? "1" : "0");
+    if (isReady) {
+      divider.style.setProperty("--divider-y", `${y.toFixed(2)}px`);
+    }
+
+    divider.style.setProperty("--divider-opacity", isReady ? "1" : "0");
   });
 }
 
@@ -892,8 +924,10 @@ function syncSegmentRail() {
 
     const groupHeight = Math.max(0, groupBottom - groupTop);
     const labelHeight = getSegmentLabelHeight(label);
-    const labelTravel = Math.max(0, groupHeight - labelHeight);
-    const labelY = clamp(SEGMENT_STICKY_TOP - groupTop, 0, labelTravel);
+    const labelBottomLimit = groupHeight - labelHeight;
+    const labelY = groupTop > SEGMENT_STICKY_TOP
+      ? 0
+      : Math.min(SEGMENT_STICKY_TOP - groupTop, labelBottomLimit);
     const isVisible = groupBottom > SEGMENT_STICKY_TOP && groupTop < window.innerHeight;
     const isStuck = isVisible && groupTop <= SEGMENT_STICKY_TOP && groupBottom > labelHeight;
 
@@ -965,9 +999,29 @@ function getProjectCurrentSurfaceHeight(index, target) {
   const project = projectsList[index];
   const state = project ? projectStates.get(project) : null;
   const progress = state ? clamp(state.progress, 0, 1) : clamp(target?.progress ?? 0, 0, 1);
-  const expandedHeight = target?.isDetailExpanded ? getDetailFrameHeight() : cardExpandedHeight;
+  const expandedHeight = getResolvedExpandedHeight(Boolean(target?.isDetailExpanded));
 
   return lerp(CARD_COLLAPSED_HEIGHT, expandedHeight, progress);
+}
+
+function getAvailableStreamWidth(isDetailExpanded = false) {
+  const rootWidth = projectsRoot.getBoundingClientRect().width || window.innerWidth;
+  const segmentWidth = isDetailExpanded ? 0 : getSegmentColumnWidth();
+  const cardWidth = isDetailExpanded ? CARD_COLLAPSED_WIDTH : CARD_EXPANDED_WIDTH;
+  const detailWidth = isDetailExpanded ? DETAIL_SIDE_WIDTH + DETAIL_SIDE_GAP : 0;
+  const reservedWidth = segmentWidth + cardWidth + PROJECT_COLUMN_GAP + detailWidth;
+
+  return Math.max(CARD_COLLAPSED_HEIGHT * 1.5, rootWidth - reservedWidth);
+}
+
+function getResolvedExpandedHeight(isDetailExpanded = false) {
+  if (isDetailExpanded) {
+    return Math.max(1, getDetailFrameHeight() * detailMediaScale);
+  }
+
+  const maxHeight = getAvailableStreamWidth(false) / 1.5;
+
+  return Math.max(CARD_COLLAPSED_HEIGHT, Math.min(cardExpandedHeight, maxHeight));
 }
 
 function getProjectGapAfter(index) {
@@ -995,9 +1049,10 @@ function buildLiveLayoutCoverYs(targets) {
 
   if (expandedProjectIndex >= 0) {
     const detailState = projectStates.get(projectsList[expandedProjectIndex]);
-    const currentCoverY = detailState ? detailState.coverY : 0;
+    const desiredDetailCoverY = getProjectCoverYForTop(-getCoverflowCenterY());
+    const currentCoverY = detailState ? detailState.coverY : desiredDetailCoverY;
 
-    coverYs[expandedProjectIndex] = lerp(currentCoverY, 0, motionFollow);
+    coverYs[expandedProjectIndex] = lerp(currentCoverY, desiredDetailCoverY, motionFollow);
     return coverYs;
   }
 
@@ -1045,7 +1100,9 @@ function syncSettleTransition() {
 }
 
 function getDetailFrameHeight() {
-  return Math.max(360, window.innerHeight - DETAIL_FRAME_VIEWPORT_OFFSET);
+  const viewportOffset = isPanelEmbed ? 0 : DETAIL_FRAME_VIEWPORT_OFFSET;
+
+  return Math.max(360, window.innerHeight - viewportOffset);
 }
 
 function getProjectTarget(index) {
@@ -1102,7 +1159,7 @@ function paintProject(project, target, index) {
 
   const visualProgress = clamp(state.progress, 0, 1);
   const indexSlideProgress = steepenProgress(state.indexSlide);
-  const expandedHeight = target.isDetailExpanded ? getDetailFrameHeight() : cardExpandedHeight;
+  const expandedHeight = getResolvedExpandedHeight(target.isDetailExpanded);
   const expandedCardWidth = target.isDetailExpanded ? CARD_COLLAPSED_WIDTH : CARD_EXPANDED_WIDTH;
   const height = Math.round(lerp(CARD_COLLAPSED_HEIGHT, expandedHeight, visualProgress));
   const cardWidth = lerp(CARD_COLLAPSED_WIDTH, expandedCardWidth, visualProgress);
@@ -1143,6 +1200,7 @@ function syncActiveProjectClass() {
   const isDetailMode = expandedProjectIndex >= 0;
 
   rollingApp?.classList.toggle("is-detail-expanded", isDetailMode);
+  document.body.classList.toggle("is-rolling-detail", isDetailMode);
 
   projectsList.forEach((project, index) => {
     const isActive = index === activeProjectIndex;
@@ -1207,6 +1265,23 @@ function selectProject(index) {
   selectCoverflowProject(index);
 }
 
+function notifyParentDetailState() {
+  if (window.parent === window) {
+    return;
+  }
+
+  const activeProject = projectsList[expandedProjectIndex];
+
+  window.parent.postMessage(
+    {
+      type: "rolling-detail-state",
+      active: expandedProjectIndex >= 0,
+      projectId: activeProject?.dataset.project || "",
+    },
+    window.location.origin,
+  );
+}
+
 function openProjectDetail(index) {
   const nextIndex = clamp(index, 0, projectsList.length - 1);
 
@@ -1215,6 +1290,7 @@ function openProjectDetail(index) {
   expandedProjectIndex = nextIndex;
   activeProjectSelectedAt = performance.now() - selectedTransitionDelayMs;
   coverflowWheelProgress = 0;
+  notifyParentDetailState();
 }
 
 function closeProjectDetail() {
@@ -1226,6 +1302,7 @@ function closeProjectDetail() {
   settledProjectIndex = activeProjectIndex;
   activeProjectSelectedAt = performance.now();
   coverflowWheelProgress = 0;
+  notifyParentDetailState();
 }
 
 function syncCoverflowWheelProgress() {
@@ -1287,6 +1364,16 @@ sizeSlider?.addEventListener("input", (event) => {
   }
 
   setCardExpandedHeight(nextHeight);
+});
+
+detailMediaSlider?.addEventListener("input", (event) => {
+  const nextScale = Number.parseFloat(event.currentTarget.value) / 100;
+
+  if (!Number.isFinite(nextScale)) {
+    return;
+  }
+
+  setDetailMediaScale(nextScale);
 });
 
 followSlider?.addEventListener("input", (event) => {
@@ -1416,6 +1503,8 @@ function handleCoverflowWheel(event) {
 
 loadCardExpandedHeight();
 syncSizeControl();
+loadDetailMediaScale();
+syncDetailMediaControl();
 loadMotionFollow();
 syncFollowControl();
 loadSelectedTransitionDelay();
@@ -1437,4 +1526,5 @@ syncCoverflowCenter();
 syncSegmentRail();
 syncActiveProjectClass();
 primeProjectStates();
+notifyParentDetailState();
 animateProjects();

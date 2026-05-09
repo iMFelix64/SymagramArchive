@@ -1090,6 +1090,15 @@ function setDebugLabelsActive(active) {
   syncRollingFrameDebugState();
 }
 
+function syncRollingDetailState(active, projectId = "") {
+  archiveApp?.classList.toggle("is-rolling-detail-expanded", active);
+
+  if (active && projectId) {
+    syncSelectedProject(projectId);
+    syncVisibleProject(projectId);
+  }
+}
+
 function bindRollingFrameDebugControls() {
   const frameDocument = getRollingFrameDocument();
 
@@ -1375,6 +1384,20 @@ labelToggle?.addEventListener("click", () => {
 });
 
 rollingFrame?.addEventListener("load", bindRollingFrameDebugControls);
+
+window.addEventListener("message", (event) => {
+  if (event.origin !== window.location.origin) {
+    return;
+  }
+
+  const message = event.data;
+
+  if (!message || message.type !== "rolling-detail-state") {
+    return;
+  }
+
+  syncRollingDetailState(Boolean(message.active), String(message.projectId || ""));
+});
 
 expandToggles.forEach((toggle) => {
   const parentPanel = toggle.closest(".project-panel");

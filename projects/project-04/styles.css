@@ -76,8 +76,25 @@ body.is-embedded {
   background: var(--project-paper);
 }
 
+body.is-embedded .project-page {
+  display: flex;
+  flex-direction: column;
+}
+
 body.is-embedded .project-stream-shell {
+  margin-block: auto;
   padding: 0;
+  width: 100%;
+}
+
+body.is-embedded .project-hero {
+  height: var(--project-vh);
+  overflow: hidden;
+}
+
+body.is-embedded .project-hero .project-image {
+  height: 100%;
+  object-fit: cover;
 }
 
 @media (max-width: 720px) {

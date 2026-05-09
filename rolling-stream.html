@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rolling Stream / Two Disk Garage</title>
-    <link rel="stylesheet" href="./rolling-stream.css?v=less-bounce-1" />
+    <link rel="stylesheet" href="./rolling-stream.css?v=media-viewport-height-1" />
   </head>
   <body>
     <div class="rolling-focus-line" id="rolling-focus-band" aria-hidden="true">
@@ -22,6 +22,17 @@
         value="680"
       />
       <output class="rolling-size-value" id="rolling-size-value" for="rolling-size-slider">680</output>
+      <span class="rolling-size-label">MEDIA</span>
+      <input
+        class="rolling-size-slider"
+        id="rolling-detail-media-slider"
+        type="range"
+        min="0"
+        max="200"
+        step="1"
+        value="100"
+      />
+      <output class="rolling-size-value" id="rolling-detail-media-value" for="rolling-detail-media-slider">100</output>
       <span class="rolling-size-label">FOLLOW</span>
       <input
         class="rolling-size-slider"
@@ -30,9 +41,9 @@
         min="0.035"
         max="0.12"
         step="0.005"
-        value="0.06"
+        value="0.07"
       />
-      <output class="rolling-size-value" id="rolling-follow-value" for="rolling-follow-slider">0.060</output>
+      <output class="rolling-size-value" id="rolling-follow-value" for="rolling-follow-slider">0.070</output>
       <span class="rolling-size-label">DELAY</span>
       <input
         class="rolling-size-slider"
@@ -74,6 +85,6 @@
       <section class="rolling-projects" aria-label="project rolling stream" data-debug-label="section.rolling-projects"></section>
     </main>
 
-    <script src="./rolling-stream.js?v=less-bounce-1"></script>
+    <script src="./rolling-stream.js?v=media-viewport-height-1"></script>
   </body>
 </html>

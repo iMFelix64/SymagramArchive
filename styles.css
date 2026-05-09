@@ -686,7 +686,8 @@ body {
   display: none;
 }
 
-.archive-app.is-panel-expanded .archive-index {
+.archive-app.is-panel-expanded .archive-index,
+.archive-app.is-rolling-detail-expanded .archive-index {
   transform: translateX(calc(-100% - 24px));
   opacity: 0;
   pointer-events: none;
@@ -922,7 +923,8 @@ body {
   transition: margin-left var(--panel-expand-motion);
 }
 
-.archive-app.is-panel-expanded .archive-detail {
+.archive-app.is-panel-expanded .archive-detail,
+.archive-app.is-rolling-detail-expanded .archive-detail {
   margin-left: 0;
 }
 
