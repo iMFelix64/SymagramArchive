@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TwoDiskGarage</title>
-    <link rel="stylesheet" href="./styles.css?v=media-viewport-height-1" />
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <div class="home-transition-stage" id="home-transition-stage">
@@ -64,29 +64,7 @@
               <span class="index-group-arrow" aria-hidden="true"></span>
             </button>
 
-            <ol class="index-list" data-debug-label="ol.index-list">
-              <li
-                class="index-item is-active"
-                data-project="01"
-                aria-label="项目 01 大地探索家"
-                data-debug-label="li.index-item[01]"
-              >
-                <span class="index-item-label">01</span>
-                <span class="index-item-dot" aria-hidden="true"></span>
-              </li>
-              <li class="index-item" data-project="02" aria-label="项目 02 针迹" data-debug-label="li.index-item[02]">
-                <span class="index-item-label">02</span>
-                <span class="index-item-dot" aria-hidden="true"></span>
-              </li>
-              <li class="index-item" data-project="03" aria-label="项目 03 乌托邦:水上静居" data-debug-label="li.index-item[03]">
-                <span class="index-item-label">03</span>
-                <span class="index-item-dot" aria-hidden="true"></span>
-              </li>
-              <li class="index-item" data-project="04" aria-label="项目 04 气:风场交互座舱" data-debug-label="li.index-item[04]">
-                <span class="index-item-label">04</span>
-                <span class="index-item-dot" aria-hidden="true"></span>
-              </li>
-            </ol>
+            <ol class="index-list" data-debug-label="ol.index-list"></ol>
           </section>
 
           <button class="index-link" id="index-about-button" type="button" aria-pressed="false" data-debug-label="button#index-about-button">
@@ -102,6 +80,9 @@
         <button class="debug-toggle" id="label-toggle" type="button" aria-pressed="false">
           LABELS
         </button>
+        <button class="debug-toggle" id="parameters-toggle" type="button" aria-pressed="true" aria-expanded="true">
+          PARAMETERS
+        </button>
       </nav>
 
       <section class="archive-detail archive-detail--rolling" aria-label="Archive detail grid" data-debug-label="section.archive-detail">
@@ -115,7 +96,7 @@
         <div class="archive-rolling-panel" data-debug-label="div.archive-rolling-panel">
           <iframe
             class="archive-rolling-frame"
-            src="./rolling-stream.html?v=media-viewport-height-1&panel=1"
+            src="./rolling-stream.html?panel=1"
             title="Rolling Stream"
             loading="eager"
           ></iframe>
@@ -164,7 +145,7 @@
                         <div class="panel-project-embed" aria-label="大地探索家独立项目容器" data-debug-label="div.panel-project-embed">
                           <iframe
                             class="panel-project-embed-frame"
-                            src="./projects/project-01/?embed=1&v=list-decouple-1"
+                            src="./projects/project-01/?embed=1"
                             title="大地探索家项目页面"
                             loading="eager"
                           ></iframe>
@@ -220,7 +201,7 @@
                         <div class="panel-project-embed" aria-label="针迹独立项目容器" data-debug-label="div.panel-project-embed">
                           <iframe
                             class="panel-project-embed-frame"
-                            src="./projects/project-02/?embed=1&v=list-decouple-1"
+                            src="./projects/project-02/?embed=1"
                             title="针迹项目页面"
                             loading="eager"
                           ></iframe>
@@ -276,7 +257,7 @@
                         <div class="panel-project-embed" aria-label="乌托邦:水上静居独立项目容器" data-debug-label="div.panel-project-embed">
                           <iframe
                             class="panel-project-embed-frame"
-                            src="./projects/project-03/?embed=1&v=list-decouple-1"
+                            src="./projects/project-03/?embed=1"
                             title="乌托邦:水上静居项目页面"
                             loading="eager"
                           ></iframe>
@@ -332,7 +313,7 @@
                         <div class="panel-project-embed" aria-label="气:风场交互座舱独立项目容器" data-debug-label="div.panel-project-embed">
                           <iframe
                             class="panel-project-embed-frame"
-                            src="./projects/project-04/?embed=1&v=list-decouple-1"
+                            src="./projects/project-04/?embed=1"
                             title="气:风场交互座舱项目页面"
                             loading="eager"
                           ></iframe>
@@ -498,6 +479,58 @@
     </main>
     </div>
 
-    <script src="./script.js?v=media-viewport-height-1"></script>
+    <script src="./archive-data.js"></script>
+    <script src="./script.js"></script>
+    <script>
+      (() => {
+        const button = document.getElementById("parameters-toggle");
+        const frame = document.querySelector(".archive-rolling-frame");
+        const storageKey = "rolling-parameters-open-v1";
+
+        const getStoredOpen = () => {
+          const storedValue = window.localStorage.getItem(storageKey);
+          return storedValue === "false" ? false : true;
+        };
+
+        const syncButton = (open) => {
+          button?.setAttribute("aria-pressed", String(open));
+          button?.setAttribute("aria-expanded", String(open));
+        };
+
+        const setParametersOpen = (open) => {
+          window.localStorage.setItem(storageKey, String(open));
+          syncButton(open);
+
+          try {
+            const frameWindow = frame?.contentWindow;
+            const frameDocument = frame?.contentDocument || frameWindow?.document;
+
+            if (typeof frameWindow?.setRollingParametersOpen === "function") {
+              frameWindow.setRollingParametersOpen(open);
+            } else {
+              frameDocument?.getElementById("rolling-size-control")?.classList.toggle("is-collapsed", !open);
+              frameDocument
+                ?.getElementById("rolling-parameters-toggle")
+                ?.setAttribute("aria-pressed", String(open));
+              frameDocument
+                ?.getElementById("rolling-parameters-toggle")
+                ?.setAttribute("aria-expanded", String(open));
+            }
+          } catch (error) {
+            // Same-origin iframe access can briefly fail while the frame reloads.
+          }
+        };
+
+        button?.addEventListener("click", () => {
+          setParametersOpen(!getStoredOpen());
+        });
+
+        frame?.addEventListener("load", () => {
+          setParametersOpen(getStoredOpen());
+        });
+
+        syncButton(getStoredOpen());
+      })();
+    </script>
   </body>
 </html>

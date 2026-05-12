@@ -1,10 +1,49 @@
 const detailScroll = document.getElementById("detail-scroll");
 const archiveApp = document.querySelector(".archive-app");
+const archiveData = window.TDG_ARCHIVE || { groups: [], projects: [] };
+const archiveProjectById = new Map((archiveData.projects || []).map((project) => [project.id, project]));
+const orderedArchiveProjects = (archiveData.groups || []).flatMap((group) => (
+  (group.projectIds || [])
+    .map((projectId) => archiveProjectById.get(projectId))
+    .filter((project) => project && project.visible !== false)
+));
+
+function buildIndexList() {
+  const indexList = document.querySelector(".index-list");
+
+  if (!indexList) {
+    return;
+  }
+
+  indexList.replaceChildren(...orderedArchiveProjects.map((project) => {
+    const item = document.createElement("li");
+    const label = document.createElement("span");
+    const dot = document.createElement("span");
+
+    item.className = "index-item";
+    item.dataset.project = project.id;
+    item.setAttribute("aria-label", `项目 ${project.id} ${project.title}`);
+    item.dataset.debugLabel = `li.index-item[${project.id}]`;
+
+    label.className = "index-item-label";
+    label.textContent = project.id;
+
+    dot.className = "index-item-dot";
+    dot.setAttribute("aria-hidden", "true");
+
+    item.append(label, dot);
+    return item;
+  }));
+}
+
+buildIndexList();
+
 const projectPanels = Array.from(document.querySelectorAll(".project-panel"));
 const indexItems = Array.from(document.querySelectorAll(".index-item"));
 const currentProject = document.getElementById("current-project");
 const debugToggle = document.getElementById("debug-toggle");
 const labelToggle = document.getElementById("label-toggle");
+const parametersToggle = document.getElementById("parameters-toggle");
 const rollingFrame = document.querySelector(".archive-rolling-frame");
 const homeTransitionStage = document.getElementById("home-transition-stage");
 const homeIntro = document.getElementById("home-intro");
@@ -27,6 +66,7 @@ const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, it
 const PANEL_RESET_ANIMATION_MS = 420;
 const HOME_RETURN_SCROLL_MS = 760;
 const HOME_RETURN_OVERLAP_MS = 180;
+const PARAMETERS_OPEN_STORAGE_KEY = "rolling-parameters-open-v1";
 const HOME_INTRO_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*+=?<>[]{}\\/|";
 const HOME_FLOAT_ASSETS = [
   "./Assets/Home/截屏2026-04-30 11.27.38 1.png",
@@ -1035,6 +1075,37 @@ function syncLabelToggle() {
   );
 }
 
+function getParametersOpenFallback() {
+  const storedValue = window.localStorage.getItem(PARAMETERS_OPEN_STORAGE_KEY);
+
+  if (storedValue === "true" || storedValue === "false") {
+    return storedValue === "true";
+  }
+
+  return true;
+}
+
+function getRollingFrameParametersOpen() {
+  const frameWindow = getRollingFrameWindow();
+
+  if (typeof frameWindow?.getRollingParametersOpen === "function") {
+    return frameWindow.getRollingParametersOpen();
+  }
+
+  return getParametersOpenFallback();
+}
+
+function syncParametersToggle() {
+  if (!parametersToggle) {
+    return;
+  }
+
+  const parametersOpen = getRollingFrameParametersOpen();
+
+  parametersToggle.setAttribute("aria-pressed", String(parametersOpen));
+  parametersToggle.setAttribute("aria-expanded", String(parametersOpen));
+}
+
 function getRollingFrameWindow() {
   try {
     return rollingFrame?.contentWindow || null;
@@ -1073,6 +1144,19 @@ function syncRollingFrameDebugState() {
   frameDocument.getElementById("label-toggle")?.setAttribute("aria-pressed", String(labelsActive));
 }
 
+function setParametersOpen(active) {
+  const parametersOpen = Boolean(active);
+  const frameWindow = getRollingFrameWindow();
+
+  window.localStorage.setItem(PARAMETERS_OPEN_STORAGE_KEY, String(parametersOpen));
+
+  if (typeof frameWindow?.setRollingParametersOpen === "function") {
+    frameWindow.setRollingParametersOpen(parametersOpen);
+  }
+
+  syncParametersToggle();
+}
+
 function setDebugOutlinesActive(active) {
   document.body.classList.toggle("debug-outlines", active);
   syncDebugToggle();
@@ -1099,11 +1183,29 @@ function syncRollingDetailState(active, projectId = "") {
   }
 }
 
+function selectRollingProject(projectId) {
+  const frameWindow = getRollingFrameWindow();
+
+  if (!frameWindow) {
+    return false;
+  }
+
+  frameWindow.postMessage(
+    {
+      type: "rolling-select-project",
+      projectId,
+    },
+    "*",
+  );
+  return true;
+}
+
 function bindRollingFrameDebugControls() {
   const frameDocument = getRollingFrameDocument();
 
   if (!frameDocument?.body || frameDocument.body.dataset.parentDebugBound === "true") {
     syncRollingFrameDebugState();
+    syncParametersToggle();
     return;
   }
 
@@ -1129,7 +1231,16 @@ function bindRollingFrameDebugControls() {
     true,
   );
 
+  frameDocument.getElementById("rolling-parameters-toggle")?.addEventListener(
+    "click",
+    () => {
+      window.requestAnimationFrame(syncParametersToggle);
+    },
+    true,
+  );
+
   syncRollingFrameDebugState();
+  syncParametersToggle();
 }
 
 function buildDebugLabel(element) {
@@ -1292,20 +1403,23 @@ indexItems.forEach((item) => {
 
   const targetPanel = projectPanels.find((panel) => panel.dataset.project === item.dataset.project);
 
-  if (!targetPanel) {
-    return;
-  }
-
   const scrollToPanel = () => {
     const targetProjectId = item.dataset.project;
 
     setAboutViewActive(false);
     listNavigationTargetId = targetProjectId === visibleProjectId ? "" : targetProjectId;
     syncSelectedProject(targetProjectId);
-    targetPanel.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+
+    if (targetPanel) {
+      targetPanel.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+      return;
+    }
+
+    syncVisibleProject(targetProjectId);
+    selectRollingProject(targetProjectId);
   };
 
   item.addEventListener("click", scrollToPanel);
@@ -1392,11 +1506,22 @@ window.addEventListener("message", (event) => {
 
   const message = event.data;
 
-  if (!message || message.type !== "rolling-detail-state") {
+  if (!message) {
     return;
   }
 
-  syncRollingDetailState(Boolean(message.active), String(message.projectId || ""));
+  if (message.type === "rolling-active-project") {
+    const projectId = String(message.projectId || "");
+
+    if (projectId) {
+      syncVisibleProject(projectId);
+    }
+    return;
+  }
+
+  if (message.type === "rolling-detail-state") {
+    syncRollingDetailState(Boolean(message.active), String(message.projectId || ""));
+  }
 });
 
 expandToggles.forEach((toggle) => {

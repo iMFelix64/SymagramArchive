@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TwoDiskGarage Archive Admin</title>
+    <style>
+      :root {
+        --bg: #f7f7f4;
+        --ink: #111;
+        --muted: #666;
+        --line: #9a9a94;
+        --panel: #fff;
+        --accent: #ffe100;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        margin: 0;
+      }
+
+      button,
+      input,
+      textarea {
+        font: inherit;
+      }
+
+      input,
+      textarea {
+        border: 1px solid var(--line);
+        border-radius: 0;
+      }
+
+      .admin-shell {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        min-height: 100vh;
+      }
+
+      .admin-header {
+        align-items: end;
+        border-bottom: 1px solid var(--ink);
+        display: grid;
+        gap: 16px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        padding: 18px 20px 14px;
+      }
+
+      .admin-kicker {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+        margin: 0 0 6px;
+        text-transform: uppercase;
+      }
+
+      .admin-title {
+        font-size: 32px;
+        line-height: 0.95;
+        margin: 0;
+      }
+
+      .admin-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .admin-button {
+        background: var(--panel);
+        border: 1px solid var(--ink);
+        cursor: pointer;
+        min-height: 34px;
+        padding: 5px 12px;
+      }
+
+      .admin-button:hover {
+        background: var(--accent);
+      }
+
+      .admin-main {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: minmax(0, 1fr) minmax(360px, 0.42fr);
+        padding: 18px 20px 24px;
+      }
+
+      .group-board {
+        display: grid;
+        gap: 15px;
+      }
+
+      .group-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        min-height: 160px;
+      }
+
+      .group-header {
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 12px;
+      }
+
+      .group-title {
+        font-size: 24px;
+        line-height: 1;
+        margin: 0;
+      }
+
+      .group-count {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .group-tools {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+      }
+
+      .group-add-button,
+      .project-delete-button {
+        background: var(--panel);
+        border: 1px solid var(--ink);
+        cursor: pointer;
+        line-height: 1;
+      }
+
+      .group-add-button {
+        min-height: 26px;
+        padding: 4px 9px;
+      }
+
+      .group-add-button:hover,
+      .project-delete-button:hover {
+        background: var(--accent);
+      }
+
+      .project-list {
+        display: grid;
+        gap: 8px;
+        list-style: none;
+        margin: 0;
+        min-height: 70px;
+        padding: 10px;
+      }
+
+      .project-list.is-drag-over {
+        background: rgba(255, 225, 0, 0.16);
+      }
+
+      .project-item {
+        align-items: center;
+        background: #fdfdfb;
+        border: 1px solid var(--line);
+        cursor: grab;
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 58px minmax(0, 1fr) auto 30px;
+        min-height: 54px;
+        padding: 8px 10px;
+        touch-action: none;
+        transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+        user-select: none;
+      }
+
+      .project-item.is-selected {
+        background: var(--accent);
+        border-color: var(--ink);
+      }
+
+      .project-item:active {
+        cursor: grabbing;
+      }
+
+      .project-item.is-hidden {
+        opacity: 0.42;
+      }
+
+      .project-item.is-pointer-dragging {
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+        cursor: grabbing;
+        left: var(--drag-left);
+        opacity: 0.96;
+        pointer-events: none;
+        position: fixed;
+        top: var(--drag-top);
+        width: var(--drag-width);
+        z-index: 1000;
+      }
+
+      .project-placeholder {
+        background: rgba(255, 225, 0, 0.22);
+        border: 1px dashed var(--ink);
+        min-height: var(--placeholder-height, 54px);
+      }
+
+      .project-id {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+      }
+
+      .project-title {
+        font-size: 15px;
+        font-weight: 700;
+        line-height: 1.2;
+      }
+
+      .project-meta {
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.35;
+        margin-top: 3px;
+      }
+
+      .visibility-toggle {
+        align-items: center;
+        color: var(--muted);
+        display: flex;
+        font-size: 12px;
+        gap: 6px;
+        white-space: nowrap;
+      }
+
+      .project-delete-button {
+        align-items: center;
+        display: inline-flex;
+        font-size: 20px;
+        font-weight: 700;
+        height: 30px;
+        justify-content: center;
+        padding: 0;
+        width: 30px;
+      }
+
+      .side-column {
+        align-self: start;
+        display: grid;
+        gap: 15px;
+        position: sticky;
+        top: 18px;
+      }
+
+      .edit-panel {
+        background: var(--panel);
+        border: 1px solid var(--ink);
+        display: grid;
+        gap: 12px;
+        padding: 12px;
+      }
+
+      .edit-title {
+        font-size: 16px;
+        margin: 0;
+      }
+
+      .edit-empty {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+        margin: 0;
+      }
+
+      .edit-grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .edit-field {
+        display: grid;
+        gap: 5px;
+      }
+
+      .edit-label {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .edit-input,
+      .edit-textarea {
+        background: #fdfdfb;
+        color: var(--ink);
+        min-height: 32px;
+        padding: 7px 8px;
+        width: 100%;
+      }
+
+      .edit-textarea {
+        line-height: 1.45;
+        min-height: 82px;
+        resize: vertical;
+      }
+
+      .edit-checks {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .export-panel {
+        background: var(--panel);
+        border: 1px solid var(--ink);
+        display: grid;
+        gap: 10px;
+        padding: 12px;
+      }
+
+      .export-title {
+        font-size: 16px;
+        margin: 0;
+      }
+
+      .export-note {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+        margin: 0;
+      }
+
+      .export-output {
+        border: 1px solid var(--line);
+        min-height: 520px;
+        padding: 10px;
+        resize: vertical;
+        white-space: pre;
+        width: 100%;
+      }
+
+      @media (max-width: 980px) {
+        .admin-main {
+          grid-template-columns: 1fr;
+        }
+
+        .side-column {
+          position: static;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <p class="admin-kicker">TwoDiskGarage / Archive Admin</p>
+          <h1 class="admin-title">目录排序导出</h1>
+        </div>
+        <div class="admin-actions">
+          <button class="admin-button" id="reset-button" type="button">Reset</button>
+          <button class="admin-button" id="export-button" type="button">Export</button>
+          <button class="admin-button" id="copy-button" type="button">Copy</button>
+        </div>
+      </header>
+
+      <section class="admin-main">
+        <div class="group-board" id="group-board" aria-label="项目分组排序"></div>
+
+        <aside class="side-column">
+          <section class="edit-panel" aria-label="编辑项目内容">
+            <h2 class="edit-title">Project Editor</h2>
+            <div id="project-editor"></div>
+          </section>
+
+          <section class="export-panel" aria-label="导出 archive-data.js">
+            <h2 class="export-title">archive-data.js</h2>
+            <p class="export-note">
+              拖动项目调整顺序或分组，勾选 Visible 控制是否显示。点击 Export 后复制下面内容，替换 archive-data.js。
+            </p>
+            <textarea class="export-output" id="export-output" spellcheck="false"></textarea>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <script src="./archive-data.js"></script>
+    <script>
+      const sourceData = window.TDG_ARCHIVE || { groups: [], projects: [] };
+      let draftData = cloneArchiveData(sourceData);
+      let dragState = null;
+      let selectedProjectId = getFirstProjectId(draftData);
+
+      const groupBoard = document.getElementById("group-board");
+      const projectEditor = document.getElementById("project-editor");
+      const exportOutput = document.getElementById("export-output");
+      const exportButton = document.getElementById("export-button");
+      const copyButton = document.getElementById("copy-button");
+      const resetButton = document.getElementById("reset-button");
+
+      function cloneArchiveData(data) {
+        return {
+          groups: (data.groups || []).map((group) => ({
+            ...group,
+            projectIds: [...(group.projectIds || [])],
+          })),
+          projects: (data.projects || []).map((project) => ({
+            ...project,
+            imageFolder: normalizeFolderPath(project.imageFolder || getCommonImageFolder(project.images || [])),
+            images: [...(project.images || [])],
+          })),
+        };
+      }
+
+      function normalizeFolderPath(path) {
+        return String(path || "").trim().replace(/\/+$/, "");
+      }
+
+      function getCommonImageFolder(images) {
+        const firstImage = images.find(Boolean);
+
+        if (!firstImage) {
+          return "";
+        }
+
+        const slashIndex = firstImage.lastIndexOf("/");
+
+        return slashIndex >= 0 ? firstImage.slice(0, slashIndex) : "";
+      }
+
+      function getFirstProjectId(data) {
+        return (data.groups || []).find((group) => group.projectIds?.length)?.projectIds[0] || "";
+      }
+
+      function getOrderedProjectIds(data = draftData) {
+        return data.groups.flatMap((group) => group.projectIds);
+      }
+
+      function formatProjectNumber(index) {
+        return String(index + 1).padStart(2, "0");
+      }
+
+      function getDisplayNumber(projectId) {
+        const index = getOrderedProjectIds().indexOf(projectId);
+
+        return index >= 0 ? formatProjectNumber(index) : projectId;
+      }
+
+      function getProject(projectId) {
+        return draftData.projects.find((project) => project.id === projectId);
+      }
+
+      function getGroup(groupId) {
+        return draftData.groups.find((group) => group.id === groupId);
+      }
+
+      function removeProjectFromGroups(projectId) {
+        draftData.groups.forEach((group) => {
+          group.projectIds = group.projectIds.filter((id) => id !== projectId);
+        });
+      }
+
+      function insertProject(targetGroupId, projectId, beforeProjectId = "") {
+        const group = getGroup(targetGroupId);
+
+        if (!group) {
+          return;
+        }
+
+        removeProjectFromGroups(projectId);
+
+        const nextIds = [...group.projectIds];
+        const beforeIndex = beforeProjectId ? nextIds.indexOf(beforeProjectId) : -1;
+
+        if (beforeIndex >= 0) {
+          nextIds.splice(beforeIndex, 0, projectId);
+        } else {
+          nextIds.push(projectId);
+        }
+
+        group.projectIds = nextIds;
+      }
+
+      function createNewProjectId() {
+        const numericIds = draftData.projects
+          .map((project) => Number(project.id))
+          .filter((id) => Number.isFinite(id));
+        const nextNumber = Math.max(0, ...numericIds) + 1;
+
+        return String(nextNumber).padStart(2, "0");
+      }
+
+      function addProjectToGroup(groupId) {
+        const group = getGroup(groupId);
+
+        if (!group) {
+          return;
+        }
+
+        const projectId = createNewProjectId();
+        const newProject = {
+          id: projectId,
+          title: "新项目",
+          year: "TBD",
+          tagline: "Placeholder / Future Entry",
+          description: "这里填写项目介绍。",
+          imageFolder: "",
+          placeholder: true,
+          visible: true,
+        };
+
+        draftData.projects.push(newProject);
+        group.projectIds.push(projectId);
+        selectedProjectId = projectId;
+        renderAdmin();
+      }
+
+      function deleteProject(projectId) {
+        draftData.projects = draftData.projects.filter((project) => project.id !== projectId);
+        removeProjectFromGroups(projectId);
+
+        if (selectedProjectId === projectId) {
+          selectedProjectId = getFirstProjectId(draftData);
+        }
+
+        renderAdmin();
+      }
+
+      function selectProject(projectId) {
+        if (!getProject(projectId)) {
+          return;
+        }
+
+        selectedProjectId = projectId;
+        groupBoard.querySelectorAll(".project-item").forEach((item) => {
+          item.classList.toggle("is-selected", item.dataset.projectId === projectId);
+        });
+        renderEditor();
+      }
+
+      function createProjectItem(project, groupId) {
+        const item = document.createElement("li");
+        const id = document.createElement("div");
+        const copy = document.createElement("div");
+        const title = document.createElement("div");
+        const meta = document.createElement("div");
+        const toggleLabel = document.createElement("label");
+        const toggle = document.createElement("input");
+        const deleteButton = document.createElement("button");
+
+        item.className = "project-item";
+        item.classList.toggle("is-hidden", project.visible === false);
+        item.classList.toggle("is-selected", project.id === selectedProjectId);
+        item.dataset.projectId = project.id;
+        item.dataset.groupId = groupId;
+
+        id.className = "project-id";
+        id.textContent = `${getDisplayNumber(project.id)}.`;
+
+        title.className = "project-title";
+        title.textContent = project.title;
+
+        meta.className = "project-meta";
+        meta.textContent = `${project.year || "TBD"} / ${project.tagline || "No tagline"}`;
+
+        copy.append(title, meta);
+
+        toggle.type = "checkbox";
+        toggle.checked = project.visible !== false;
+        toggle.addEventListener("change", () => {
+          project.visible = toggle.checked;
+          item.classList.toggle("is-hidden", !toggle.checked);
+          exportArchiveData();
+        });
+
+        toggleLabel.className = "visibility-toggle";
+        toggleLabel.append(toggle, "Visible");
+
+        deleteButton.className = "project-delete-button";
+        deleteButton.type = "button";
+        deleteButton.setAttribute("aria-label", `Delete ${project.title}`);
+        deleteButton.textContent = "-";
+        deleteButton.addEventListener("click", (event) => {
+          event.stopPropagation();
+          deleteProject(project.id);
+        });
+
+        item.append(id, copy, toggleLabel, deleteButton);
+
+        item.addEventListener("pointerdown", (event) => {
+          startProjectDrag(event, item);
+        });
+
+        item.addEventListener("click", () => {
+          selectProject(project.id);
+        });
+
+        return item;
+      }
+
+      function createGroupPanel(group) {
+        const panel = document.createElement("section");
+        const header = document.createElement("header");
+        const title = document.createElement("h2");
+        const tools = document.createElement("div");
+        const count = document.createElement("span");
+        const addButton = document.createElement("button");
+        const list = document.createElement("ol");
+
+        panel.className = "group-panel";
+        panel.dataset.groupId = group.id;
+
+        header.className = "group-header";
+        title.className = "group-title";
+        title.textContent = group.title;
+        count.className = "group-count";
+        count.textContent = `${group.projectIds.length} items`;
+
+        addButton.className = "group-add-button";
+        addButton.type = "button";
+        addButton.textContent = "Add Project";
+        addButton.addEventListener("click", () => {
+          addProjectToGroup(group.id);
+        });
+
+        tools.className = "group-tools";
+        tools.append(count, addButton);
+        header.append(title, tools);
+
+        list.className = "project-list";
+        list.dataset.groupId = group.id;
+
+        group.projectIds.forEach((projectId) => {
+          const project = getProject(projectId);
+
+          if (project) {
+            list.append(createProjectItem(project, group.id));
+          }
+        });
+
+        panel.append(header, list);
+        return panel;
+      }
+
+      function renderEditor() {
+        const project = getProject(selectedProjectId);
+
+        if (!project) {
+          projectEditor.replaceChildren(createEmptyEditor());
+          return;
+        }
+
+        const editorGrid = document.createElement("div");
+        const displayNumber = document.createElement("p");
+        const checks = document.createElement("div");
+        const visibleLabel = document.createElement("label");
+        const visibleToggle = document.createElement("input");
+        const placeholderLabel = document.createElement("label");
+        const placeholderToggle = document.createElement("input");
+
+        editorGrid.className = "edit-grid";
+        displayNumber.className = "edit-empty";
+        displayNumber.textContent = `当前序号 ${getDisplayNumber(project.id)} / 内部 ID ${project.id}`;
+
+        visibleToggle.type = "checkbox";
+        visibleToggle.checked = project.visible !== false;
+        visibleToggle.addEventListener("change", () => {
+          project.visible = visibleToggle.checked;
+          refreshProjectListItem(project);
+          exportArchiveData();
+        });
+
+        placeholderToggle.type = "checkbox";
+        placeholderToggle.checked = project.placeholder === true;
+        placeholderToggle.addEventListener("change", () => {
+          project.placeholder = placeholderToggle.checked;
+          exportArchiveData();
+        });
+
+        checks.className = "edit-checks";
+        visibleLabel.className = "visibility-toggle";
+        visibleLabel.append(visibleToggle, "Visible");
+        placeholderLabel.className = "visibility-toggle";
+        placeholderLabel.append(placeholderToggle, "Placeholder");
+        checks.append(visibleLabel, placeholderLabel);
+
+        editorGrid.append(
+          displayNumber,
+          createTextField("标题", project.title || "", (value) => {
+            project.title = value;
+            refreshProjectListItem(project);
+            exportArchiveData();
+          }),
+          createTextField("年份", project.year || "", (value) => {
+            project.year = value;
+            refreshProjectListItem(project);
+            exportArchiveData();
+          }),
+          createTextField("方向 / Tagline", project.tagline || "", (value) => {
+            project.tagline = value;
+            refreshProjectListItem(project);
+            exportArchiveData();
+          }),
+          createTextField("介绍", project.description || "", (value) => {
+            project.description = value;
+            exportArchiveData();
+          }, true),
+          createTextField("嵌入页面", project.embedSrc || "", (value) => {
+            project.embedSrc = value;
+            exportArchiveData();
+          }),
+          createTextField("图片文件夹路径", project.imageFolder || "", (value) => {
+            project.imageFolder = normalizeFolderPath(value);
+            project.images = [];
+            exportArchiveData();
+          }),
+          checks
+        );
+
+        projectEditor.replaceChildren(editorGrid);
+      }
+
+      function createEmptyEditor() {
+        const empty = document.createElement("p");
+
+        empty.className = "edit-empty";
+        empty.textContent = "选择左侧项目后编辑文字、图片文件夹和显示状态。";
+
+        return empty;
+      }
+
+      function createTextField(labelText, value, onInput, multiline = false, extraClass = "") {
+        const field = document.createElement("label");
+        const label = document.createElement("span");
+        const input = document.createElement(multiline ? "textarea" : "input");
+
+        field.className = "edit-field";
+        label.className = "edit-label";
+        label.textContent = labelText;
+        input.className = multiline ? `edit-textarea ${extraClass}`.trim() : "edit-input";
+        input.value = value;
+
+        if (!multiline) {
+          input.type = "text";
+        }
+
+        input.addEventListener("input", () => {
+          onInput(input.value);
+        });
+
+        field.append(label, input);
+        return field;
+      }
+
+      function refreshProjectListItem(project) {
+        const item = groupBoard.querySelector(`.project-item[data-project-id="${project.id}"]`);
+
+        if (!item) {
+          return;
+        }
+
+        item.classList.toggle("is-hidden", project.visible === false);
+        item.querySelector(".project-title").textContent = project.title || "";
+        item.querySelector(".project-meta").textContent = `${project.year || "TBD"} / ${project.tagline || "No tagline"}`;
+        item.querySelector(".visibility-toggle input").checked = project.visible !== false;
+      }
+
+      function isInteractiveDragTarget(target) {
+        return Boolean(target.closest("button, input, label, select, textarea"));
+      }
+
+      function startProjectDrag(event, item) {
+        if (event.button !== 0 || isInteractiveDragTarget(event.target) || dragState) {
+          return;
+        }
+
+        event.preventDefault();
+        selectProject(item.dataset.projectId);
+
+        const rect = item.getBoundingClientRect();
+        const placeholder = document.createElement("li");
+        const originList = item.closest(".project-list");
+
+        placeholder.className = "project-placeholder";
+        placeholder.style.setProperty("--placeholder-height", `${rect.height}px`);
+        item.after(placeholder);
+        document.body.append(item);
+
+        dragState = {
+          item,
+          originList,
+          placeholder,
+          projectId: item.dataset.projectId,
+          pointerOffsetX: event.clientX - rect.left,
+          pointerOffsetY: event.clientY - rect.top,
+        };
+
+        item.classList.add("is-pointer-dragging");
+        item.style.setProperty("--drag-width", `${rect.width}px`);
+        item.setPointerCapture?.(event.pointerId);
+
+        moveProjectDrag(event);
+        window.addEventListener("pointermove", moveProjectDrag);
+        window.addEventListener("pointerup", finishProjectDrag, { once: true });
+        window.addEventListener("pointercancel", cancelProjectDrag, { once: true });
+      }
+
+      function moveProjectDrag(event) {
+        if (!dragState) {
+          return;
+        }
+
+        const left = event.clientX - dragState.pointerOffsetX;
+        const top = event.clientY - dragState.pointerOffsetY;
+        const targetList = getListUnderPointer(event.clientX, event.clientY)
+          || dragState.placeholder.closest(".project-list")
+          || dragState.originList;
+
+        dragState.item.style.setProperty("--drag-left", `${left}px`);
+        dragState.item.style.setProperty("--drag-top", `${top}px`);
+
+        document.querySelectorAll(".project-list.is-drag-over").forEach((list) => {
+          list.classList.remove("is-drag-over");
+        });
+
+        if (!targetList) {
+          return;
+        }
+
+        targetList.classList.add("is-drag-over");
+        targetList.insertBefore(dragState.placeholder, getPlaceholderReference(targetList, event.clientY));
+      }
+
+      function finishProjectDrag() {
+        if (!dragState) {
+          return;
+        }
+
+        const targetList = dragState.placeholder.closest(".project-list");
+        const beforeProjectId = dragState.placeholder.nextElementSibling?.dataset?.projectId || "";
+        const targetGroupId = targetList?.dataset.groupId || dragState.originList?.dataset.groupId || "";
+        const projectId = dragState.projectId;
+
+        cleanupProjectDrag();
+
+        if (targetGroupId && projectId) {
+          insertProject(targetGroupId, projectId, beforeProjectId);
+        }
+
+        renderAdmin();
+      }
+
+      function cancelProjectDrag() {
+        cleanupProjectDrag();
+        renderAdmin();
+      }
+
+      function cleanupProjectDrag() {
+        if (!dragState) {
+          return;
+        }
+
+        const { item, placeholder } = dragState;
+
+        window.removeEventListener("pointermove", moveProjectDrag);
+        document.querySelectorAll(".project-list.is-drag-over").forEach((list) => {
+          list.classList.remove("is-drag-over");
+        });
+        item.classList.remove("is-pointer-dragging");
+        item.style.removeProperty("--drag-left");
+        item.style.removeProperty("--drag-top");
+        item.style.removeProperty("--drag-width");
+        item.remove();
+        placeholder.remove();
+        dragState = null;
+      }
+
+      function getListUnderPointer(x, y) {
+        const listUnderPointer = Array.from(document.querySelectorAll(".project-list")).find((list) => {
+          const rect = list.getBoundingClientRect();
+
+          return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+        });
+
+        if (listUnderPointer) {
+          return listUnderPointer;
+        }
+
+        const panelUnderPointer = Array.from(document.querySelectorAll(".group-panel")).find((panel) => {
+          const rect = panel.getBoundingClientRect();
+
+          return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+        });
+
+        return panelUnderPointer?.querySelector(".project-list") || null;
+      }
+
+      function getPlaceholderReference(list, pointerY) {
+        return Array.from(list.querySelectorAll(".project-item:not(.is-pointer-dragging)")).find((item) => {
+          const rect = item.getBoundingClientRect();
+
+          return pointerY < rect.top + rect.height * 0.5;
+        }) || null;
+      }
+
+      function renderAdmin() {
+        groupBoard.replaceChildren(...draftData.groups.map(createGroupPanel));
+        renderEditor();
+        exportArchiveData();
+      }
+
+      function exportArchiveData() {
+        exportOutput.value = `window.TDG_ARCHIVE = ${JSON.stringify(createExportData(), null, 2)};\n`;
+      }
+
+      function createExportData() {
+        const orderedIds = getOrderedProjectIds();
+        const idMap = new Map(orderedIds.map((projectId, index) => [projectId, formatProjectNumber(index)]));
+        const orderedProjects = orderedIds.map(getProject).filter(Boolean);
+        const groupedIdSet = new Set(orderedIds);
+        const orphanProjects = draftData.projects.filter((project) => !groupedIdSet.has(project.id));
+        const exportProjects = [...orderedProjects, ...orphanProjects].map((project, index) => {
+          const { images, ...projectData } = project;
+          const imageFolder = normalizeFolderPath(project.imageFolder || getCommonImageFolder(images || []));
+
+          return {
+            ...projectData,
+            id: idMap.get(project.id) || formatProjectNumber(index),
+            ...(imageFolder ? { imageFolder } : {}),
+          };
+        });
+
+        return {
+          groups: draftData.groups.map((group) => ({
+            ...group,
+            projectIds: group.projectIds.map((projectId) => idMap.get(projectId) || projectId),
+          })),
+          projects: exportProjects,
+        };
+      }
+
+      exportButton.addEventListener("click", exportArchiveData);
+
+      copyButton.addEventListener("click", async () => {
+        exportArchiveData();
+        exportOutput.select();
+
+        try {
+          await navigator.clipboard.writeText(exportOutput.value);
+          copyButton.textContent = "Copied";
+          window.setTimeout(() => {
+            copyButton.textContent = "Copy";
+          }, 1200);
+        } catch (error) {
+          document.execCommand("copy");
+        }
+      });
+
+      resetButton.addEventListener("click", () => {
+        draftData = cloneArchiveData(sourceData);
+        selectedProjectId = getFirstProjectId(draftData);
+        renderAdmin();
+      });
+
+      renderAdmin();
+    </script>
+  </body>
+</html>

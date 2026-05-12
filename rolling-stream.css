@@ -47,6 +47,121 @@ body {
   overflow: hidden;
 }
 
+.rolling-frame-cursor {
+  --cursor-size: 72px;
+  border-radius: 50%;
+  display: grid;
+  height: var(--cursor-size);
+  left: 0;
+  opacity: 0;
+  place-items: center;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  transform: translate3d(var(--cursor-x, 50vw), var(--cursor-y, 50vh), 0) translate(-50%, -50%);
+  transition: opacity 120ms ease;
+  width: var(--cursor-size);
+  will-change: transform, opacity;
+  z-index: 1200;
+}
+
+.rolling-frame-cursor::before {
+  background: #efefef;
+  border-radius: inherit;
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+.rolling-frame-cursor-inner {
+  display: grid;
+  height: 100%;
+  opacity: 1;
+  place-items: center;
+  position: relative;
+  transform: scale(0.72);
+  width: 100%;
+  z-index: 1;
+}
+
+.rolling-frame-cursor-arrow-shell {
+  display: grid;
+  place-items: center;
+  translate: 0 0;
+}
+
+.rolling-frame-cursor-arrow {
+  display: block;
+  height: auto;
+  width: 48px;
+}
+
+body.is-rolling-frame-cursor-active .rolling-frame-cursor {
+  opacity: 1;
+}
+
+.rolling-frame-cursor.is-bouncing .rolling-frame-cursor-arrow-shell {
+  animation: rollingFrameCursorArrowBounceRight 1000ms cubic-bezier(0.2, 1, 0.22, 1) infinite both;
+}
+
+.rolling-scroll-cursor {
+  --cursor-size: 72px;
+  border-radius: 50%;
+  display: grid;
+  height: var(--cursor-size);
+  left: 0;
+  opacity: 0;
+  place-items: center;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  transform: translate3d(var(--cursor-x, 50vw), var(--cursor-y, 50vh), 0) translate(-50%, -50%);
+  transition: opacity 120ms ease;
+  width: var(--cursor-size);
+  will-change: transform, opacity;
+  z-index: 1200;
+}
+
+.rolling-scroll-cursor::before {
+  background: #efefef;
+  border-radius: inherit;
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+.rolling-scroll-cursor-inner {
+  display: grid;
+  height: 100%;
+  opacity: 1;
+  place-items: center;
+  position: relative;
+  transform: scale(1);
+  width: 100%;
+  z-index: 1;
+}
+
+.rolling-scroll-cursor-arrow-shell {
+  display: grid;
+  place-items: center;
+  translate: 0 0;
+}
+
+.rolling-scroll-cursor-arrow {
+  display: block;
+  height: auto;
+  rotate: 90deg;
+  width: 34px;
+}
+
+body.is-rolling-scroll-cursor-active .rolling-scroll-cursor {
+  opacity: 1;
+}
+
+body.is-rolling-scroll-cursor-active .rolling-scroll-cursor-arrow-shell {
+  animation: rollingScrollCursorArrowDrop 1000ms cubic-bezier(0.2, 1, 0.22, 1) infinite both;
+}
+
 .rolling-focus-line {
   pointer-events: none;
   position: fixed;
@@ -95,6 +210,10 @@ body {
   right: 12px;
   top: 12px;
   z-index: 240;
+}
+
+.rolling-size-control.is-collapsed {
+  display: none;
 }
 
 .rolling-size-label,
@@ -311,6 +430,8 @@ img {
 .rolling-app.is-detail-expanded .rolling-segment-rail {
   opacity: 0;
   transform: translate3d(calc(-100% - 24px), 0, 0);
+  transition: none;
+  visibility: hidden;
 }
 
 .rolling-segment-group {
@@ -355,11 +476,13 @@ img {
 
 .rolling-app.is-detail-expanded .rolling-segment-divider {
   opacity: 0;
+  visibility: hidden;
 }
 
 .rolling-project {
   --band-progress: 0;
   --surface-height: 178px;
+  --card-height: var(--surface-height);
   --card-width: calc(var(--rolling-card-number-width) + var(--rolling-card-copy-width));
   --cover-opacity: 1;
   --cover-scale: 1;
@@ -369,25 +492,33 @@ img {
   --image-lift: 0px;
   --glow: 0;
   --stream-width: calc(var(--surface-height) * 1.5);
+  --layout-spacer-width: 0px;
+  --detail-gap-width: 0px;
+  --detail-copy-space: 0px;
+  --media-expand-progress: 0;
+  --project-left: var(--rolling-segment-column);
+  --project-width: calc(100% - var(--rolling-segment-column));
   border-bottom: 0;
   display: grid;
   gap: 0;
   grid-template-columns:
-    minmax(0, 1fr)
+    var(--layout-spacer-width)
     var(--card-width)
     var(--rolling-project-gap)
-    var(--stream-width);
+    var(--stream-width)
+    var(--detail-gap-width)
+    var(--detail-copy-space);
   justify-content: stretch;
   margin-left: 0;
   opacity: var(--cover-opacity);
   padding: 0;
   position: absolute;
-  left: var(--rolling-segment-column);
+  left: var(--project-left);
   right: auto;
   top: var(--cover-center-y);
   transform: translate3d(0, calc(var(--cover-y) - var(--cover-anchor-offset)), 0);
   transform-origin: right top;
-  width: calc(100% - var(--rolling-segment-column));
+  width: var(--project-width);
   will-change: transform, opacity;
 }
 
@@ -404,22 +535,23 @@ img {
 .rolling-project.is-detail-expanded {
   gap: 0;
   grid-template-columns:
+    var(--layout-spacer-width)
     var(--card-width)
     var(--rolling-project-gap)
-    minmax(0, 1fr)
-    var(--rolling-detail-gap)
-    var(--rolling-detail-copy-width);
+    var(--stream-width)
+    var(--detail-gap-width)
+    var(--detail-copy-space);
   justify-content: stretch;
-  left: 0;
+  left: var(--project-left);
   margin-left: 0;
   padding-right: 0;
   right: auto;
-  width: 100%;
+  width: var(--project-width);
 }
 
 .rolling-project.is-detail-expanded .rolling-project-stream {
-  grid-column: 3;
-  width: min(var(--stream-width), 100%);
+  grid-column: 4;
+  width: var(--stream-width);
 }
 
 .rolling-project:last-child {
@@ -435,7 +567,7 @@ img {
   grid-template-columns: minmax(0, var(--rolling-card-number-width)) minmax(0, calc(var(--card-width) - var(--rolling-card-number-width)));
   column-gap: 0;
   align-items: start;
-  height: var(--surface-height);
+  height: var(--card-height);
   min-height: 0;
   min-width: 0;
   overflow: hidden;
@@ -457,14 +589,24 @@ img {
   background: var(--rolling-accent);
 }
 
+.rolling-project.is-frame-cursor-hover .rolling-project-card {
+  background: var(--rolling-accent);
+}
+
 .rolling-project.is-detail-expanded .rolling-project-card {
   background: transparent;
-  grid-column: 1;
+  grid-column: 2;
   cursor: pointer;
 }
 
 .rolling-project.is-active.is-color-ready.is-detail-expanded .rolling-project-card {
   background: transparent;
+}
+
+.rolling-project.is-detail-expanded .rolling-project-card:hover,
+.rolling-project.is-active.is-color-ready.is-detail-expanded .rolling-project-card:hover {
+  background: var(--rolling-accent) !important;
+  background-color: var(--rolling-accent) !important;
 }
 
 .rolling-project-index {
@@ -488,7 +630,7 @@ img {
   visibility: hidden;
 }
 
-.rolling-project.is-active.is-card-expanded .rolling-project-copy {
+.rolling-project.is-active.is-copy-ready .rolling-project-copy {
   opacity: 1;
   visibility: visible;
 }
@@ -511,34 +653,9 @@ img {
   max-width: var(--rolling-card-copy-width);
 }
 
-.rolling-project-meta {
-  display: grid;
-  gap: 2px;
-  grid-column: 2;
-  margin-top: 14px;
-  opacity: 0;
-  padding-left: 0;
-  transition: opacity 160ms ease;
-  visibility: hidden;
-}
-
-.rolling-project.is-active.is-card-expanded .rolling-project-meta {
-  opacity: 1;
-  visibility: visible;
-}
-
-.rolling-project.is-active.is-detail-expanded .rolling-project-copy,
-.rolling-project.is-active.is-detail-expanded .rolling-project-meta {
+.rolling-project.is-active.is-detail-expanded .rolling-project-copy {
   opacity: 0;
   visibility: hidden;
-}
-
-.rolling-project-year,
-.rolling-project-tagline {
-  color: var(--rolling-muted);
-  font-size: 10px;
-  line-height: 1.4;
-  margin: 0;
 }
 
 .rolling-project-arrow {
@@ -559,7 +676,13 @@ img {
   transform: rotate(0deg);
 }
 
-.rolling-project.is-detail-expanded .rolling-project-arrow {
+.rolling-project.is-detail-expanded .rolling-project-arrow,
+.rolling-project.is-active.is-index-sliding.is-detail-expanded .rolling-project-arrow {
+  transform: rotate(225deg);
+}
+
+.rolling-project.is-detail-expanded .rolling-project-card:hover .rolling-project-arrow,
+.rolling-project.is-active.is-index-sliding.is-detail-expanded .rolling-project-card:hover .rolling-project-arrow {
   transform: rotate(180deg);
 }
 
@@ -584,14 +707,23 @@ img {
   background: var(--rolling-stage);
   border: 0;
   contain: paint;
-  cursor: pointer;
   height: var(--surface-height);
   justify-self: start;
   margin: 0;
   min-width: 0;
   overflow: hidden;
   position: relative;
+  transform-origin: center top;
+  will-change: height;
   width: 100%;
+}
+
+.rolling-app:not(.is-detail-expanded) .rolling-image-media {
+  cursor: none;
+}
+
+.rolling-app.is-detail-expanded .rolling-image-media {
+  cursor: pointer;
 }
 
 .rolling-image-media:focus-visible {
@@ -632,6 +764,22 @@ img {
   pointer-events: auto;
 }
 
+.rolling-image-wheel-layer {
+  background: transparent;
+  display: none;
+  inset: 0;
+  position: absolute;
+  z-index: 5;
+}
+
+.rolling-project.is-detail-expanded .rolling-image-wheel-layer {
+  display: block;
+}
+
+body.is-rolling-scroll-cursor-active .rolling-project.is-detail-expanded .rolling-image-wheel-layer {
+  cursor: none;
+}
+
 .rolling-image-media--placeholder {
   align-items: center;
   background:
@@ -657,30 +805,24 @@ img {
   display: grid;
   gap: 15px;
   align-content: start;
-  grid-column: auto;
+  grid-column: 6;
   grid-row: 1;
+  justify-self: start;
   width: var(--rolling-detail-copy-width);
-  min-width: 0;
+  min-width: var(--rolling-detail-copy-width);
+  max-width: var(--rolling-detail-copy-width);
   padding: 0 20px 8px 0;
   background: var(--rolling-bg);
-  opacity: 0;
+  opacity: var(--detail-progress);
+  overflow: hidden;
   pointer-events: none;
-  position: absolute;
-  right: 0;
-  top: 0;
-  transform: translateX(calc(100% + 24px));
-  transition:
-    opacity 360ms ease,
-    transform 360ms ease;
+  position: static;
+  transform: translateX(0);
 }
 
 .rolling-project.is-detail-expanded .rolling-detail-copy {
-  grid-column: 5;
-  opacity: 1;
+  grid-column: 6;
   pointer-events: auto;
-  position: static;
-  transform: translateX(0);
-  width: 100%;
 }
 
 .rolling-detail-copy p {
@@ -766,23 +908,26 @@ img {
 
   .is-panel-embed .rolling-project {
     grid-template-columns:
-      minmax(0, 1fr)
+      var(--layout-spacer-width)
       var(--card-width)
       var(--rolling-project-gap)
-      var(--stream-width);
+      var(--stream-width)
+      var(--detail-gap-width)
+      var(--detail-copy-space);
   }
 
   .is-panel-embed .rolling-project.is-detail-expanded {
     grid-template-columns:
+      var(--layout-spacer-width)
       var(--card-width)
       var(--rolling-project-gap)
-      minmax(0, 1fr)
-      var(--rolling-detail-gap)
-      var(--rolling-detail-copy-width);
+      var(--stream-width)
+      var(--detail-gap-width)
+      var(--detail-copy-space);
   }
 
   .rolling-project-card {
-    height: var(--surface-height);
+    height: var(--card-height);
   }
 
   .rolling-project-stream {
@@ -796,5 +941,35 @@ img {
   .rolling-image-media {
     height: var(--surface-height);
     width: 100%;
+  }
+}
+
+@keyframes rollingFrameCursorArrowBounceRight {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  42% {
+    translate: 8px 0;
+  }
+
+  68% {
+    translate: -2px 0;
+  }
+}
+
+@keyframes rollingScrollCursorArrowDrop {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  42% {
+    translate: 0 8px;
+  }
+
+  68% {
+    translate: 0 -2px;
   }
 }

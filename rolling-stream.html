@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Rolling Stream / Two Disk Garage</title>
-    <link rel="stylesheet" href="./rolling-stream.css?v=media-viewport-height-1" />
+    <link rel="stylesheet" href="./rolling-stream.css" />
   </head>
   <body>
     <div class="rolling-focus-line" id="rolling-focus-band" aria-hidden="true">
@@ -33,7 +33,29 @@
         value="100"
       />
       <output class="rolling-size-value" id="rolling-detail-media-value" for="rolling-detail-media-slider">100</output>
-      <span class="rolling-size-label">FOLLOW</span>
+      <span class="rolling-size-label">CARD</span>
+      <input
+        class="rolling-size-slider"
+        id="rolling-detail-card-slider"
+        type="range"
+        min="168"
+        max="720"
+        step="10"
+        value="680"
+      />
+      <output class="rolling-size-value" id="rolling-detail-card-value" for="rolling-detail-card-slider">680</output>
+      <span class="rolling-size-label">WIDTH</span>
+      <input
+        class="rolling-size-slider"
+        id="rolling-detail-card-width-slider"
+        type="range"
+        min="150"
+        max="392"
+        step="1"
+        value="180"
+      />
+      <output class="rolling-size-value" id="rolling-detail-card-width-value" for="rolling-detail-card-width-slider">180</output>
+      <span class="rolling-size-label">MOTION</span>
       <input
         class="rolling-size-slider"
         id="rolling-follow-slider"
@@ -44,6 +66,17 @@
         value="0.07"
       />
       <output class="rolling-size-value" id="rolling-follow-value" for="rolling-follow-slider">0.070</output>
+      <span class="rolling-size-label">WHEEL</span>
+      <input
+        class="rolling-size-slider"
+        id="rolling-wheel-slider"
+        type="range"
+        min="0.25"
+        max="1"
+        step="0.05"
+        value="0.6"
+      />
+      <output class="rolling-size-value" id="rolling-wheel-value" for="rolling-wheel-slider">0.600</output>
       <span class="rolling-size-label">DELAY</span>
       <input
         class="rolling-size-slider"
@@ -55,6 +88,17 @@
         value="0"
       />
       <output class="rolling-size-value" id="rolling-delay-value" for="rolling-delay-slider">0</output>
+      <span class="rolling-size-label">RETURN</span>
+      <input
+        class="rolling-size-slider"
+        id="rolling-return-scroll-slider"
+        type="range"
+        min="0"
+        max="1600"
+        step="20"
+        value="520"
+      />
+      <output class="rolling-size-value" id="rolling-return-scroll-value" for="rolling-return-scroll-slider">520</output>
     </div>
     <main class="rolling-app" aria-label="Two Disk Garage rolling stream" data-debug-label="main.rolling-app">
       <header class="rolling-topbar" aria-label="rolling stream 工具栏" data-debug-label="header.rolling-topbar">
@@ -67,6 +111,7 @@
           <span>3:2</span>
           <button class="rolling-debug-toggle" id="debug-toggle" type="button" aria-pressed="false">OUTLINE</button>
           <button class="rolling-debug-toggle" id="label-toggle" type="button" aria-pressed="false">LABEL</button>
+          <button class="rolling-debug-toggle" id="rolling-parameters-toggle" type="button" aria-pressed="true" aria-expanded="true">PARAMETERS</button>
         </div>
       </header>
 
@@ -85,6 +130,7 @@
       <section class="rolling-projects" aria-label="project rolling stream" data-debug-label="section.rolling-projects"></section>
     </main>
 
-    <script src="./rolling-stream.js?v=media-viewport-height-1"></script>
+    <script src="./archive-data.js"></script>
+    <script src="./rolling-stream.js"></script>
   </body>
 </html>

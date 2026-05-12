@@ -1,243 +1,17 @@
-const projectCatalog = [
-  {
-    id: "01",
-    title: "大地探索家",
-    year: "2024",
-    tagline: "Lighting / Field Kit / Industrial Design",
-    description:
-      "兼顾了户外探索的照明安全与专业拍摄的补光需求，在严苛环境下为摄影师提供可靠保障与精准的创作支持。",
-    images: [
-      "./Assets/Project 01/1-EARTH EXPLORER 01.jpg",
-      "./Assets/Project 01/1-EARTH EXPLORER 02.jpg",
-      "./Assets/Project 01/1-EARTH EXPLORER 03.jpg",
-      "./Assets/Project 01/1-EARTH EXPLORER 04.jpg",
-      "./Assets/Project 01/1-EARTH EXPLORER 05.jpg",
-      "./Assets/Project 01/1-EARTH EXPLORER 06.jpg",
-      "./Assets/Project 01/1-EARTH EXPLORER 07.jpg",
-      "./Assets/Project 01/1-EARTH EXPLORER 08.jpg",
-    ],
-    embedSrc: "./projects/project-01/?embed=1&v=media-viewport-height-1",
-  },
-  {
-    id: "02",
-    title: "针迹",
-    year: "2023",
-    tagline: "Wearable Hardware / Labor Narrative",
-    description:
-      "通过可穿戴硬件记录外卖骑手的劳动轨迹与个人叙事，以此对抗算法系统的“隐形化”困境，并重塑其在数字化时代下的个体尊严与社会价值。",
-    images: [
-      "./Assets/Project 02/2-PinBridge 01.jpg",
-      "./Assets/Project 02/2-PinBridge 02.jpg",
-      "./Assets/Project 02/2-PinBridge 03.jpg",
-      "./Assets/Project 02/2-PinBridge 04.jpg",
-      "./Assets/Project 02/2-PinBridge 05.jpg",
-      "./Assets/Project 02/2-PinBridge 06.jpg",
-      "./Assets/Project 02/2-PinBridge 07.jpg",
-      "./Assets/Project 02/2-PinBridge 08.jpg",
-      "./Assets/Project 02/2-PinBridge 09.jpg",
-    ],
-    embedSrc: "./projects/project-02/?embed=1&v=media-viewport-height-1",
-  },
-  {
-    id: "03",
-    title: "乌托邦：水上静居",
-    year: "2023",
-    tagline: "Concept Yacht / Marine Living",
-    description:
-      "受逆戟鲸仿生美学启发的先锋居住空间概念游艇。在 20 米级船身内平衡了极致的动力学流线外观与现代居住空间，探索了未来海上生活的新形态。",
-    images: [
-      "./Assets/Project 03/3-UTOPIA 01.jpg",
-      "./Assets/Project 03/3-UTOPIA 02.jpg",
-      "./Assets/Project 03/3-UTOPIA 03.jpg",
-      "./Assets/Project 03/3-UTOPIA 04.jpg",
-      "./Assets/Project 03/3-UTOPIA 05.jpg",
-      "./Assets/Project 03/3-UTOPIA 06.jpg",
-      "./Assets/Project 03/3-UTOPIA 07.jpg",
-      "./Assets/Project 03/3-UTOPIA 08.jpg",
-    ],
-    embedSrc: "./projects/project-03/?embed=1&v=media-viewport-height-1",
-  },
-  {
-    id: "04",
-    title: "气：风场交互座舱",
-    year: "2022",
-    tagline: "Interaction Design / Cockpit UX",
-    description:
-      "探索以气流为交互媒介的未来座舱方案。通过定向气流将信息转化为身体的本能反馈，解决了辅助驾驶中人机感官疏离的问题，实现了更具直觉性的感官闭环。",
-    images: [
-      "./Assets/Project 04/4-AeroSense 01.jpg",
-      "./Assets/Project 04/4-AeroSense 02.jpg",
-      "./Assets/Project 04/4-AeroSense 03.jpg",
-      "./Assets/Project 04/4-AeroSense 04.jpg",
-      "./Assets/Project 04/4-AeroSense 05.jpg",
-      "./Assets/Project 04/4-AeroSense 06.jpg",
-      "./Assets/Project 04/4-AeroSense 07.jpg",
-    ],
-    embedSrc: "./projects/project-04/?embed=1&v=media-viewport-height-1",
-  },
-  {
-    id: "05",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "06",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "07",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "08",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "09",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "10",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "11",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "12",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "13",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "14",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "15",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "16",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "17",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "18",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "19",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-  {
-    id: "20",
-    title: "待添加项目",
-    year: "TBD",
-    tagline: "Placeholder / Future Entry",
-    description: "这里预留给后续加入的项目内容与主图。",
-    images: [],
-    placeholder: true,
-  },
-];
-
-const projectGroups = [
-  {
-    id: "product",
-    title: "产品",
-    projectIds: ["01", "02", "03", "04", "05", "06", "07"],
-  },
-  {
-    id: "ui",
-    title: "UI",
-    projectIds: ["08", "09", "10", "11", "12", "13", "14", "15"],
-  },
-  {
-    id: "rendering",
-    title: "视觉渲染",
-    projectIds: ["16", "17", "18", "19", "20"],
-  },
-];
+const archiveData = window.TDG_ARCHIVE || { groups: [], projects: [] };
+const projectCatalog = (archiveData.projects || [])
+  .filter((project) => project && project.visible !== false)
+  .map((project) => ({
+    ...project,
+    images: [...(project.images || [])],
+  }));
+const visibleProjectIds = new Set(projectCatalog.map((project) => project.id));
+const projectGroups = (archiveData.groups || [])
+  .map((group) => ({
+    ...group,
+    projectIds: (group.projectIds || []).filter((projectId) => visibleProjectIds.has(projectId)),
+  }))
+  .filter((group) => group.projectIds.length > 0);
 
 const projectById = new Map(projectCatalog.map((project) => [project.id, project]));
 const projects = projectGroups.flatMap((group) => (
@@ -260,6 +34,7 @@ projects.forEach((project) => {
 });
 
 const isPanelEmbed = new URLSearchParams(window.location.search).get("panel") === "1";
+const rollingCursorAsset = "./Assets/Icons/Arrow.svg";
 
 document.documentElement.classList.toggle("is-panel-embed", isPanelEmbed);
 document.body.classList.toggle("is-panel-embed", isPanelEmbed);
@@ -271,19 +46,33 @@ const focusBandHandle = document.getElementById("rolling-focus-band-handle");
 const debugToggle = document.getElementById("debug-toggle");
 const labelToggle = document.getElementById("label-toggle");
 const sizeControl = document.getElementById("rolling-size-control");
+const parametersToggle = document.getElementById("rolling-parameters-toggle");
 const sizeSlider = document.getElementById("rolling-size-slider");
 const sizeValue = document.getElementById("rolling-size-value");
 const detailMediaSlider = document.getElementById("rolling-detail-media-slider");
 const detailMediaValue = document.getElementById("rolling-detail-media-value");
+const detailCardSlider = document.getElementById("rolling-detail-card-slider");
+const detailCardValue = document.getElementById("rolling-detail-card-value");
+const detailCardWidthSlider = document.getElementById("rolling-detail-card-width-slider");
+const detailCardWidthValue = document.getElementById("rolling-detail-card-width-value");
 const followSlider = document.getElementById("rolling-follow-slider");
 const followValue = document.getElementById("rolling-follow-value");
+const wheelSlider = document.getElementById("rolling-wheel-slider");
+const wheelValue = document.getElementById("rolling-wheel-value");
 const delaySlider = document.getElementById("rolling-delay-slider");
 const delayValue = document.getElementById("rolling-delay-value");
+const returnScrollSlider = document.getElementById("rolling-return-scroll-slider");
+const returnScrollValue = document.getElementById("rolling-return-scroll-value");
 const FOCUS_BAND_STORAGE_KEY = "rolling-coverflow-center-top-ratio";
 const EXPANDED_SIZE_STORAGE_KEY = "rolling-coverflow-expanded-height-v2";
 const DETAIL_MEDIA_SCALE_STORAGE_KEY = "rolling-detail-media-scale-v3";
+const DETAIL_CARD_HEIGHT_STORAGE_KEY = "rolling-detail-card-height-v1";
+const DETAIL_CARD_WIDTH_STORAGE_KEY = "rolling-detail-card-width-v1";
 const FOLLOW_STORAGE_KEY = "rolling-coverflow-follow-v4";
+const WHEEL_SENSITIVITY_STORAGE_KEY = "rolling-coverflow-wheel-sensitivity-v1";
 const DELAY_STORAGE_KEY = "rolling-coverflow-delay-ms-v2";
+const RETURN_SCROLL_DURATION_STORAGE_KEY = "rolling-return-scroll-duration-ms-v1";
+const PARAMETERS_OPEN_STORAGE_KEY = "rolling-parameters-open-v1";
 const FOCUS_BAND_HEIGHT_RATIO = 0.12;
 const DEFAULT_FOCUS_BAND_TOP_RATIO = 0.44;
 const COVERFLOW_WHEEL_THRESHOLD = 60;
@@ -293,9 +82,15 @@ const COVERFLOW_TUG_DECAY = 0.92;
 const DEFAULT_FOLLOW = 0.07;
 const MIN_FOLLOW = 0.035;
 const MAX_FOLLOW = 0.12;
+const DEFAULT_WHEEL_SENSITIVITY = 0.6;
+const MIN_WHEEL_SENSITIVITY = 0.25;
+const MAX_WHEEL_SENSITIVITY = 1;
 const DEFAULT_SELECTED_DELAY_MS = 0;
 const MIN_SELECTED_DELAY_MS = 0;
 const MAX_SELECTED_DELAY_MS = 100;
+const DEFAULT_RETURN_SCROLL_DURATION_MS = 520;
+const MIN_RETURN_SCROLL_DURATION_MS = 0;
+const MAX_RETURN_SCROLL_DURATION_MS = 1600;
 const CARD_COLLAPSED_HEIGHT = 168;
 const DEFAULT_CARD_EXPANDED_HEIGHT = 680;
 const MIN_CARD_EXPANDED_HEIGHT = 480;
@@ -303,14 +98,21 @@ const MAX_CARD_EXPANDED_HEIGHT = 720;
 const MIN_DETAIL_MEDIA_SCALE = 0;
 const MAX_DETAIL_MEDIA_SCALE = 2;
 const DEFAULT_DETAIL_MEDIA_SCALE = 1;
+const DEFAULT_DETAIL_CARD_HEIGHT = 680;
+const MIN_DETAIL_CARD_HEIGHT = CARD_COLLAPSED_HEIGHT;
+const MAX_DETAIL_CARD_HEIGHT = 720;
 const PROJECT_ROW_BOTTOM_PADDING = 0;
 const CARD_COLLAPSED_WIDTH = 150;
 const CARD_EXPANDED_WIDTH = 392;
+const DEFAULT_DETAIL_CARD_WIDTH = 180;
+const MIN_DETAIL_CARD_WIDTH = CARD_COLLAPSED_WIDTH;
+const MAX_DETAIL_CARD_WIDTH = CARD_EXPANDED_WIDTH;
 const EXPANDED_PROJECT_GAP = 15;
 const PROJECT_COLUMN_GAP = 10;
 const DETAIL_SIDE_WIDTH = 318;
 const DETAIL_SIDE_GAP = 10;
 const DETAIL_FRAME_VIEWPORT_OFFSET = 82;
+const DETAIL_MEDIA_BOTTOM_GAP = 15;
 const INDEX_SLIDE_FOLLOW = 0.09;
 const SEGMENT_STICKY_TOP = 0;
 const SEGMENT_DIVIDER_TOP_GAP = 15;
@@ -323,8 +125,23 @@ let focusBandTopRatio = DEFAULT_FOCUS_BAND_TOP_RATIO;
 let focusBandDragOffset = 0;
 let cardExpandedHeight = DEFAULT_CARD_EXPANDED_HEIGHT;
 let detailMediaScale = DEFAULT_DETAIL_MEDIA_SCALE;
+let detailCardHeight = DEFAULT_DETAIL_CARD_HEIGHT;
+let detailCardWidth = DEFAULT_DETAIL_CARD_WIDTH;
 let motionFollow = DEFAULT_FOLLOW;
+let wheelSensitivity = DEFAULT_WHEEL_SENSITIVITY;
 let selectedTransitionDelayMs = DEFAULT_SELECTED_DELAY_MS;
+let returnScrollDurationMs = DEFAULT_RETURN_SCROLL_DURATION_MS;
+let returnScrollProjectIndex = -1;
+let parametersOpen = true;
+let lastNotifiedActiveProjectId = "";
+let rollingFrameCursor = null;
+let rollingFrameCursorX = window.innerWidth / 2;
+let rollingFrameCursorY = window.innerHeight / 2;
+let rollingFrameCursorProject = null;
+let rollingScrollCursor = null;
+let rollingScrollCursorX = window.innerWidth / 2;
+let rollingScrollCursorY = window.innerHeight / 2;
+let rollingScrollCursorLayer = null;
 
 function buildProjects() {
   const segmentRailMarkup = `
@@ -354,7 +171,7 @@ function buildProjects() {
 
   const projectsMarkup = projects
     .map((project) => {
-      const leadImage = project.images[0];
+      const leadImage = project.images[0] || project.coverImage || "";
       const mediaMarkup = project.placeholder
         ? `
           <figure class="rolling-image-media rolling-image-media--placeholder" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
@@ -370,11 +187,18 @@ function buildProjects() {
               title="${project.title} 项目页面"
               loading="eager"
             ></iframe>
+            <div class="rolling-image-wheel-layer" aria-hidden="true"></div>
           </figure>
         `
-        : `
+        : leadImage
+          ? `
           <figure class="rolling-image-media" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
             <img src="${leadImage}" alt="${project.title} 主图" loading="eager" />
+          </figure>
+        `
+          : `
+          <figure class="rolling-image-media rolling-image-media--placeholder" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
+            <div class="rolling-image-placeholder-copy">PLACEHOLDER ${project.id}</div>
           </figure>
         `;
 
@@ -385,10 +209,6 @@ function buildProjects() {
             <div class="rolling-project-copy">
               <h2 class="rolling-project-name">${project.title}</h2>
               <p class="rolling-project-description">${project.description}</p>
-            </div>
-            <div class="rolling-project-meta">
-              <p class="rolling-project-year">${project.year}</p>
-              <p class="rolling-project-tagline">${project.tagline}</p>
             </div>
             <div class="rolling-project-arrow" aria-hidden="true">→</div>
           </aside>
@@ -455,6 +275,7 @@ const projectStates = new Map(
       coverScale: 0.88,
       opacity: 0,
       indexSlide: 0,
+      detailProgress: 0,
     },
   ]),
 );
@@ -638,6 +459,20 @@ function steepenProgress(progress) {
   return p * p * (3 - 2 * p);
 }
 
+function easeInOutCubic(progress) {
+  const p = clamp(progress, 0, 1);
+
+  return p < 0.5
+    ? 4 * p * p * p
+    : 1 - ((-2 * p + 2) ** 3) / 2;
+}
+
+function easeOutCubic(progress) {
+  const p = clamp(progress, 0, 1);
+
+  return 1 - (1 - p) ** 3;
+}
+
 function loadCardExpandedHeight() {
   const storedValue = Number.parseFloat(window.localStorage.getItem(EXPANDED_SIZE_STORAGE_KEY) || "");
 
@@ -694,6 +529,58 @@ function setDetailMediaScale(nextScale) {
   syncDetailMediaControl();
 }
 
+function loadDetailCardHeight() {
+  const storedValue = Number.parseFloat(window.localStorage.getItem(DETAIL_CARD_HEIGHT_STORAGE_KEY) || "");
+
+  if (Number.isFinite(storedValue)) {
+    detailCardHeight = clamp(storedValue, MIN_DETAIL_CARD_HEIGHT, MAX_DETAIL_CARD_HEIGHT);
+  }
+}
+
+function syncDetailCardControl() {
+  if (detailCardSlider) {
+    detailCardSlider.value = String(Math.round(detailCardHeight));
+  }
+
+  if (detailCardValue) {
+    detailCardValue.value = String(Math.round(detailCardHeight));
+    detailCardValue.textContent = String(Math.round(detailCardHeight));
+  }
+}
+
+function setDetailCardHeight(nextHeight) {
+  detailCardHeight = clamp(nextHeight, MIN_DETAIL_CARD_HEIGHT, MAX_DETAIL_CARD_HEIGHT);
+  window.localStorage.setItem(DETAIL_CARD_HEIGHT_STORAGE_KEY, String(detailCardHeight));
+  syncDetailCardControl();
+}
+
+function loadDetailCardWidth() {
+  const storedValue = Number.parseFloat(window.localStorage.getItem(DETAIL_CARD_WIDTH_STORAGE_KEY) || "");
+
+  if (Number.isFinite(storedValue)) {
+    detailCardWidth = clamp(storedValue, MIN_DETAIL_CARD_WIDTH, MAX_DETAIL_CARD_WIDTH);
+  }
+}
+
+function syncDetailCardWidthControl() {
+  const roundedWidth = Math.round(detailCardWidth);
+
+  if (detailCardWidthSlider) {
+    detailCardWidthSlider.value = String(roundedWidth);
+  }
+
+  if (detailCardWidthValue) {
+    detailCardWidthValue.value = String(roundedWidth);
+    detailCardWidthValue.textContent = String(roundedWidth);
+  }
+}
+
+function setDetailCardWidth(nextWidth) {
+  detailCardWidth = clamp(nextWidth, MIN_DETAIL_CARD_WIDTH, MAX_DETAIL_CARD_WIDTH);
+  window.localStorage.setItem(DETAIL_CARD_WIDTH_STORAGE_KEY, String(detailCardWidth));
+  syncDetailCardWidthControl();
+}
+
 function loadMotionFollow() {
   const storedValue = Number.parseFloat(window.localStorage.getItem(FOLLOW_STORAGE_KEY) || "");
 
@@ -725,6 +612,37 @@ function setMotionFollow(nextFollow) {
   syncFollowControl();
 }
 
+function loadWheelSensitivity() {
+  const storedValue = Number.parseFloat(window.localStorage.getItem(WHEEL_SENSITIVITY_STORAGE_KEY) || "");
+
+  if (Number.isFinite(storedValue)) {
+    wheelSensitivity = clamp(storedValue, MIN_WHEEL_SENSITIVITY, MAX_WHEEL_SENSITIVITY);
+  }
+}
+
+function formatWheelSensitivity(value) {
+  return value.toFixed(3);
+}
+
+function syncWheelControl() {
+  if (wheelSlider) {
+    wheelSlider.value = formatWheelSensitivity(wheelSensitivity);
+  }
+
+  if (wheelValue) {
+    const formattedValue = formatWheelSensitivity(wheelSensitivity);
+
+    wheelValue.value = formattedValue;
+    wheelValue.textContent = formattedValue;
+  }
+}
+
+function setWheelSensitivity(nextSensitivity) {
+  wheelSensitivity = clamp(nextSensitivity, MIN_WHEEL_SENSITIVITY, MAX_WHEEL_SENSITIVITY);
+  window.localStorage.setItem(WHEEL_SENSITIVITY_STORAGE_KEY, String(wheelSensitivity));
+  syncWheelControl();
+}
+
 function loadSelectedTransitionDelay() {
   const storedValue = Number.parseFloat(window.localStorage.getItem(DELAY_STORAGE_KEY) || "");
 
@@ -750,6 +668,279 @@ function setSelectedTransitionDelay(nextDelay) {
   selectedTransitionDelayMs = clamp(nextDelay, MIN_SELECTED_DELAY_MS, MAX_SELECTED_DELAY_MS);
   window.localStorage.setItem(DELAY_STORAGE_KEY, String(selectedTransitionDelayMs));
   syncDelayControl();
+}
+
+function loadReturnScrollDuration() {
+  const storedValue = Number.parseFloat(window.localStorage.getItem(RETURN_SCROLL_DURATION_STORAGE_KEY) || "");
+
+  if (Number.isFinite(storedValue)) {
+    returnScrollDurationMs = clamp(
+      storedValue,
+      MIN_RETURN_SCROLL_DURATION_MS,
+      MAX_RETURN_SCROLL_DURATION_MS,
+    );
+  }
+}
+
+function syncReturnScrollControl() {
+  const roundedDuration = Math.round(returnScrollDurationMs);
+
+  if (returnScrollSlider) {
+    returnScrollSlider.value = String(roundedDuration);
+  }
+
+  if (returnScrollValue) {
+    returnScrollValue.value = String(roundedDuration);
+    returnScrollValue.textContent = String(roundedDuration);
+  }
+}
+
+function setReturnScrollDuration(nextDuration) {
+  returnScrollDurationMs = clamp(
+    nextDuration,
+    MIN_RETURN_SCROLL_DURATION_MS,
+    MAX_RETURN_SCROLL_DURATION_MS,
+  );
+  window.localStorage.setItem(RETURN_SCROLL_DURATION_STORAGE_KEY, String(returnScrollDurationMs));
+  syncReturnScrollControl();
+}
+
+function loadParametersOpen() {
+  const storedValue = window.localStorage.getItem(PARAMETERS_OPEN_STORAGE_KEY);
+
+  if (storedValue === "true" || storedValue === "false") {
+    parametersOpen = storedValue === "true";
+  }
+}
+
+function syncParametersToggle() {
+  sizeControl?.classList.toggle("is-collapsed", !parametersOpen);
+  parametersToggle?.setAttribute("aria-expanded", parametersOpen ? "true" : "false");
+  parametersToggle?.setAttribute("aria-pressed", parametersOpen ? "true" : "false");
+}
+
+function setParametersOpen(nextOpen) {
+  parametersOpen = Boolean(nextOpen);
+  window.localStorage.setItem(PARAMETERS_OPEN_STORAGE_KEY, String(parametersOpen));
+  syncParametersToggle();
+}
+
+function getParametersOpen() {
+  return parametersOpen;
+}
+
+function buildRollingFrameCursor() {
+  if (rollingFrameCursor) {
+    return;
+  }
+
+  rollingFrameCursor = document.createElement("div");
+  const cursorInner = document.createElement("div");
+  const cursorArrowShell = document.createElement("div");
+  const cursorArrow = document.createElement("img");
+
+  rollingFrameCursor.className = "rolling-frame-cursor";
+  rollingFrameCursor.setAttribute("aria-hidden", "true");
+  cursorInner.className = "rolling-frame-cursor-inner";
+  cursorArrowShell.className = "rolling-frame-cursor-arrow-shell";
+  cursorArrow.className = "rolling-frame-cursor-arrow";
+  cursorArrow.src = rollingCursorAsset;
+  cursorArrow.alt = "";
+  cursorArrow.decoding = "async";
+
+  cursorArrowShell.append(cursorArrow);
+  cursorInner.append(cursorArrowShell);
+  rollingFrameCursor.append(cursorInner);
+  document.body.append(rollingFrameCursor);
+}
+
+function syncRollingFrameCursorPosition() {
+  if (!rollingFrameCursor) {
+    return;
+  }
+
+  rollingFrameCursor.style.setProperty("--cursor-x", `${rollingFrameCursorX}px`);
+  rollingFrameCursor.style.setProperty("--cursor-y", `${rollingFrameCursorY}px`);
+}
+
+function syncRollingFrameCursorProject(project) {
+  if (rollingFrameCursorProject === project) {
+    return;
+  }
+
+  rollingFrameCursorProject?.classList.remove("is-frame-cursor-hover");
+  rollingFrameCursorProject = project;
+  rollingFrameCursorProject?.classList.add("is-frame-cursor-hover");
+}
+
+function shouldShowRollingFrameCursor(target) {
+  return (
+    expandedProjectIndex < 0 &&
+    target instanceof Element &&
+    Boolean(target.closest(".rolling-image-media"))
+  );
+}
+
+function showRollingFrameCursor(event) {
+  if (!shouldShowRollingFrameCursor(event.target)) {
+    hideRollingFrameCursor();
+    return;
+  }
+
+  buildRollingFrameCursor();
+  syncRollingFrameCursorProject(event.target.closest(".rolling-project"));
+
+  rollingFrameCursorX = event.clientX;
+  rollingFrameCursorY = event.clientY;
+  syncRollingFrameCursorPosition();
+
+  document.body.classList.add("is-rolling-frame-cursor-active");
+  rollingFrameCursor.classList.remove("is-bouncing");
+  void rollingFrameCursor.offsetWidth;
+  rollingFrameCursor.classList.add("is-bouncing");
+}
+
+function moveRollingFrameCursor(event) {
+  if (!shouldShowRollingFrameCursor(event.target)) {
+    hideRollingFrameCursor();
+    return;
+  }
+
+  syncRollingFrameCursorProject(event.target.closest(".rolling-project"));
+  rollingFrameCursorX = event.clientX;
+  rollingFrameCursorY = event.clientY;
+  syncRollingFrameCursorPosition();
+}
+
+function hideRollingFrameCursor() {
+  document.body.classList.remove("is-rolling-frame-cursor-active");
+  rollingFrameCursor?.classList.remove("is-bouncing");
+  syncRollingFrameCursorProject(null);
+}
+
+function buildRollingScrollCursor() {
+  if (rollingScrollCursor) {
+    return;
+  }
+
+  rollingScrollCursor = document.createElement("div");
+  const cursorInner = document.createElement("div");
+  const cursorArrowShell = document.createElement("div");
+  const cursorArrow = document.createElement("img");
+
+  rollingScrollCursor.className = "rolling-scroll-cursor";
+  rollingScrollCursor.setAttribute("aria-hidden", "true");
+  cursorInner.className = "rolling-scroll-cursor-inner";
+  cursorArrowShell.className = "rolling-scroll-cursor-arrow-shell";
+  cursorArrow.className = "rolling-scroll-cursor-arrow";
+  cursorArrow.src = rollingCursorAsset;
+  cursorArrow.alt = "";
+  cursorArrow.decoding = "async";
+
+  cursorArrowShell.append(cursorArrow);
+  cursorInner.append(cursorArrowShell);
+  rollingScrollCursor.append(cursorInner);
+  document.body.append(rollingScrollCursor);
+}
+
+function syncRollingScrollCursorPosition() {
+  if (!rollingScrollCursor) {
+    return;
+  }
+
+  rollingScrollCursor.style.setProperty("--cursor-x", `${rollingScrollCursorX}px`);
+  rollingScrollCursor.style.setProperty("--cursor-y", `${rollingScrollCursorY}px`);
+}
+
+function getRollingEmbedScrollState(wheelLayer) {
+  const project = wheelLayer?.closest(".rolling-project");
+  const embedFrame = project?.querySelector(".rolling-image-embed-frame");
+
+  try {
+    const viewportState = embedFrame?.contentWindow?.projectViewport?.getScrollState?.();
+
+    if (viewportState) {
+      return viewportState;
+    }
+
+    const projectPage = embedFrame?.contentDocument?.querySelector(".project-page");
+
+    if (!projectPage) {
+      return {
+        isAtBottom: true,
+        isReady: false,
+      };
+    }
+
+    const maxScrollTop = Math.max(0, projectPage.scrollHeight - projectPage.clientHeight);
+
+    return {
+      isAtBottom: projectPage.scrollTop >= maxScrollTop - 2,
+      isReady: true,
+      maxScrollTop,
+      scrollTop: projectPage.scrollTop,
+    };
+  } catch (error) {
+    return {
+      isAtBottom: true,
+      isReady: false,
+    };
+  }
+}
+
+function refreshRollingScrollCursor(wheelLayer = rollingScrollCursorLayer) {
+  if (
+    !wheelLayer?.closest(".rolling-project.is-detail-expanded") ||
+    getRollingEmbedScrollState(wheelLayer).isAtBottom
+  ) {
+    hideRollingScrollCursor();
+    return;
+  }
+
+  buildRollingScrollCursor();
+  rollingScrollCursorLayer = wheelLayer;
+  syncRollingScrollCursorPosition();
+  document.body.classList.add("is-rolling-scroll-cursor-active");
+}
+
+function showRollingScrollCursor(event) {
+  rollingScrollCursorX = event.clientX;
+  rollingScrollCursorY = event.clientY;
+  syncRollingScrollCursorPosition();
+  refreshRollingScrollCursor(event.target.closest(".rolling-image-wheel-layer"));
+}
+
+function moveRollingScrollCursor(event) {
+  rollingScrollCursorX = event.clientX;
+  rollingScrollCursorY = event.clientY;
+  syncRollingScrollCursorPosition();
+  refreshRollingScrollCursor(event.target.closest(".rolling-image-wheel-layer"));
+}
+
+function hideRollingScrollCursor() {
+  document.body.classList.remove("is-rolling-scroll-cursor-active");
+  rollingScrollCursorLayer = null;
+}
+
+function postScrollToRollingEmbeddedProject(project, deltaY) {
+  const embedFrame = project?.querySelector(".rolling-image-embed-frame");
+
+  if (!embedFrame?.contentWindow) {
+    return false;
+  }
+
+  try {
+    embedFrame.contentWindow.postMessage(
+      {
+        type: "project-scroll-by",
+        deltaY,
+      },
+      "*",
+    );
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 function loadFocusBandTopRatio() {
@@ -829,15 +1020,29 @@ function getActiveSegmentRange(position = activeProjectIndex) {
 
 function getSegmentLastProjectBottom(range) {
   const lastProject = projectsList[range?.end];
+  const lastProjectCard = lastProject?.querySelector(".rolling-project-card");
 
-  if (!lastProject) {
+  if (!lastProjectCard) {
     return Number.NEGATIVE_INFINITY;
   }
 
   const rootRect = projectsRoot.getBoundingClientRect();
-  const projectRect = lastProject.getBoundingClientRect();
+  const projectRect = lastProjectCard.getBoundingClientRect();
 
   return projectRect.bottom - rootRect.top;
+}
+
+function getSegmentFirstProjectTop(range) {
+  const firstProject = projectsList[range?.start];
+
+  if (!firstProject) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  const rootRect = projectsRoot.getBoundingClientRect();
+  const projectRect = firstProject.getBoundingClientRect();
+
+  return projectRect.top - rootRect.top;
 }
 
 function getSegmentDividerY(range) {
@@ -847,25 +1052,18 @@ function getSegmentDividerY(range) {
     return Number.NEGATIVE_INFINITY;
   }
 
-  const previousRange = segmentRanges[rangeIndex - 1];
-  const previousBottom = getSegmentLastProjectBottom(previousRange);
+  const firstTop = getSegmentFirstProjectTop(range);
 
-  return Number.isFinite(previousBottom)
-    ? previousBottom + SEGMENT_DIVIDER_TOP_GAP
+  return Number.isFinite(firstTop)
+    ? firstTop - SEGMENT_DIVIDER_BOTTOM_GAP
     : Number.POSITIVE_INFINITY;
 }
 
 function getSegmentGroupTop(range) {
-  const rangeIndex = segmentRanges.indexOf(range);
+  const firstTop = getSegmentFirstProjectTop(range);
 
-  if (rangeIndex <= 0) {
-    return 0;
-  }
-
-  const dividerY = getSegmentDividerY(range);
-
-  return Number.isFinite(dividerY)
-    ? dividerY + SEGMENT_DIVIDER_BOTTOM_GAP
+  return Number.isFinite(firstTop)
+    ? firstTop
     : Number.POSITIVE_INFINITY;
 }
 
@@ -930,7 +1128,6 @@ function syncSegmentRail() {
       : Math.min(SEGMENT_STICKY_TOP - groupTop, labelBottomLimit);
     const isVisible = groupBottom > SEGMENT_STICKY_TOP && groupTop < window.innerHeight;
     const isStuck = isVisible && groupTop <= SEGMENT_STICKY_TOP && groupBottom > labelHeight;
-
     group.style.setProperty("--segment-group-y", `${groupTop.toFixed(2)}px`);
     group.style.setProperty("--segment-group-height", `${groupHeight.toFixed(2)}px`);
     group.style.setProperty("--segment-group-opacity", isVisible ? "1" : "0");
@@ -1007,7 +1204,7 @@ function getProjectCurrentSurfaceHeight(index, target) {
 function getAvailableStreamWidth(isDetailExpanded = false) {
   const rootWidth = projectsRoot.getBoundingClientRect().width || window.innerWidth;
   const segmentWidth = isDetailExpanded ? 0 : getSegmentColumnWidth();
-  const cardWidth = isDetailExpanded ? CARD_COLLAPSED_WIDTH : CARD_EXPANDED_WIDTH;
+  const cardWidth = isDetailExpanded ? detailCardWidth : CARD_EXPANDED_WIDTH;
   const detailWidth = isDetailExpanded ? DETAIL_SIDE_WIDTH + DETAIL_SIDE_GAP : 0;
   const reservedWidth = segmentWidth + cardWidth + PROJECT_COLUMN_GAP + detailWidth;
 
@@ -1016,7 +1213,7 @@ function getAvailableStreamWidth(isDetailExpanded = false) {
 
 function getResolvedExpandedHeight(isDetailExpanded = false) {
   if (isDetailExpanded) {
-    return Math.max(1, getDetailFrameHeight() * detailMediaScale);
+    return Math.max(CARD_COLLAPSED_HEIGHT, getDetailFrameHeight() * detailMediaScale);
   }
 
   const maxHeight = getAvailableStreamWidth(false) / 1.5;
@@ -1102,7 +1299,7 @@ function syncSettleTransition() {
 function getDetailFrameHeight() {
   const viewportOffset = isPanelEmbed ? 0 : DETAIL_FRAME_VIEWPORT_OFFSET;
 
-  return Math.max(360, window.innerHeight - viewportOffset);
+  return Math.max(360, window.innerHeight - viewportOffset - DETAIL_MEDIA_BOTTOM_GAP);
 }
 
 function getProjectTarget(index) {
@@ -1133,6 +1330,7 @@ function getProjectTarget(index) {
     isSelected,
     isAwaitingSettle: isSelected && !isExpanded && expandedProjectIndex < 0,
     opacity,
+    detailProgress: isDetailExpanded ? 1 : 0,
   };
 }
 
@@ -1142,6 +1340,7 @@ function syncProjectSizeState(state, target) {
   state.lift += (target.lift - state.lift) * motionFollow;
   state.glow += (target.glow - state.glow) * motionFollow;
   state.coverScale += (target.coverScale - state.coverScale) * motionFollow;
+  state.detailProgress += (target.detailProgress - state.detailProgress) * motionFollow;
 }
 
 function syncProjectMotionState(project, target) {
@@ -1158,25 +1357,55 @@ function paintProject(project, target, index) {
   const state = projectStates.get(project);
 
   const visualProgress = clamp(state.progress, 0, 1);
+  const detailProgress = easeInOutCubic(state.detailProgress);
+  const mediaExpandProgress = easeOutCubic(state.detailProgress);
   const indexSlideProgress = steepenProgress(state.indexSlide);
-  const expandedHeight = getResolvedExpandedHeight(target.isDetailExpanded);
-  const expandedCardWidth = target.isDetailExpanded ? CARD_COLLAPSED_WIDTH : CARD_EXPANDED_WIDTH;
-  const height = Math.round(lerp(CARD_COLLAPSED_HEIGHT, expandedHeight, visualProgress));
-  const cardWidth = lerp(CARD_COLLAPSED_WIDTH, expandedCardWidth, visualProgress);
+  const normalExpandedHeight = getResolvedExpandedHeight(false);
+  const detailExpandedHeight = getResolvedExpandedHeight(true);
+  const normalHeight = lerp(CARD_COLLAPSED_HEIGHT, normalExpandedHeight, visualProgress);
+  const height = Math.round(lerp(normalHeight, detailExpandedHeight, mediaExpandProgress));
+  const cardHeight = Math.round(lerp(normalHeight, detailCardHeight, mediaExpandProgress));
+  const normalCardWidth = lerp(CARD_COLLAPSED_WIDTH, CARD_EXPANDED_WIDTH, visualProgress);
+  const cardWidth = lerp(normalCardWidth, detailCardWidth, mediaExpandProgress);
   const indexShift = (cardWidth - CARD_COLLAPSED_WIDTH) * (1 - indexSlideProgress);
-  const targetStreamWidth = height * 1.5;
+  const rootWidth = projectsRoot.getBoundingClientRect().width || window.innerWidth;
+  const segmentWidth = getSegmentColumnWidth();
+  const normalProjectWidth = Math.max(0, rootWidth - segmentWidth);
+  const projectLeft = lerp(segmentWidth, 0, detailProgress);
+  const projectWidth = lerp(normalProjectWidth, rootWidth, detailProgress);
+  const normalStreamWidth = height * 1.5;
+  const detailGapWidth = DETAIL_SIDE_GAP * detailProgress;
+  const detailCopyWidth = DETAIL_SIDE_WIDTH * detailProgress;
+  const detailStreamWidth = Math.max(
+    1,
+    projectWidth - cardWidth - PROJECT_COLUMN_GAP - detailGapWidth - detailCopyWidth,
+  );
+  const targetStreamWidth = lerp(normalStreamWidth, detailStreamWidth, detailProgress);
+  const normalSpacerWidth = Math.max(
+    0,
+    normalProjectWidth - normalCardWidth - PROJECT_COLUMN_GAP - normalStreamWidth,
+  );
+  const layoutSpacerWidth = lerp(normalSpacerWidth, 0, detailProgress);
   const coverAnchorOffset = target.anchorOffset ?? (
     target.isSelected ? CARD_COLLAPSED_HEIGHT * 0.5 : height * 0.5
   );
 
+  project.style.setProperty("--detail-progress", detailProgress.toFixed(4));
+  project.style.setProperty("--media-expand-progress", mediaExpandProgress.toFixed(4));
   project.style.setProperty("--band-progress", state.progress.toFixed(4));
   project.style.setProperty("--cover-opacity", state.opacity.toFixed(4));
   project.style.setProperty("--cover-scale", state.coverScale.toFixed(4));
   project.style.setProperty("--cover-y", `${state.coverY.toFixed(2)}px`);
   project.style.setProperty("--cover-anchor-offset", `${coverAnchorOffset.toFixed(2)}px`);
   project.style.setProperty("--surface-height", `${height}px`);
+  project.style.setProperty("--card-height", `${cardHeight}px`);
   project.style.setProperty("--card-width", `${cardWidth.toFixed(2)}px`);
   project.style.setProperty("--stream-width", `${targetStreamWidth.toFixed(2)}px`);
+  project.style.setProperty("--layout-spacer-width", `${layoutSpacerWidth.toFixed(2)}px`);
+  project.style.setProperty("--detail-gap-width", `${detailGapWidth.toFixed(2)}px`);
+  project.style.setProperty("--detail-copy-space", `${detailCopyWidth.toFixed(2)}px`);
+  project.style.setProperty("--project-left", `${projectLeft.toFixed(2)}px`);
+  project.style.setProperty("--project-width", `${projectWidth.toFixed(2)}px`);
   project.style.setProperty("--image-scale", state.scale.toFixed(4));
   project.style.setProperty("--image-lift", `${state.lift.toFixed(2)}px`);
   project.style.setProperty("--glow", state.glow.toFixed(4));
@@ -1184,6 +1413,13 @@ function paintProject(project, target, index) {
   project.style.zIndex = String(100 - Math.round(Math.abs(index - activeProjectIndex) * 10));
   project.classList.toggle("is-index-sliding", state.indexSlide > 0.001);
   project.classList.toggle("is-card-expanded", state.indexSlide > 0.985);
+  project.classList.toggle(
+    "is-copy-ready",
+    target.isExpanded &&
+      state.progress > 0.998 &&
+      state.indexSlide > 0.998 &&
+      state.detailProgress < 0.001,
+  );
 }
 
 function updateProject(project, target, index) {
@@ -1233,6 +1469,7 @@ function primeProjectStates() {
     state.coverScale = target.coverScale;
     state.opacity = target.opacity;
     state.indexSlide = target.isExpanded ? 1 : 0;
+    state.detailProgress = target.detailProgress;
   });
 
   const coverYs = buildLiveLayoutCoverYs(targets);
@@ -1255,6 +1492,7 @@ function selectCoverflowProject(nextIndex, selectedAt = performance.now()) {
 
   activeProjectIndex = clampedIndex;
   activeProjectSelectedAt = selectedAt;
+  notifyParentActiveProject();
 }
 
 function moveActiveProject(direction) {
@@ -1282,9 +1520,150 @@ function notifyParentDetailState() {
   );
 }
 
+function notifyParentActiveProject() {
+  if (window.parent === window) {
+    return;
+  }
+
+  const activeProject = projectsList[activeProjectIndex];
+  const projectId = activeProject?.dataset.project || "";
+
+  if (!projectId || projectId === lastNotifiedActiveProjectId) {
+    return;
+  }
+
+  lastNotifiedActiveProjectId = projectId;
+
+  window.parent.postMessage(
+    {
+      type: "rolling-active-project",
+      projectId,
+    },
+    window.location.origin,
+  );
+}
+
+function animateElementScrollToTop(element, durationMs, frameWindow = window) {
+  if (!element) {
+    return;
+  }
+
+  const startTop = element.scrollTop || 0;
+  const startLeft = element.scrollLeft || 0;
+  const duration = Math.max(0, durationMs);
+
+  if (duration === 0 || (startTop === 0 && startLeft === 0)) {
+    element.scrollTop = 0;
+    element.scrollLeft = 0;
+    return;
+  }
+
+  const frame = frameWindow || window;
+  const requestFrame = frame.requestAnimationFrame?.bind(frame) || window.requestAnimationFrame.bind(window);
+  const startTime = frame.performance?.now?.() ?? performance.now();
+
+  const tick = (currentTime) => {
+    const elapsed = currentTime - startTime;
+    const progress = clamp(elapsed / duration, 0, 1);
+    const easedProgress = easeInOutCubic(progress);
+
+    element.scrollTop = lerp(startTop, 0, easedProgress);
+    element.scrollLeft = lerp(startLeft, 0, easedProgress);
+
+    if (progress < 1) {
+      requestFrame(tick);
+    }
+  };
+
+  requestFrame(tick);
+}
+
+function animateWindowScrollToTop(frameWindow, durationMs) {
+  if (!frameWindow) {
+    return;
+  }
+
+  const frameDocument = frameWindow.document;
+  const startTop =
+    frameWindow.scrollY ||
+    frameDocument?.documentElement?.scrollTop ||
+    frameDocument?.body?.scrollTop ||
+    0;
+  const startLeft =
+    frameWindow.scrollX ||
+    frameDocument?.documentElement?.scrollLeft ||
+    frameDocument?.body?.scrollLeft ||
+    0;
+  const duration = Math.max(0, durationMs);
+
+  if (duration === 0 || (startTop === 0 && startLeft === 0)) {
+    frameWindow.scrollTo(0, 0);
+    return;
+  }
+
+  const requestFrame =
+    frameWindow.requestAnimationFrame?.bind(frameWindow) ||
+    window.requestAnimationFrame.bind(window);
+  const startTime = frameWindow.performance?.now?.() ?? performance.now();
+
+  const tick = (currentTime) => {
+    const elapsed = currentTime - startTime;
+    const progress = clamp(elapsed / duration, 0, 1);
+    const easedProgress = easeInOutCubic(progress);
+
+    frameWindow.scrollTo(
+      lerp(startLeft, 0, easedProgress),
+      lerp(startTop, 0, easedProgress),
+    );
+
+    if (progress < 1) {
+      requestFrame(tick);
+    }
+  };
+
+  requestFrame(tick);
+}
+
+function resetProjectMediaScroll(index) {
+  const project = projectsList[index];
+  const frame = project?.querySelector(".rolling-image-embed-frame");
+
+  if (!frame?.contentWindow) {
+    return;
+  }
+
+  try {
+    const frameDocument = frame.contentDocument;
+    const scrollRoot = frameDocument?.querySelector(".project-page");
+
+    if (scrollRoot) {
+      animateElementScrollToTop(scrollRoot, returnScrollDurationMs, frame.contentWindow);
+      return;
+    }
+
+    animateWindowScrollToTop(frame.contentWindow, returnScrollDurationMs);
+    animateElementScrollToTop(frameDocument?.documentElement, returnScrollDurationMs, frame.contentWindow);
+    animateElementScrollToTop(frameDocument?.body, returnScrollDurationMs, frame.contentWindow);
+  } catch (error) {
+    // The embed is same-origin in this project; keep close behavior intact if that ever changes.
+  }
+}
+
+function prepareProjectReturnScroll(index) {
+  if (index < 0 || index >= projectsList.length) {
+    return;
+  }
+
+  resetProjectMediaScroll(index);
+  returnScrollProjectIndex = index;
+}
+
 function openProjectDetail(index) {
   const nextIndex = clamp(index, 0, projectsList.length - 1);
 
+  hideRollingFrameCursor();
+  hideRollingScrollCursor();
+  returnScrollProjectIndex = -1;
   activeProjectIndex = nextIndex;
   settledProjectIndex = nextIndex;
   expandedProjectIndex = nextIndex;
@@ -1298,6 +1677,14 @@ function closeProjectDetail() {
     return;
   }
 
+  const closingProjectIndex = expandedProjectIndex;
+
+  if (returnScrollProjectIndex !== closingProjectIndex) {
+    resetProjectMediaScroll(closingProjectIndex);
+  }
+
+  returnScrollProjectIndex = -1;
+  hideRollingScrollCursor();
   expandedProjectIndex = -1;
   settledProjectIndex = activeProjectIndex;
   activeProjectSelectedAt = performance.now();
@@ -1376,6 +1763,26 @@ detailMediaSlider?.addEventListener("input", (event) => {
   setDetailMediaScale(nextScale);
 });
 
+detailCardSlider?.addEventListener("input", (event) => {
+  const nextHeight = Number.parseFloat(event.currentTarget.value);
+
+  if (!Number.isFinite(nextHeight)) {
+    return;
+  }
+
+  setDetailCardHeight(nextHeight);
+});
+
+detailCardWidthSlider?.addEventListener("input", (event) => {
+  const nextWidth = Number.parseFloat(event.currentTarget.value);
+
+  if (!Number.isFinite(nextWidth)) {
+    return;
+  }
+
+  setDetailCardWidth(nextWidth);
+});
+
 followSlider?.addEventListener("input", (event) => {
   const nextFollow = Number.parseFloat(event.currentTarget.value);
 
@@ -1384,6 +1791,16 @@ followSlider?.addEventListener("input", (event) => {
   }
 
   setMotionFollow(nextFollow);
+});
+
+wheelSlider?.addEventListener("input", (event) => {
+  const nextSensitivity = Number.parseFloat(event.currentTarget.value);
+
+  if (!Number.isFinite(nextSensitivity)) {
+    return;
+  }
+
+  setWheelSensitivity(nextSensitivity);
 });
 
 delaySlider?.addEventListener("input", (event) => {
@@ -1395,6 +1812,23 @@ delaySlider?.addEventListener("input", (event) => {
 
   setSelectedTransitionDelay(nextDelay);
 });
+
+returnScrollSlider?.addEventListener("input", (event) => {
+  const nextDuration = Number.parseFloat(event.currentTarget.value);
+
+  if (!Number.isFinite(nextDuration)) {
+    return;
+  }
+
+  setReturnScrollDuration(nextDuration);
+});
+
+parametersToggle?.addEventListener("click", () => {
+  setParametersOpen(!parametersOpen);
+});
+
+window.setRollingParametersOpen = setParametersOpen;
+window.getRollingParametersOpen = getParametersOpen;
 
 focusBandHandle?.addEventListener("pointerdown", (event) => {
   focusBandDragOffset = event.clientY - window.innerHeight * focusBandTopRatio;
@@ -1442,6 +1876,75 @@ projectsRoot.addEventListener("click", (event) => {
   openProjectDetail(projectsList.indexOf(project));
 });
 
+projectsRoot.addEventListener("pointerover", showRollingFrameCursor);
+projectsRoot.addEventListener("pointermove", moveRollingFrameCursor);
+projectsRoot.addEventListener("pointerout", (event) => {
+  if (
+    event.relatedTarget instanceof Element &&
+    event.relatedTarget.closest(".rolling-image-media")
+  ) {
+    return;
+  }
+
+  hideRollingFrameCursor();
+});
+projectsRoot.addEventListener("pointerleave", hideRollingFrameCursor);
+
+projectsRoot.addEventListener("pointerover", showRollingScrollCursor);
+projectsRoot.addEventListener("pointermove", moveRollingScrollCursor);
+projectsRoot.addEventListener("pointerout", (event) => {
+  if (
+    event.relatedTarget instanceof Element &&
+    event.relatedTarget.closest(".rolling-image-wheel-layer")
+  ) {
+    return;
+  }
+
+  hideRollingScrollCursor();
+});
+projectsRoot.addEventListener("pointerleave", hideRollingScrollCursor);
+
+projectsRoot.addEventListener("pointerdown", (event) => {
+  if (event.button !== 0) {
+    return;
+  }
+
+  const projectCard = event.target.closest(".rolling-project-card");
+  const cardProject = projectCard?.closest(".rolling-project");
+  const cardProjectIndex = projectsList.indexOf(cardProject);
+
+  if (cardProjectIndex === expandedProjectIndex) {
+    prepareProjectReturnScroll(cardProjectIndex);
+  }
+});
+
+projectsRoot.addEventListener(
+  "wheel",
+  (event) => {
+    const wheelLayer = event.target instanceof Element
+      ? event.target.closest(".rolling-image-wheel-layer")
+      : null;
+    const project = wheelLayer?.closest(".rolling-project");
+
+    if (!project?.classList.contains("is-detail-expanded")) {
+      return;
+    }
+
+    const didPost = postScrollToRollingEmbeddedProject(project, event.deltaY);
+
+    if (!didPost) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    rollingScrollCursorX = event.clientX;
+    rollingScrollCursorY = event.clientY;
+    window.setTimeout(() => refreshRollingScrollCursor(wheelLayer), 40);
+  },
+  { passive: false },
+);
+
 projectsRoot.addEventListener("keydown", (event) => {
   if (event.key !== "Enter" && event.key !== " ") {
     return;
@@ -1462,6 +1965,25 @@ window.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeProjectDetail();
   }
+});
+
+window.addEventListener("message", (event) => {
+  const message = event.data;
+
+  if (!message || message.type !== "rolling-select-project") {
+    return;
+  }
+
+  const projectIndex = projectsList.findIndex((project) => (
+    project.dataset.project === String(message.projectId || "")
+  ));
+
+  if (projectIndex < 0) {
+    return;
+  }
+
+  closeProjectDetail();
+  selectProject(projectIndex);
 });
 
 function handleCoverflowWheel(event) {
@@ -1489,10 +2011,11 @@ function handleCoverflowWheel(event) {
           ? event.deltaY * window.innerHeight
           : event.deltaY;
     const normalizedDelta = clamp(rawDelta, -COVERFLOW_WHEEL_DELTA_LIMIT, COVERFLOW_WHEEL_DELTA_LIMIT);
+    const adjustedDelta = normalizedDelta * wheelSensitivity;
     const now = performance.now();
     lastCoverflowWheelTime = now;
     activeProjectSelectedAt = now;
-    coverflowWheelProgress += normalizedDelta / COVERFLOW_WHEEL_THRESHOLD;
+    coverflowWheelProgress += adjustedDelta / COVERFLOW_WHEEL_THRESHOLD;
 
     if (Math.abs(coverflowWheelProgress) >= 1) {
       const stepCount = Math.trunc(coverflowWheelProgress);
@@ -1505,10 +2028,20 @@ loadCardExpandedHeight();
 syncSizeControl();
 loadDetailMediaScale();
 syncDetailMediaControl();
+loadDetailCardHeight();
+syncDetailCardControl();
+loadDetailCardWidth();
+syncDetailCardWidthControl();
 loadMotionFollow();
 syncFollowControl();
+loadWheelSensitivity();
+syncWheelControl();
 loadSelectedTransitionDelay();
 syncDelayControl();
+loadReturnScrollDuration();
+syncReturnScrollControl();
+loadParametersOpen();
+syncParametersToggle();
 
 window.addEventListener("wheel", handleCoverflowWheel, { passive: false });
 projectsRoot.addEventListener("wheel", handleCoverflowWheel, { passive: false });
@@ -1526,5 +2059,6 @@ syncCoverflowCenter();
 syncSegmentRail();
 syncActiveProjectClass();
 primeProjectStates();
+notifyParentActiveProject();
 notifyParentDetailState();
 animateProjects();
