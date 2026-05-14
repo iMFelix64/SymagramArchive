@@ -127,6 +127,7 @@
       }
 
       .group-add-button,
+      .group-delete-button,
       .project-delete-button {
         background: var(--panel);
         border: 1px solid var(--ink);
@@ -134,12 +135,14 @@
         line-height: 1;
       }
 
-      .group-add-button {
+      .group-add-button,
+      .group-delete-button {
         min-height: 26px;
         padding: 4px 9px;
       }
 
       .group-add-button:hover,
+      .group-delete-button:hover,
       .project-delete-button:hover {
         background: var(--accent);
       }
@@ -328,6 +331,13 @@
         margin: 0;
       }
 
+      .export-status {
+        color: var(--muted);
+        font-size: 12px;
+        margin: 0;
+        min-height: 16px;
+      }
+
       .export-output {
         border: 1px solid var(--line);
         min-height: 520px;
@@ -335,6 +345,11 @@
         resize: vertical;
         white-space: pre;
         width: 100%;
+      }
+
+      .export-output.is-updated {
+        border-color: var(--ink);
+        box-shadow: 0 0 0 3px rgba(255, 225, 0, 0.55);
       }
 
       @media (max-width: 980px) {
@@ -356,6 +371,7 @@
           <h1 class="admin-title">目录排序导出</h1>
         </div>
         <div class="admin-actions">
+          <button class="admin-button" id="add-group-button" type="button">Add Group</button>
           <button class="admin-button" id="reset-button" type="button">Reset</button>
           <button class="admin-button" id="export-button" type="button">Export</button>
           <button class="admin-button" id="copy-button" type="button">Copy</button>
@@ -376,6 +392,7 @@
             <p class="export-note">
               拖动项目调整顺序或分组，勾选 Visible 控制是否显示。点击 Export 后复制下面内容，替换 archive-data.js。
             </p>
+            <p class="export-status" id="export-status" aria-live="polite"></p>
             <textarea class="export-output" id="export-output" spellcheck="false"></textarea>
           </section>
         </aside>
@@ -392,9 +409,12 @@
       const groupBoard = document.getElementById("group-board");
       const projectEditor = document.getElementById("project-editor");
       const exportOutput = document.getElementById("export-output");
+      const exportStatus = document.getElementById("export-status");
+      const addGroupButton = document.getElementById("add-group-button");
       const exportButton = document.getElementById("export-button");
       const copyButton = document.getElementById("copy-button");
       const resetButton = document.getElementById("reset-button");
+      let exportStatusTimer = 0;
 
       function cloneArchiveData(data) {
         return {
@@ -450,6 +470,45 @@
 
       function getGroup(groupId) {
         return draftData.groups.find((group) => group.id === groupId);
+      }
+
+      function createGroupId(title) {
+        const baseId = String(title || "")
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "") || "group";
+        const existingIds = new Set(draftData.groups.map((group) => group.id));
+        let nextId = baseId;
+        let suffix = 2;
+
+        while (existingIds.has(nextId)) {
+          nextId = `${baseId}-${suffix}`;
+          suffix += 1;
+        }
+
+        return nextId;
+      }
+
+      function addGroup() {
+        const title = window.prompt("输入新分组名称", "新分组");
+
+        if (title === null) {
+          return;
+        }
+
+        const trimmedTitle = title.trim();
+
+        if (!trimmedTitle) {
+          return;
+        }
+
+        draftData.groups.push({
+          id: createGroupId(trimmedTitle),
+          title: trimmedTitle,
+          projectIds: [],
+        });
+        renderAdmin();
       }
 
       function removeProjectFromGroups(projectId) {
@@ -518,6 +577,35 @@
         removeProjectFromGroups(projectId);
 
         if (selectedProjectId === projectId) {
+          selectedProjectId = getFirstProjectId(draftData);
+        }
+
+        renderAdmin();
+      }
+
+      function deleteGroup(groupId) {
+        const group = getGroup(groupId);
+
+        if (!group) {
+          return;
+        }
+
+        if (group.projectIds.length > 0) {
+          const shouldDelete = window.confirm(
+            `删除分组「${group.title}」和其中 ${group.projectIds.length} 个项目？`
+          );
+
+          if (!shouldDelete) {
+            return;
+          }
+        }
+
+        const deletedProjectIds = new Set(group.projectIds);
+
+        draftData.groups = draftData.groups.filter((currentGroup) => currentGroup.id !== groupId);
+        draftData.projects = draftData.projects.filter((project) => !deletedProjectIds.has(project.id));
+
+        if (deletedProjectIds.has(selectedProjectId)) {
           selectedProjectId = getFirstProjectId(draftData);
         }
 
@@ -603,6 +691,7 @@
         const tools = document.createElement("div");
         const count = document.createElement("span");
         const addButton = document.createElement("button");
+        const deleteButton = document.createElement("button");
         const list = document.createElement("ol");
 
         panel.className = "group-panel";
@@ -621,8 +710,16 @@
           addProjectToGroup(group.id);
         });
 
+        deleteButton.className = "group-delete-button";
+        deleteButton.type = "button";
+        deleteButton.textContent = "Delete Group";
+        deleteButton.setAttribute("aria-label", `Delete group ${group.title}`);
+        deleteButton.addEventListener("click", () => {
+          deleteGroup(group.id);
+        });
+
         tools.className = "group-tools";
-        tools.append(count, addButton);
+        tools.append(count, addButton, deleteButton);
         header.append(title, tools);
 
         list.className = "project-list";
@@ -907,8 +1004,72 @@
         exportArchiveData();
       }
 
-      function exportArchiveData() {
+      function setTemporaryButtonText(button, text, originalText = button.textContent) {
+        button.textContent = text;
+        window.setTimeout(() => {
+          button.textContent = originalText;
+        }, 1200);
+      }
+
+      function showExportFeedback(message, options = {}) {
+        window.clearTimeout(exportStatusTimer);
+        exportStatus.textContent = message;
+        exportOutput.classList.add("is-updated");
+
+        if (options.selectOutput !== false) {
+          exportOutput.focus();
+          exportOutput.select();
+          exportOutput.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        }
+
+        exportStatusTimer = window.setTimeout(() => {
+          exportStatus.textContent = "";
+          exportOutput.classList.remove("is-updated");
+        }, 1600);
+      }
+
+      function exportArchiveData(options = {}) {
         exportOutput.value = `window.TDG_ARCHIVE = ${JSON.stringify(createExportData(), null, 2)};\n`;
+
+        if (options.feedback) {
+          showExportFeedback("Exported. Copy the selected content into archive-data.js.");
+        }
+      }
+
+      async function saveExportFile() {
+        const fileName = "archive-data.js";
+        const fileContent = exportOutput.value;
+
+        if ("showSaveFilePicker" in window) {
+          const fileHandle = await window.showSaveFilePicker({
+            suggestedName: fileName,
+            types: [
+              {
+                description: "JavaScript file",
+                accept: {
+                  "text/javascript": [".js"],
+                },
+              },
+            ],
+          });
+          const writable = await fileHandle.createWritable();
+
+          await writable.write(fileContent);
+          await writable.close();
+          return;
+        }
+
+        const downloadLink = document.createElement("a");
+        const fileBlob = new Blob([fileContent], { type: "text/javascript" });
+
+        downloadLink.href = URL.createObjectURL(fileBlob);
+        downloadLink.download = fileName;
+        document.body.append(downloadLink);
+        downloadLink.click();
+        downloadLink.remove();
+        window.setTimeout(() => {
+          URL.revokeObjectURL(downloadLink.href);
+        }, 0);
       }
 
       function createExportData() {
@@ -937,7 +1098,25 @@
         };
       }
 
-      exportButton.addEventListener("click", exportArchiveData);
+      addGroupButton.addEventListener("click", addGroup);
+
+      exportButton.addEventListener("click", async () => {
+        exportArchiveData();
+
+        try {
+          await saveExportFile();
+          setTemporaryButtonText(exportButton, "Saved");
+          showExportFeedback("Saved archive-data.js.", { selectOutput: false });
+        } catch (error) {
+          if (error.name === "AbortError") {
+            showExportFeedback("Save canceled.", { selectOutput: false });
+            return;
+          }
+
+          setTemporaryButtonText(exportButton, "Exported");
+          showExportFeedback("Exported. Select and copy the content below.");
+        }
+      });
 
       copyButton.addEventListener("click", async () => {
         exportArchiveData();
@@ -945,12 +1124,12 @@
 
         try {
           await navigator.clipboard.writeText(exportOutput.value);
-          copyButton.textContent = "Copied";
-          window.setTimeout(() => {
-            copyButton.textContent = "Copy";
-          }, 1200);
+          setTemporaryButtonText(copyButton, "Copied");
+          showExportFeedback("Copied to clipboard.");
         } catch (error) {
           document.execCommand("copy");
+          setTemporaryButtonText(copyButton, "Copied");
+          showExportFeedback("Copied to clipboard.");
         }
       });
 

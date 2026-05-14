@@ -470,13 +470,13 @@ img {
   position: absolute;
   right: 0;
   top: 0;
+  transition: opacity 260ms ease;
   transform: translate3d(0, var(--divider-y, 0), 0);
   z-index: 115;
 }
 
 .rolling-app.is-detail-expanded .rolling-segment-divider {
   opacity: 0;
-  visibility: hidden;
 }
 
 .rolling-project {
@@ -530,6 +530,7 @@ img {
 .rolling-project.is-detail-hidden {
   opacity: 0;
   pointer-events: none;
+  visibility: hidden;
 }
 
 .rolling-project.is-detail-expanded {

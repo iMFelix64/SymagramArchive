@@ -2,11 +2,28 @@ const detailScroll = document.getElementById("detail-scroll");
 const archiveApp = document.querySelector(".archive-app");
 const archiveData = window.TDG_ARCHIVE || { groups: [], projects: [] };
 const archiveProjectById = new Map((archiveData.projects || []).map((project) => [project.id, project]));
-const orderedArchiveProjects = (archiveData.groups || []).flatMap((group) => (
-  (group.projectIds || [])
-    .map((projectId) => archiveProjectById.get(projectId))
-    .filter((project) => project && project.visible !== false)
-));
+const archiveProjectDisplayNumberById = new Map();
+const archiveProjectGroups = (archiveData.groups || [])
+  .map((group) => {
+    const projects = (group.projectIds || [])
+      .map((projectId) => archiveProjectById.get(projectId))
+      .filter((project) => project && project.visible !== false)
+      .map((project, projectIndex) => {
+        const displayNumber = String(projectIndex + 1).padStart(2, "0");
+        archiveProjectDisplayNumberById.set(project.id, displayNumber);
+        return {
+          ...project,
+          displayNumber,
+        };
+      });
+
+    return {
+      ...group,
+      projects,
+    };
+  })
+  .filter((group) => group.projects.length > 0);
+const orderedArchiveProjects = archiveProjectGroups.flatMap((group) => group.projects);
 
 function buildIndexList() {
   const indexList = document.querySelector(".index-list");
@@ -15,25 +32,57 @@ function buildIndexList() {
     return;
   }
 
-  indexList.replaceChildren(...orderedArchiveProjects.map((project) => {
-    const item = document.createElement("li");
-    const label = document.createElement("span");
-    const dot = document.createElement("span");
+  const segments = archiveProjectGroups.map((group) => {
+    const segment = document.createElement("li");
+    const segmentTitle = document.createElement("span");
+    const segmentItems = document.createElement("ol");
 
-    item.className = "index-item";
-    item.dataset.project = project.id;
-    item.setAttribute("aria-label", `项目 ${project.id} ${project.title}`);
-    item.dataset.debugLabel = `li.index-item[${project.id}]`;
+    segment.className = "index-segment";
+    segment.dataset.segment = group.id;
+    segment.dataset.debugLabel = `li.index-segment[${group.id}]`;
+    segment.style.display = "grid";
+    segment.style.gridTemplateColumns = "116px minmax(0, 1fr)";
 
-    label.className = "index-item-label";
-    label.textContent = project.id;
+    segmentTitle.className = "index-segment-title";
+    segmentTitle.textContent = group.title;
+    segmentTitle.style.minWidth = "104px";
+    segmentTitle.style.overflowWrap = "normal";
+    segmentTitle.style.whiteSpace = "nowrap";
+    segmentTitle.style.wordBreak = "keep-all";
 
-    dot.className = "index-item-dot";
-    dot.setAttribute("aria-hidden", "true");
+    segmentItems.className = "index-segment-items";
+    segmentItems.setAttribute("aria-label", group.title);
 
-    item.append(label, dot);
-    return item;
-  }));
+    group.projects.forEach((project) => {
+      const item = document.createElement("li");
+      const number = document.createElement("span");
+      const title = document.createElement("span");
+      const dot = document.createElement("span");
+
+      item.className = "index-item";
+      item.dataset.project = project.id;
+      item.dataset.segment = group.id;
+      item.setAttribute("aria-label", `项目 ${project.displayNumber} ${project.title}`);
+      item.dataset.debugLabel = `li.index-item[${project.id}]`;
+
+      number.className = "index-item-number";
+      number.textContent = project.displayNumber;
+
+      title.className = "index-item-title";
+      title.textContent = project.title;
+
+      dot.className = "index-item-dot";
+      dot.setAttribute("aria-hidden", "true");
+
+      item.append(number, title, dot);
+      segmentItems.append(item);
+    });
+
+    segment.append(segmentTitle, segmentItems);
+    return segment;
+  });
+
+  indexList.replaceChildren(...segments);
 }
 
 buildIndexList();
@@ -48,10 +97,83 @@ const rollingFrame = document.querySelector(".archive-rolling-frame");
 const homeTransitionStage = document.getElementById("home-transition-stage");
 const homeIntro = document.getElementById("home-intro");
 const homeIntroLetters = Array.from(document.querySelectorAll(".home-intro-letter"));
+const homeNavButtons = Array.from(document.querySelectorAll(".home-nav-button"));
+const homeTopLogo = document.querySelector(".index-header, .home-top-logo");
 const homeCursorAsset = "./Assets/Icons/Arrow.svg";
 const homeButton = document.getElementById("index-home-button");
 const aboutButton = document.getElementById("index-about-button");
 const projectGroup = document.getElementById("index-project-group");
+
+function syncStaticProjectPanelNumbers() {
+  projectPanels.forEach((panel) => {
+    const displayNumber = archiveProjectDisplayNumberById.get(panel.dataset.project);
+
+    if (!displayNumber) {
+      return;
+    }
+
+    const bandNumber = panel.querySelector(".band-number");
+    const sideKicker = panel.querySelector(".panel-side-copy-kicker");
+
+    if (bandNumber) {
+      bandNumber.textContent = `${displayNumber}.`;
+    }
+
+    if (sideKicker) {
+      sideKicker.textContent = `PROJECT ${displayNumber}`;
+    }
+  });
+}
+
+syncStaticProjectPanelNumbers();
+
+function setProjectDirectoryExpanded() {
+  projectGroup?.classList.remove("is-collapsed");
+  projectToggle?.setAttribute("aria-expanded", "true");
+}
+
+function syncRollingFrameProjectNumbers() {
+  const frameDocument = rollingFrame?.contentDocument;
+
+  if (!frameDocument) {
+    return false;
+  }
+
+  frameDocument.querySelectorAll(".rolling-project").forEach((projectElement) => {
+    const displayNumber = archiveProjectDisplayNumberById.get(projectElement.dataset.project);
+
+    if (!displayNumber) {
+      return;
+    }
+
+    const projectIndex = projectElement.querySelector(".rolling-project-index");
+    const detailKicker = projectElement.querySelector(".rolling-detail-kicker");
+
+    if (projectIndex) {
+      projectIndex.textContent = `${displayNumber}.`;
+    }
+
+    if (detailKicker) {
+      detailKicker.textContent = `PROJECT ${displayNumber}`;
+    }
+
+    projectElement.querySelectorAll(".rolling-image-placeholder-copy").forEach((placeholder) => {
+      placeholder.textContent = `PLACEHOLDER ${displayNumber}`;
+    });
+  });
+
+  return true;
+}
+
+function queueRollingFrameNumberSync() {
+  syncRollingFrameProjectNumbers();
+  window.setTimeout(syncRollingFrameProjectNumbers, 120);
+  window.setTimeout(syncRollingFrameProjectNumbers, 420);
+}
+
+rollingFrame?.addEventListener("load", queueRollingFrameNumberSync);
+queueRollingFrameNumberSync();
+
 const projectToggle = document.getElementById("index-project-toggle");
 const expandToggles = Array.from(document.querySelectorAll(".panel-expand-toggle"));
 const panelFrames = Array.from(document.querySelectorAll(".panel-frame"));
@@ -61,6 +183,7 @@ const frameShells = Array.from(document.querySelectorAll(".panel-frame-shell"));
 const projectEmbedFrames = Array.from(document.querySelectorAll(".panel-project-embed-frame"));
 const projectEmbedWheelLayers = Array.from(document.querySelectorAll(".panel-project-embed-wheel-layer"));
 const aboutView = document.getElementById("about-view");
+const archiveDetail = document.querySelector(".archive-detail");
 const panelByProject = new Map(projectPanels.map((panel) => [panel.dataset.project, panel]));
 const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, item]));
 const PANEL_RESET_ANIMATION_MS = 420;
@@ -105,6 +228,7 @@ let ticking = false;
 let isHomeIntroPrepared = false;
 const collapseCopyTimers = new Map();
 const homeIntroScrambleTimers = new Map();
+const homeIntroFlowTimers = new Set();
 let homeFloatLayer = null;
 let homeCursor = null;
 let homeCursorX = window.innerWidth / 2;
@@ -137,6 +261,23 @@ function shuffledItems(items) {
 
 function randomHomeIntroGlyph() {
   return HOME_INTRO_GLYPHS[Math.floor(Math.random() * HOME_INTRO_GLYPHS.length)];
+}
+
+function scheduleHomeIntroTimer(callback, delay) {
+  const timer = window.setTimeout(() => {
+    homeIntroFlowTimers.delete(timer);
+    callback();
+  }, delay);
+
+  homeIntroFlowTimers.add(timer);
+  return timer;
+}
+
+function clearHomeIntroFlowTimers() {
+  homeIntroFlowTimers.forEach((timer) => {
+    window.clearTimeout(timer);
+  });
+  homeIntroFlowTimers.clear();
 }
 
 function startHomeIntroScramble(letter) {
@@ -517,11 +658,33 @@ function layoutHomeFloatItems() {
 
   const anchors = shuffledItems(HOME_FLOAT_ANCHORS);
   const items = Array.from(homeFloatLayer.children);
+  const placedAnchors = [];
+  const minAnchorDistance = 19;
 
   items.forEach((item, index) => {
     const [anchorX, anchorY] = anchors[index % anchors.length];
-    const left = Math.max(0, Math.min(88, anchorX + randomBetween(-3, 3)));
-    const top = Math.max(3, Math.min(82, anchorY + randomBetween(-4, 4)));
+    let left = anchorX;
+    let top = anchorY;
+
+    for (let attempt = 0; attempt < 12; attempt += 1) {
+      const candidateLeft = Math.max(0, Math.min(88, anchorX + randomBetween(-5, 5)));
+      const candidateTop = Math.max(1, Math.min(86, anchorY + randomBetween(-10, 10)));
+      const hasEnoughSpace = placedAnchors.every((placedAnchor) => {
+        const deltaX = candidateLeft - placedAnchor.left;
+        const deltaY = candidateTop - placedAnchor.top;
+
+        return Math.hypot(deltaX, deltaY) >= minAnchorDistance;
+      });
+
+      left = candidateLeft;
+      top = candidateTop;
+
+      if (hasEnoughSpace) {
+        break;
+      }
+    }
+
+    placedAnchors.push({ left, top });
 
     item.style.setProperty("--float-left", `${left}%`);
     item.style.setProperty("--float-top", `${top}%`);
@@ -545,10 +708,11 @@ function finishHomeIntro({ immediate = false } = {}) {
     return;
   }
 
+  clearHomeIntroFlowTimers();
   homeIntro.classList.add("is-exiting");
   homeTransitionStage?.classList.add("is-index-visible");
 
-  window.setTimeout(
+  scheduleHomeIntroTimer(
     () => {
       homeIntro.hidden = true;
       homeIntro.inert = true;
@@ -605,6 +769,7 @@ function playHomeIntro({ autoExit = true, immediate = false } = {}) {
     return;
   }
 
+  clearHomeIntroFlowTimers();
   layoutHomeFloatItems();
 
   homeIntro.hidden = false;
@@ -648,10 +813,10 @@ function playHomeIntro({ autoExit = true, immediate = false } = {}) {
   }
 
   homeIntroLetters.forEach((letter, index) => {
-    window.setTimeout(() => {
+    scheduleHomeIntroTimer(() => {
       startHomeIntroScramble(letter);
 
-      window.setTimeout(() => {
+      scheduleHomeIntroTimer(() => {
         stopHomeIntroScramble(letter);
       }, HOME_TYPE_SCRAMBLE_DURATION);
     }, HOME_TYPE_START_DELAY + index * HOME_TYPE_LETTER_DELAY);
@@ -662,12 +827,12 @@ function playHomeIntro({ autoExit = true, immediate = false } = {}) {
     (homeIntroLetters.length - 1) * HOME_TYPE_LETTER_DELAY +
     HOME_TYPE_SCRAMBLE_DURATION;
 
-  window.setTimeout(() => {
+  scheduleHomeIntroTimer(() => {
     homeIntro.classList.add("is-complete");
   }, introDuration);
 
   if (autoExit) {
-    window.setTimeout(() => {
+    scheduleHomeIntroTimer(() => {
       finishHomeIntro();
     }, introDuration + HOME_EXIT_DELAY);
   }
@@ -739,7 +904,7 @@ function syncVisibleProject(visibleId) {
   visibleProjectId = visibleId;
 }
 
-function setAboutViewActive(active) {
+function setAboutViewActive(active, { deferHide = false, targetView = "projects" } = {}) {
   if (isAboutViewActive === active) {
     return;
   }
@@ -748,7 +913,39 @@ function setAboutViewActive(active) {
   archiveApp?.classList.toggle("is-about-active", active);
   aboutButton?.classList.toggle("is-active", active);
   aboutButton?.setAttribute("aria-pressed", String(active));
-  aboutView?.toggleAttribute("hidden", !active);
+
+  if (active) {
+    aboutView?.removeAttribute("hidden");
+    aboutView?.removeAttribute("inert");
+    homeTransitionStage?.classList.remove("is-about-leaving");
+    homeTransitionStage?.classList.add("is-index-visible", "is-about-visible");
+    if (archiveApp) {
+      archiveApp.inert = true;
+    }
+  } else {
+    if (deferHide) {
+      homeTransitionStage?.classList.add("is-about-leaving");
+    }
+    homeTransitionStage?.classList.remove("is-about-visible");
+    homeTransitionStage?.classList.toggle("is-index-visible", targetView !== "home");
+    if (archiveApp) {
+      archiveApp.inert = false;
+    }
+
+    if (deferHide) {
+      window.setTimeout(() => {
+        if (!isAboutViewActive) {
+          aboutView?.setAttribute("hidden", "");
+          aboutView?.setAttribute("inert", "");
+          homeTransitionStage?.classList.remove("is-about-leaving");
+        }
+      }, 760);
+    } else {
+      aboutView?.setAttribute("hidden", "");
+      aboutView?.setAttribute("inert", "");
+      homeTransitionStage?.classList.remove("is-about-leaving");
+    }
+  }
 
   if (currentProject) {
     currentProject.textContent = active ? "ABOUT" : visibleProjectId || selectedProjectId || "01";
@@ -853,6 +1050,42 @@ function animateElementScrollToTop(element, duration = PANEL_RESET_ANIMATION_MS)
       }
 
       element.scrollTop = 0;
+      resolve(true);
+    };
+
+    window.requestAnimationFrame(tick);
+  });
+}
+
+function animateElementScrollTo(element, target, duration = PANEL_RESET_ANIMATION_MS) {
+  if (!element) {
+    return Promise.resolve(false);
+  }
+
+  const start = element.scrollTop;
+  const maxTarget = Math.max(0, element.scrollHeight - element.clientHeight);
+  const nextTarget = Math.max(0, Math.min(target, maxTarget));
+  const distance = nextTarget - start;
+
+  if (Math.abs(distance) <= 1) {
+    element.scrollTo({ top: nextTarget, behavior: "auto" });
+    return Promise.resolve(false);
+  }
+
+  return new Promise((resolve) => {
+    const startTime = window.performance.now();
+
+    const tick = (timestamp) => {
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const eased = 1 - (1 - progress) ** 3;
+      element.scrollTop = start + distance * eased;
+
+      if (progress < 1) {
+        window.requestAnimationFrame(tick);
+        return;
+      }
+
+      element.scrollTop = nextTarget;
       resolve(true);
     };
 
@@ -1410,16 +1643,26 @@ indexItems.forEach((item) => {
     listNavigationTargetId = targetProjectId === visibleProjectId ? "" : targetProjectId;
     syncSelectedProject(targetProjectId);
 
-    if (targetPanel) {
-      targetPanel.scrollIntoView({
+    if (selectRollingProject(targetProjectId)) {
+      return;
+    }
+
+    if (targetPanel && detailScroll) {
+      refreshMeasurements();
+      const targetTop = (
+        targetPanel.getBoundingClientRect().top -
+        detailScroll.getBoundingClientRect().top +
+        detailScroll.scrollTop
+      );
+
+      detailScroll?.scrollTo({
+        top: targetTop,
         behavior: "smooth",
-        block: "start",
       });
       return;
     }
 
     syncVisibleProject(targetProjectId);
-    selectRollingProject(targetProjectId);
   };
 
   item.addEventListener("click", scrollToPanel);
@@ -1440,8 +1683,7 @@ window.addEventListener("blur", () => {
   hideProjectEmbedScrollCursor();
 });
 
-homeButton?.addEventListener("click", async () => {
-  setAboutViewActive(false);
+async function showHomeIntroFromNav() {
   const firstProjectId = projectPanels[0]?.dataset.project || "01";
   let hasStartedHome = false;
 
@@ -1459,6 +1701,12 @@ homeButton?.addEventListener("click", async () => {
 
   await syncExpandedProject("");
 
+  if (isAboutViewActive) {
+    startHomeReturn();
+    setAboutViewActive(false, { deferHide: true, targetView: "home" });
+    return;
+  }
+
   if (detailScroll && detailScroll.scrollTop > 1) {
     const transitionLeadTime = Math.max(0, HOME_RETURN_SCROLL_MS - HOME_RETURN_OVERLAP_MS);
     const homeReturnTimer = window.setTimeout(startHomeReturn, transitionLeadTime);
@@ -1468,26 +1716,57 @@ homeButton?.addEventListener("click", async () => {
   }
 
   startHomeReturn();
-});
+}
 
-aboutButton?.addEventListener("click", async () => {
-  const nextState = !isAboutViewActive;
-
+async function showProjectsFromNav() {
+  setProjectDirectoryExpanded();
   await syncExpandedProject("");
-  setAboutViewActive(nextState);
 
-  if (nextState) {
-    detailScroll?.scrollTo({ top: 0, behavior: "auto" });
-  } else {
-    requestActiveUpdate();
+  if (isAboutViewActive) {
+    setAboutViewActive(false, { deferHide: true });
   }
+
+  finishHomeIntro();
+  requestActiveUpdate();
+}
+
+async function showAboutFromNav() {
+  await syncExpandedProject("");
+  finishHomeIntro();
+
+  if (detailScroll) {
+    detailScroll.scrollTo({ top: 0, behavior: "auto" });
+  }
+
+  setAboutViewActive(true);
+}
+
+homeButton?.addEventListener("click", showHomeIntroFromNav);
+homeTopLogo?.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  showHomeIntroFromNav();
 });
 
-projectToggle?.addEventListener("click", () => {
-  const isCollapsed = projectGroup?.classList.toggle("is-collapsed");
+aboutButton?.addEventListener("click", showAboutFromNav);
+projectToggle?.addEventListener("click", showProjectsFromNav);
 
-  projectToggle.setAttribute("aria-expanded", String(!isCollapsed));
+homeNavButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const action = button.dataset.homeAction;
+
+    if (action === "home") {
+      showHomeIntroFromNav();
+    } else if (action === "projects") {
+      showProjectsFromNav();
+    } else if (action === "about") {
+      showAboutFromNav();
+    }
+  });
 });
+
+setProjectDirectoryExpanded();
 
 debugToggle?.addEventListener("click", () => {
   setDebugOutlinesActive(!document.body.classList.contains("debug-outlines"));

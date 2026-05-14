@@ -28,9 +28,11 @@ const segmentIdByProjectId = new Map(
 projects.forEach((project) => {
   const segmentId = segmentIdByProjectId.get(project.id) || projectSegments[0].id;
   const segment = segmentById.get(segmentId) || projectSegments[0];
+  const segmentProjectIndex = Math.max(0, segment.projectIds.indexOf(project.id));
 
   project.segmentId = segment.id;
   project.segmentTitle = segment.title;
+  project.displayNumber = String(segmentProjectIndex + 1).padStart(2, "0");
 });
 
 const isPanelEmbed = new URLSearchParams(window.location.search).get("panel") === "1";
@@ -68,7 +70,7 @@ const EXPANDED_SIZE_STORAGE_KEY = "rolling-coverflow-expanded-height-v2";
 const DETAIL_MEDIA_SCALE_STORAGE_KEY = "rolling-detail-media-scale-v3";
 const DETAIL_CARD_HEIGHT_STORAGE_KEY = "rolling-detail-card-height-v1";
 const DETAIL_CARD_WIDTH_STORAGE_KEY = "rolling-detail-card-width-v1";
-const FOLLOW_STORAGE_KEY = "rolling-coverflow-follow-v4";
+const FOLLOW_STORAGE_KEY = "rolling-coverflow-follow-v5";
 const WHEEL_SENSITIVITY_STORAGE_KEY = "rolling-coverflow-wheel-sensitivity-v1";
 const DELAY_STORAGE_KEY = "rolling-coverflow-delay-ms-v2";
 const RETURN_SCROLL_DURATION_STORAGE_KEY = "rolling-return-scroll-duration-ms-v1";
@@ -79,7 +81,7 @@ const COVERFLOW_WHEEL_THRESHOLD = 60;
 const COVERFLOW_WHEEL_DELTA_LIMIT = 220;
 const COVERFLOW_IDLE_DECAY_DELAY_MS = 220;
 const COVERFLOW_TUG_DECAY = 0.92;
-const DEFAULT_FOLLOW = 0.07;
+const DEFAULT_FOLLOW = 0.045;
 const MIN_FOLLOW = 0.035;
 const MAX_FOLLOW = 0.12;
 const DEFAULT_WHEEL_SENSITIVITY = 0.6;
@@ -175,7 +177,7 @@ function buildProjects() {
       const mediaMarkup = project.placeholder
         ? `
           <figure class="rolling-image-media rolling-image-media--placeholder" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
-            <div class="rolling-image-placeholder-copy">PLACEHOLDER ${project.id}</div>
+            <div class="rolling-image-placeholder-copy">PLACEHOLDER ${project.displayNumber}</div>
           </figure>
         `
         : project.embedSrc
@@ -198,14 +200,14 @@ function buildProjects() {
         `
           : `
           <figure class="rolling-image-media rolling-image-media--placeholder" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
-            <div class="rolling-image-placeholder-copy">PLACEHOLDER ${project.id}</div>
+            <div class="rolling-image-placeholder-copy">PLACEHOLDER ${project.displayNumber}</div>
           </figure>
         `;
 
       return `
         <article class="rolling-project" data-project="${project.id}" data-segment="${project.segmentId}" data-debug-label="article.rolling-project[${project.id}]">
           <aside class="rolling-project-card" aria-label="${project.title} 项目信息" data-debug-label="aside.rolling-project-card[${project.id}]">
-            <p class="rolling-project-index">${project.id}.</p>
+            <p class="rolling-project-index">${project.displayNumber}.</p>
             <div class="rolling-project-copy">
               <h2 class="rolling-project-name">${project.title}</h2>
               <p class="rolling-project-description">${project.description}</p>
@@ -220,7 +222,7 @@ function buildProjects() {
           </div>
 
           <aside class="rolling-detail-copy" aria-hidden="true" data-debug-label="aside.rolling-detail-copy[${project.id}]">
-            <p class="rolling-detail-kicker">PROJECT ${project.id}</p>
+            <p class="rolling-detail-kicker">PROJECT ${project.displayNumber}</p>
             <h3 class="rolling-detail-title">${project.title}</h3>
             <p class="rolling-detail-description">${project.description}</p>
             <span class="rolling-detail-rule" aria-hidden="true"></span>
@@ -1249,6 +1251,12 @@ function buildLiveLayoutCoverYs(targets) {
     const desiredDetailCoverY = getProjectCoverYForTop(-getCoverflowCenterY());
     const currentCoverY = detailState ? detailState.coverY : desiredDetailCoverY;
 
+    projectsList.forEach((project, index) => {
+      if (index !== expandedProjectIndex) {
+        coverYs[index] = projectStates.get(project)?.coverY ?? 0;
+      }
+    });
+
     coverYs[expandedProjectIndex] = lerp(currentCoverY, desiredDetailCoverY, motionFollow);
     return coverYs;
   }
@@ -1358,7 +1366,7 @@ function paintProject(project, target, index) {
 
   const visualProgress = clamp(state.progress, 0, 1);
   const detailProgress = easeInOutCubic(state.detailProgress);
-  const mediaExpandProgress = easeOutCubic(state.detailProgress);
+  const mediaExpandProgress = detailProgress;
   const indexSlideProgress = steepenProgress(state.indexSlide);
   const normalExpandedHeight = getResolvedExpandedHeight(false);
   const detailExpandedHeight = getResolvedExpandedHeight(true);

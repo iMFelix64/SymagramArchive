@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TwoDiskGarage · Olha Effect Study</title>
+    <link rel="stylesheet" href="./olha-effect.css" />
+  </head>
+  <body class="is-loading">
+    <div class="olha-loader" aria-live="polite">
+      <span class="loader-tick" id="loader-tick">0%</span>
+      <span class="loader-mark">TWO / DISK / GARAGE</span>
+    </div>
+
+    <div class="scroll-meter" aria-hidden="true">
+      <span id="scroll-percent">0%</span>
+      <span class="scroll-meter-line"></span>
+    </div>
+
+    <header class="clone-header" id="clone-header">
+      <a class="header-logo" href="./index.html" aria-label="TwoDiskGarage home">
+        <span>TWO</span>
+        <span>DISK</span>
+        <span>GARAGE</span>
+      </a>
+
+      <nav class="header-menu" aria-label="Effect navigation">
+        <a class="split-link" href="#about" data-split="ABOUT">ABOUT</a>
+        <a class="split-link" href="#works" data-split="WORKS">WORKS</a>
+        <a class="split-link" href="#services" data-split="SERVICES">SERVICES</a>
+        <a class="split-link" href="#connect" data-split="CONNECT">CONNECT</a>
+      </nav>
+
+      <a class="header-contact" href="#connect">CONTACT ME ↗</a>
+    </header>
+
+    <main class="effect-page">
+      <section class="hero-section" id="hero" data-section="1/5">
+        <p class="hero-index">1/5</p>
+        <h1 class="hero-title" aria-label="Creative archive">
+          <span class="number-cloud">0 1 2 3 4 5 6 7 8 9 , 0 1 2 3 4 5 6 7 8 9</span>
+          <span class="hero-word" data-drift="left">CREATIVE</span>
+          <span class="hero-word" data-drift="right">ARCHIVE</span>
+        </h1>
+
+        <div class="hero-media" data-parallax="0.18">
+          <img src="./Assets/Project 01/1-EARTH EXPLORER 01.jpg" alt="Earth Explorer product render" />
+          <div class="hero-media-caption">
+            <span>/ INDUSTRIAL DESIGN</span>
+            <span>/ PRODUCT STORYTELLING</span>
+            <span>/ VISUAL SYSTEM</span>
+          </div>
+        </div>
+
+        <p class="hero-location">BASED IN<br />AFTER SCHOOL PROJECTS</p>
+        <p class="hero-copy">
+          A high-contrast portfolio surface inspired by Olha Lazarieva's kinetic typography,
+          smooth scroll pacing, and black-white editorial rhythm.
+        </p>
+
+        <a class="hero-collab" href="#connect">AVAILABLE FOR COLLABORATION ↘</a>
+        <a class="hero-recent" href="#works">
+          <span>RECENT WORK</span>
+          <strong>EARTH EXPLORER</strong>
+        </a>
+      </section>
+
+      <section class="dark-section" id="about" data-section="2/5">
+        <div class="section-sticky-label">
+          <span>TWO<br />DISK</span>
+          <strong>2/5</strong>
+        </div>
+
+        <div class="dark-topline">
+          <span>FOR ME</span>
+          <span>DSGN/2</span>
+        </div>
+
+        <div class="kinetic-copy" aria-label="Design is not just decoration but a tool for influence and growth">
+          <p data-kinetic>DESIGN IS NOT JUST</p>
+          <p data-kinetic>DECORATION, BUT</p>
+          <p data-kinetic>A TOOL FOR INPUT</p>
+          <p data-kinetic>AND GROWTH.</p>
+        </div>
+
+        <div class="about-grid reveal-row">
+          <figure>
+            <img src="./Assets/Project 02/2-PinBridge 01.jpg" alt="PinBridge product and app render" />
+          </figure>
+          <figure>
+            <img src="./Assets/Project 03/3-UTOPIA 01.jpg" alt="Utopia waterside residence render" />
+          </figure>
+          <div class="about-text">
+            <p class="eyebrow">MY LIFESTYLE ↘</p>
+            <p>
+              I look for aesthetics everywhere: in object systems, interaction traces,
+              material decisions, and the small frictions that make a project memorable.
+            </p>
+            <a class="line-link" href="#connect">LETS CONTACT ↗</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="works-section" id="works" data-section="3/5">
+        <div class="works-heading">
+          <p>RECENT WORKS</p>
+          <h2>Swipe</h2>
+        </div>
+
+        <div class="work-strip">
+          <article class="work-card reveal-row">
+            <img src="./Assets/Project 01/1-EARTH EXPLORER 05.jpg" alt="Earth Explorer lighting product detail" />
+            <div>
+              <span>01.</span>
+              <h3>EARTH EXPLORER</h3>
+              <a class="split-link" href="./projects/project-01/" data-split="VIEW CASE">VIEW CASE</a>
+            </div>
+          </article>
+          <article class="work-card reveal-row">
+            <img src="./Assets/Project 04/4-AeroSense 01.jpg" alt="AeroSense cockpit render" />
+            <div>
+              <span>02.</span>
+              <h3>AEROSENSE</h3>
+              <a class="split-link" href="./projects/project-04/" data-split="VIEW CASE">VIEW CASE</a>
+            </div>
+          </article>
+          <article class="work-card reveal-row">
+            <img src="./Assets/Project 03/3-UTOPIA 04.jpg" alt="Utopia interior render" />
+            <div>
+              <span>03.</span>
+              <h3>UTOPIA</h3>
+              <a class="split-link" href="./projects/project-03/" data-split="VIEW CASE">VIEW CASE</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="services-section" id="services" data-section="4/5">
+        <p class="section-kicker">SERVICES</p>
+        <div class="service-list">
+          <p>ART DIRECTION</p>
+          <p>WEB DESIGN (UX/UI)</p>
+          <p>INDUSTRIAL STORYTELLING</p>
+          <p>INTERACTIVE PROTOTYPES</p>
+        </div>
+      </section>
+
+      <section class="connect-section" id="connect" data-section="5/5">
+        <h2>LET'S START THE CONVERSATION</h2>
+        <form class="clone-form">
+          <label>YOUR NAME*<input type="text" /></label>
+          <label>PHONE*<input type="tel" /></label>
+          <label>YOUR EMAIL*<input type="email" /></label>
+          <label>HOW CAN I HELP YOU<textarea></textarea></label>
+          <fieldset>
+            <legend>PROJECT BUDGET (USD)</legend>
+            <label><input type="radio" name="budget" /> 5K-10K</label>
+            <label><input type="radio" name="budget" /> 10K-20K</label>
+            <label><input type="radio" name="budget" /> MORE</label>
+          </fieldset>
+          <button type="button">DISCUSS THE PROJECT ↗</button>
+        </form>
+
+        <footer class="clone-footer">
+          <a href="mailto:hello@twodiskgarage.local">hello@twodiskgarage.local</a>
+          <nav>
+            <a href="./index.html">ARCHIVE</a>
+            <a href="#works">WORKS</a>
+            <a href="#about">ABOUT</a>
+          </nav>
+        </footer>
+      </section>
+    </main>
+
+    <script src="./olha-effect.js"></script>
+  </body>
+</html>

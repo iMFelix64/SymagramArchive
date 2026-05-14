@@ -34,56 +34,16 @@
 
       <main class="archive-app" aria-label="SYMTY archive layout" data-debug-label="main.archive-app">
       <aside class="archive-index" data-debug-label="aside.archive-index">
-        <header class="index-header" data-debug-label="header.index-header">
-          <h1>
-            <span>TWO</span>
-            <span>DISK</span>
-            <span>GARAGE</span>
-          </h1>
-        </header>
-
-        <nav class="index-nav" aria-label="Archive menu" data-debug-label="nav.index-nav">
-          <button class="index-link index-link--primary" id="index-home-button" type="button" data-debug-label="button#index-home-button">
-            <span class="index-link-label">首页</span>
-          </button>
-
-          <section
-            class="index-group is-collapsed"
-            id="index-project-group"
-            aria-labelledby="index-project-toggle"
-            data-debug-label="section#index-project-group"
-          >
-            <button
-              class="index-group-toggle"
-              id="index-project-toggle"
-              type="button"
-              aria-expanded="false"
-              data-debug-label="button#index-project-toggle"
-            >
-              <span class="index-group-label">项目</span>
-              <span class="index-group-arrow" aria-hidden="true"></span>
-            </button>
-
-            <ol class="index-list" data-debug-label="ol.index-list"></ol>
-          </section>
-
-          <button class="index-link" id="index-about-button" type="button" aria-pressed="false" data-debug-label="button#index-about-button">
-            <span class="index-link-label">关于我</span>
-          </button>
-        </nav>
+        <section
+          class="index-group"
+          id="index-project-group"
+          aria-labelledby="index-project-toggle"
+          data-debug-label="section#index-project-group"
+        >
+          <h2 class="index-panel-title">项目</h2>
+          <ol class="index-list" data-debug-label="ol.index-list"></ol>
+        </section>
       </aside>
-
-      <nav class="archive-debug-controls" aria-label="Debug controls" data-debug-label="nav.archive-debug-controls">
-        <button class="debug-toggle" id="debug-toggle" type="button" aria-pressed="false">
-          OUTLINE
-        </button>
-        <button class="debug-toggle" id="label-toggle" type="button" aria-pressed="false">
-          LABELS
-        </button>
-        <button class="debug-toggle" id="parameters-toggle" type="button" aria-pressed="true" aria-expanded="true">
-          PARAMETERS
-        </button>
-      </nav>
 
       <section class="archive-detail archive-detail--rolling" aria-label="Archive detail grid" data-debug-label="section.archive-detail">
         <header class="archive-rolling-toolbar" data-debug-label="header.archive-rolling-toolbar">
@@ -346,141 +306,271 @@
           </div>
         </div>
 
-        <section class="about-view" id="about-view" aria-label="About Felix" hidden>
+      </section>
+    </main>
+
+        <section class="about-view" id="about-view" aria-label="关于傅瑀聪" hidden>
           <div class="about-sheet">
-            <div class="about-hero">
-              <p class="about-watermark" aria-hidden="true">Resume</p>
-              <h2 class="about-title">Resume.</h2>
-            </div>
+            <div class="about-resume-grid">
+              <aside class="about-panel about-profile-panel" aria-label="个人信息">
+                <h2 class="about-panel-title">傅瑀璁</h2>
+                <div class="about-panel-rule" aria-hidden="true"></div>
 
-            <div class="about-grid">
-              <div class="about-column about-column--summary">
-                <section class="about-section">
-                  <h3 class="about-section-title">Education</h3>
-                  <div class="about-entry-list">
-                    <article class="about-entry">
-                      <div class="about-entry-link" aria-hidden="true">↗</div>
-                      <div class="about-entry-body">
-                        <h4>Strate School of Design</h4>
-                        <p class="about-entry-meta">2020 - 2025</p>
-                        <p class="about-entry-copy">Industrial design - Product design</p>
+                <img
+                  class="about-portrait"
+                  src="./Assets/About/fu-yucong-portrait-full.png"
+                  alt="傅瑀璁肖像"
+                />
+
+                <address class="about-contact-list">
+                  <a href="tel:+8613685796615">
+                    <span class="about-contact-icon about-contact-icon--phone" aria-hidden="true">
+                      <img src="./Assets/Icons/Phone.svg" alt="" />
+                    </span>
+                    <span>13685796615</span>
+                  </a>
+                  <a href="mailto:fuyucong63@126.com">
+                    <span class="about-contact-icon about-contact-icon--mail" aria-hidden="true">
+                      <img src="./Assets/Icons/Mail.svg" alt="" />
+                    </span>
+                    <span>fuyucong63@126.com</span>
+                  </a>
+                  <a href="https://www.behance.net/felixsanchez" target="_blank" rel="noreferrer">
+                    <span class="about-contact-icon about-contact-icon--behance" aria-hidden="true">
+                      <img src="./Assets/Icons/Behance.svg" alt="" />
+                    </span>
+                    <span>www.behance.net/felixsanchez</span>
+                  </a>
+                </address>
+              </aside>
+
+              <section class="about-panel about-keyword-panel" aria-label="关键词">
+                <h2 class="about-panel-title">关键词</h2>
+                <div class="about-panel-rule" aria-hidden="true"></div>
+                <div class="about-keyword-stack" aria-hidden="true">
+                  <span class="about-keyword-orbit">需求导向</span>
+                  <span class="about-keyword-orbit">理性克制</span>
+                  <span class="about-keyword-orbit">实用美学</span>
+                </div>
+              </section>
+
+              <section class="about-panel about-core-panel" aria-label="技能与荣誉">
+                <section class="about-compact-section">
+                  <h2 class="about-panel-title">技能</h2>
+                  <div class="about-panel-rule" aria-hidden="true"></div>
+                  <div class="about-skill-metrics">
+                    <p>Google AI Professional Certificate</p>
+                    <p>
+                      <span>雅思IELTS</span>
+                      <strong>7.5</strong>
+                      <span>L-7.5 R-8.5 R-6.5 S-7.0</span>
+                    </p>
+                  </div>
+                </section>
+
+                <section class="about-compact-section">
+                  <div class="about-title-row-inline">
+                    <h2 class="about-panel-title">荣誉</h2>
+                    <span class="about-section-arrow" aria-hidden="true">
+                      <img src="./Assets/Icons/Arrow.svg" alt="" />
+                    </span>
+                  </div>
+                  <div class="about-panel-rule" aria-hidden="true"></div>
+                  <div class="about-award-list">
+                    <article class="about-award-item">
+                      <div>
+                        <h3>美国好设计奖 American Good Design Award</h3>
+                        <p>铂金奖</p>
                       </div>
+                      <time>2026.05</time>
                     </article>
-
-                    <article class="about-entry">
-                      <div class="about-entry-link" aria-hidden="true">↗</div>
-                      <div class="about-entry-body">
-                        <h4>ESCP Business School</h4>
-                        <p class="about-entry-meta">Sep. - Dec. 2023</p>
-                        <p class="about-entry-copy">Entrepreneurship Program in Madrid</p>
+                    <article class="about-award-item">
+                      <div>
+                        <h3>实用新型专利：一种拾便器</h3>
+                        <p>专利号ZL 2024 2 1298481.4</p>
                       </div>
+                      <time>2025.03</time>
+                    </article>
+                    <article class="about-award-item">
+                      <div>
+                        <h3>海南国际设计大赛</h3>
+                        <p>游艇设计分赛道铜奖</p>
+                      </div>
+                      <time>2024.12</time>
+                    </article>
+                    <article class="about-award-item">
+                      <div>
+                        <h3>论文发表</h3>
+                        <p>《基于 FAST 的胰岛素注射系统改良设计》</p>
+                      </div>
+                      <time>2024.11</time>
+                    </article>
+                    <article class="about-award-item">
+                      <div>
+                        <h3>未来设计师·全国高校数字艺术设计大赛</h3>
+                        <p>全国三等奖/浙江省二等奖</p>
+                      </div>
+                      <time>2024.05</time>
                     </article>
                   </div>
                 </section>
 
-                <section class="about-section">
-                  <h3 class="about-section-title">Skills</h3>
-                  <div class="about-skill-columns">
-                    <div class="about-skill-list">
-                      <div class="about-skill-item">
-                        <span class="about-skill-badge">Bl</span>
-                        <span>Blender</span>
-                      </div>
-                      <div class="about-skill-item">
-                        <span class="about-skill-badge">C4</span>
-                        <span>Cinema 4D</span>
-                      </div>
-                      <div class="about-skill-item">
-                        <span class="about-skill-badge">Rh</span>
-                        <span>Rhino 3D</span>
-                      </div>
-                      <div class="about-skill-item">
-                        <span class="about-skill-badge">Ks</span>
-                        <span>KeyShot</span>
-                      </div>
-                      <div class="about-skill-item">
-                        <span class="about-skill-badge">Ad</span>
-                        <span>Adobe : Ps | Ai | Lr | Pr | Id | Sa</span>
-                      </div>
-                      <div class="about-skill-item">
-                        <span class="about-skill-badge">Fg</span>
-                        <span>Figma</span>
-                      </div>
+                <section class="about-compact-section">
+                  <h2 class="about-panel-title">工具</h2>
+                  <div class="about-panel-rule" aria-hidden="true"></div>
+                  <ul class="about-tool-list">
+                    <li>Rhino</li>
+                    <li>Keyshot</li>
+                    <li>Fusion 360</li>
+                    <li>Blender</li>
+                    <li>Figma</li>
+                    <li>OpenAI Codex</li>
+                    <li>Google AI Studio</li>
+                    <li>ChatGPT</li>
+                    <li>Arduino</li>
+                    <li>Adobe：Ps/Ai/Xd</li>
+                    <li>Midjourney</li>
+                  </ul>
+                </section>
+              </section>
+
+              <section class="about-panel about-experience-panel" aria-label="过往经历">
+                <h2 class="about-panel-title">过往经历</h2>
+                <div class="about-panel-rule" aria-hidden="true"></div>
+
+                <div class="about-experience-list">
+                  <article class="about-experience-item">
+                    <header>
+                      <h3>宁波智屿创新科技有限公司 <span>| 产品设计</span></h3>
+                      <time>2024.06 - 2025.06</time>
+                    </header>
+                    <p>产品设计-水域设备前期预研与概念方案</p>
+                    <div class="about-work-grid about-work-grid--three" aria-hidden="true">
+                      <span></span>
+                      <span></span>
+                      <span></span>
                     </div>
+                  </article>
 
-                    <div class="about-skill-list">
-                      <div class="about-skill-item">
-                        <span class="about-skill-badge">Fr</span>
-                        <span>Native</span>
-                      </div>
-                      <div class="about-skill-item">
-                        <span class="about-skill-badge">En</span>
-                        <span>English C1</span>
-                      </div>
-                      <div class="about-skill-item">
-                        <span class="about-skill-badge">Ph</span>
-                        <span>Photography</span>
-                      </div>
+                  <article class="about-experience-item">
+                    <header>
+                      <h3>汪汪喵智能科技有限公司 <span>| 产品与动画设计实习生</span></h3>
+                      <time>2023.12 - 2024.01</time>
+                    </header>
+                    <p>产品与动画设计实习生-商业静态图与CG镜头</p>
+                    <div class="about-work-grid about-work-grid--two" aria-hidden="true">
+                      <span></span>
+                      <span></span>
                     </div>
-                  </div>
-                </section>
-              </div>
+                  </article>
 
-              <div class="about-column about-column--experience">
-                <section class="about-section">
-                  <h3 class="about-section-title">Experiences</h3>
-                  <div class="about-experience-list">
-                    <article class="about-role">
-                      <h4>CROIX ROUGE</h4>
-                      <p class="about-role-meta">Partnership Project &nbsp;|&nbsp; January - June 2024</p>
-                      <p class="about-role-copy">
-                        Designed sustainable furniture solutions using wood and recycled rope for the French Red Cross addressing poor housing conditions.
-                      </p>
-                    </article>
-
-                    <article class="about-role">
-                      <h4>ESCP BUSINESS SCHOOL</h4>
-                      <p class="about-role-meta">Entrepreneurship Program &nbsp;|&nbsp; September - December 2023</p>
-                      <p class="about-role-copy">
-                        Innovative business and startup development. Developed a healthcare startup to improve medical file management, earning the “Best Ready to Invest Project” award.
-                      </p>
-                    </article>
-
-                    <article class="about-role">
-                      <h4>SAFRAN SEATS</h4>
-                      <p class="about-role-meta">Internship &nbsp;|&nbsp; March - August 2023</p>
-                      <p class="about-role-copy">
-                        3D renderings of Business suits and First Class for Japan Airlines, Qatar Airways and Emirates within the Advanced Concept Team.
-                      </p>
-                    </article>
-
-                    <article class="about-role">
-                      <h4>CENTRALE LYON</h4>
-                      <p class="about-role-meta">EPSA Team &nbsp;|&nbsp; 2022 - 2024 Season</p>
-                      <p class="about-role-copy">
-                        Integration in the design department for EPSA team at Centrale Lyon. Designed the steering wheel, dashboard and vehicle wrapping for Formula Student competition.
-                      </p>
-                    </article>
-
-                    <article class="about-role">
-                      <h4>STRATE</h4>
-                      <p class="about-role-meta">Communication Team &nbsp;|&nbsp; 2021 - 2024</p>
-                      <p class="about-role-copy">
-                        Team member overseeing the 300 m² workshop at Strate, managing 3D printers, laser cutting and woodworking machines, while supporting project creation for external partners.
-                      </p>
-                    </article>
-                  </div>
-                </section>
-              </div>
+                  <article class="about-experience-item">
+                    <header>
+                      <h3>宁波安意家木业有限公司 <span>| 产品设计实习生</span></h3>
+                      <time>2023.09 - 2023.11</time>
+                    </header>
+                    <p>产品设计实习生-商业家具需求转译与多品类方案设计</p>
+                    <div class="about-work-grid about-work-grid--three" aria-hidden="true">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </article>
+                </div>
+              </section>
             </div>
           </div>
         </section>
-      </section>
-    </main>
     </div>
 
+    <header class="archive-top-nav" data-debug-label="header.archive-top-nav">
+      <a class="index-header" href="#home" aria-label="Two Disk Garage 首页" data-debug-label="a.index-header">
+        <h1>
+          <span>TWO</span>
+          <span>DISK</span>
+          <span>GARAGE</span>
+        </h1>
+      </a>
+
+      <nav class="archive-primary-nav" aria-label="Archive menu" data-debug-label="nav.archive-primary-nav">
+        <button class="index-link index-link--primary" id="index-home-button" type="button" data-debug-label="button#index-home-button">
+          <span class="index-link-label">首页</span>
+        </button>
+
+        <button
+          class="index-group-toggle"
+          id="index-project-toggle"
+          type="button"
+          aria-expanded="true"
+          data-debug-label="button#index-project-toggle"
+        >
+          <span class="index-group-label">项目</span>
+        </button>
+
+        <button class="index-link" id="index-about-button" type="button" aria-pressed="false" data-about-page="./about.html" data-debug-label="button#index-about-button">
+          <span class="index-link-label">关于我</span>
+        </button>
+      </nav>
+
+      <nav class="archive-debug-controls" aria-label="Debug controls" data-debug-label="nav.archive-debug-controls">
+        <button class="debug-toggle" id="debug-toggle" type="button" aria-pressed="false">
+          OUTLINE
+        </button>
+        <button class="debug-toggle" id="label-toggle" type="button" aria-pressed="false">
+          LABELS
+        </button>
+        <button class="debug-toggle" id="parameters-toggle" type="button" aria-pressed="true" aria-expanded="true">
+          PARAMETERS
+        </button>
+      </nav>
+    </header>
+
     <script src="./archive-data.js"></script>
-    <script src="./script.js"></script>
+    <script src="./script.js?v=about-scroll"></script>
+    <script>
+      (() => {
+        const syncIndexSegmentLayout = () => {
+          const segments = document.querySelectorAll(".index-segment");
+
+          segments.forEach((segment) => {
+            segment.style.display = "grid";
+            segment.style.gridTemplateColumns = "116px minmax(0, 1fr)";
+          });
+
+          document.querySelectorAll(".index-segment-title").forEach((title) => {
+            title.style.minWidth = "104px";
+            title.style.overflowWrap = "normal";
+            title.style.whiteSpace = "nowrap";
+            title.style.wordBreak = "keep-all";
+          });
+
+          return segments.length > 0;
+        };
+
+        const indexList = document.querySelector(".index-list");
+
+        if (indexList) {
+          const observer = new MutationObserver(() => {
+            if (syncIndexSegmentLayout()) {
+              observer.disconnect();
+            }
+          });
+
+          observer.observe(indexList, { childList: true, subtree: true });
+        }
+
+        let syncAttempts = 0;
+        const syncTimer = window.setInterval(() => {
+          syncAttempts += 1;
+
+          if (syncIndexSegmentLayout() || syncAttempts >= 30) {
+            window.clearInterval(syncTimer);
+          }
+        }, 100);
+
+        window.addEventListener("load", syncIndexSegmentLayout);
+      })();
+    </script>
     <script>
       (() => {
         const button = document.getElementById("parameters-toggle");
