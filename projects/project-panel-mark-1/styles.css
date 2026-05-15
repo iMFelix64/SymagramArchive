@@ -1,0 +1,108 @@
+:root {
+  --project-paper: #fbfbf9;
+  --project-panel: rgba(255, 255, 255, 0.92);
+  --project-stream-gap: 18px;
+  --project-vh: 100dvh;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  height: var(--project-vh);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.7), transparent 42%),
+    var(--project-paper);
+  font-family: "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", Arial, sans-serif;
+}
+
+.project-page {
+  height: var(--project-vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.project-page::-webkit-scrollbar {
+  display: none;
+}
+
+.project-stream-shell {
+  min-height: 0;
+  padding: 0;
+}
+
+.project-stream {
+  width: 100%;
+  margin: 0;
+  display: grid;
+  gap: var(--project-stream-gap);
+  padding-bottom: 0;
+}
+
+.project-hero {
+  margin: 0;
+}
+
+body.is-shell-driven .project-hero {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--project-paper);
+}
+
+body.is-shell-driven .project-stream {
+  transform: translateY(-15px);
+}
+
+.project-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 0;
+  background: var(--project-panel);
+}
+
+body.is-embedded {
+  background: var(--project-paper);
+}
+
+body.is-embedded .project-page {
+  display: flex;
+  flex-direction: column;
+}
+
+body.is-embedded .project-stream-shell {
+  margin-block: 0;
+  padding: 0;
+  width: 100%;
+}
+
+body.is-embedded .project-hero {
+  height: auto;
+  overflow: visible;
+}
+
+body.is-embedded .project-hero .project-image {
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 720px) {
+  .project-stream-shell {
+    padding: 0;
+  }
+
+  body.is-embedded .project-stream-shell {
+    padding: 0;
+  }
+}

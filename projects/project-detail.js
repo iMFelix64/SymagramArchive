@@ -2,9 +2,18 @@ const root = document.documentElement;
 const projectPage = document.querySelector(".project-page");
 const projectStream = document.querySelector("[data-project-stream]");
 const archiveData = window.TDG_ARCHIVE || { groups: [], projects: [] };
+const projectVault = window.TDG_PROJECT_VAULT || {};
 const isEmbedded =
   window.self !== window.top || new URLSearchParams(window.location.search).get("embed") === "1";
 const PROJECT_RESET_ANIMATION_MS = 420;
+
+function getProjectIdFromSearch() {
+  const params = new URLSearchParams(window.location.search);
+  const projectId = params.get("project") || params.get("projectId") || params.get("id") || "";
+  const normalizedId = projectId.match(/\d+/)?.[0] || projectId;
+
+  return normalizedId ? normalizedId.padStart(2, "0") : "";
+}
 
 function getProjectIdFromPath() {
   const match = window.location.pathname.match(/project-(\d+)/);
@@ -13,13 +22,30 @@ function getProjectIdFromPath() {
 }
 
 function getCurrentProject() {
-  const projectId = projectPage?.dataset.projectId || getProjectIdFromPath();
+  const projectId = projectPage?.dataset.projectId || getProjectIdFromSearch() || getProjectIdFromPath();
 
   return (archiveData.projects || []).find((project) => project.id === projectId) || null;
 }
 
 function getArchiveRootUrl() {
   return new URL("../../", window.location.href);
+}
+
+function normalizeFolderPath(path) {
+  return String(path || "").trim().replace(/\/+$/, "");
+}
+
+function getProjectImages(project) {
+  const imageFolder = normalizeFolderPath(project.imageFolder);
+  const folderImages = projectVault[imageFolder];
+
+  if (folderImages?.length) {
+    return [...folderImages];
+  }
+
+  return project.images?.length
+    ? project.images
+    : [project.coverImage].filter(Boolean);
 }
 
 function resolveArchivePath(path) {
@@ -47,9 +73,7 @@ function renderProjectStream() {
     return;
   }
 
-  const images = project.images?.length
-    ? project.images
-    : [project.coverImage].filter(Boolean);
+  const images = getProjectImages(project);
 
   document.title = `Project ${project.id} / ${project.title}`;
   projectPage?.setAttribute("aria-label", `${project.title}项目页面`);

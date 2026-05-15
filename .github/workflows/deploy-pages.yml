@@ -32,16 +32,11 @@ jobs:
 
       - name: Build static site artifact
         run: |
-          mkdir -p _site
-          cp index.html _site/
-          cp styles.css _site/
-          cp script.js _site/
-          cp home.html _site/
-          cp home.css _site/
-          cp home.js _site/
-          cp project01-gallery.html _site/
-          cp -R Assets _site/
-          cp -R projects _site/
+          rsync -av \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='_site' \
+            ./ _site/
           touch _site/.nojekyll
 
       - name: Upload Pages artifact

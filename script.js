@@ -93,6 +93,10 @@ function getProjectDisplayValue(project, key, fallback = "") {
   return value === undefined || value === null || value === "" ? fallback : String(value);
 }
 
+function createProjectEmbedSrc(projectId) {
+  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1`;
+}
+
 function createElementWithClass(tagName, className, textContent = "") {
   const element = document.createElement(tagName);
 
@@ -108,13 +112,13 @@ function createElementWithClass(tagName, className, textContent = "") {
 function createProjectEmbed(project) {
   const embed = createElementWithClass("div", "panel-project-embed");
   const wheelLayer = createElementWithClass("div", "panel-project-embed-wheel-layer");
-  const embedSrc = getProjectDisplayValue(project, "embedSrc");
+  const embedSrc = createProjectEmbedSrc(project.id);
 
   embed.setAttribute("aria-label", `${project.title}独立项目容器`);
   embed.dataset.debugLabel = "div.panel-project-embed";
   wheelLayer.setAttribute("aria-hidden", "true");
 
-  if (embedSrc) {
+  if (!project.placeholder) {
     const frame = document.createElement("iframe");
 
     frame.className = "panel-project-embed-frame";

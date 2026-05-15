@@ -7,7 +7,8 @@ window.TDG_ARCHIVE = {
         "01",
         "02",
         "03",
-        "04"
+        "04",
+        "05"
       ]
     }
   ],
@@ -16,102 +17,47 @@ window.TDG_ARCHIVE = {
       "id": "01",
       "title": "大地探索家",
       "year": "2024",
-      "metaTitle": "ATLAS TYPE SYSTEMS",
-      "metaSubtitle": "POSTER GRID / 2024",
       "tagline": "Lighting / Field Kit / Industrial Design",
-      "direction": "Industrial Design",
-      "keywords": "Lighting, Exploration, Field Kit",
       "description": "兼顾了户外探索的照明安全与专业拍摄的补光需求，在严苛环境下为摄影师提供可靠保障与精准的创作支持。",
-      "sideDescription": "受哈苏美学启发的多模式照明设备。兼顾了户外探索的照明安全与专业拍摄补光需求，在严苛环境下为摄影师提供可靠保障与精准的创作支持。",
-      "imageFolder": "./Assets/Project Vault/25P-A EarthExplorer",
-      "coverImage": "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 01.jpg",
-      "images": [
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 01.jpg",
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 02.jpg",
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 03.jpg",
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 04.jpg",
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 05.jpg",
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 06.jpg",
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 07.jpg",
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 08.jpg"
-      ],
-      "embedSrc": "./projects/project-01/?embed=1",
-      "visible": true
+      "visible": true,
+      "imageFolder": "./Assets/Project Vault/25P-A EarthExplorer"
     },
     {
       "id": "02",
       "title": "针迹",
       "year": "2023",
-      "metaTitle": "NEUE TERRAIN ARCHIVE",
-      "metaSubtitle": "IMAGE INDEX / 2023",
       "tagline": "Wearable Hardware / Labor Narrative",
-      "direction": "Wearable Hardware",
-      "keywords": "Labor, Narrative, Platform Justice",
       "description": "通过可穿戴硬件记录外卖骑手的劳动轨迹与个人叙事，以此对抗算法系统的“隐形化”困境，并重塑其在数字化时代下的个体尊严与社会价值。",
-      "imageFolder": "./Assets/Project Vault/24S-C PinBridge",
-      "coverImage": "./Assets/Project Vault/24S-C PinBridge/2-PinBridge 01.jpg",
-      "images": [
-        "./Assets/Project Vault/24S-C PinBridge/2-PinBridge 01.jpg",
-        "./Assets/Project Vault/24S-C PinBridge/2-PinBridge 02.jpg",
-        "./Assets/Project Vault/24S-C PinBridge/2-PinBridge 03.jpg",
-        "./Assets/Project Vault/24S-C PinBridge/2-PinBridge 04.jpg",
-        "./Assets/Project Vault/24S-C PinBridge/2-PinBridge 05.jpg",
-        "./Assets/Project Vault/24S-C PinBridge/2-PinBridge 06.jpg",
-        "./Assets/Project Vault/24S-C PinBridge/2-PinBridge 07.jpg",
-        "./Assets/Project Vault/24S-C PinBridge/2-PinBridge 08.jpg",
-        "./Assets/Project Vault/24S-C PinBridge/2-PinBridge 09.jpg"
-      ],
-      "embedSrc": "./projects/project-02/?embed=1",
-      "visible": true
+      "visible": true,
+      "imageFolder": "./Assets/Project Vault/24S-C PinBridge"
     },
     {
       "id": "03",
       "title": "乌托邦：水上静居",
       "year": "2023",
-      "metaTitle": "TRANSIT SIGNAL MANUAL",
-      "metaSubtitle": "WAYFINDING / 2023",
       "tagline": "Concept Yacht / Marine Living",
-      "direction": "Concept Yacht",
-      "keywords": "Marine Living, Biomimicry, Spatial Concept",
       "description": "受逆戟鲸仿生美学启发的先锋居住空间概念游艇。在 20 米级船身内平衡了极致的动力学流线外观与现代居住空间，探索了未来海上生活的新形态。",
-      "imageFolder": "./Assets/Project Vault/24P-C Utopia",
-      "coverImage": "./Assets/Project Vault/24P-C Utopia/3-UTOPIA 01.jpg",
-      "images": [
-        "./Assets/Project Vault/24P-C Utopia/3-UTOPIA 01.jpg",
-        "./Assets/Project Vault/24P-C Utopia/3-UTOPIA 02.jpg",
-        "./Assets/Project Vault/24P-C Utopia/3-UTOPIA 03.jpg",
-        "./Assets/Project Vault/24P-C Utopia/3-UTOPIA 04.jpg",
-        "./Assets/Project Vault/24P-C Utopia/3-UTOPIA 05.jpg",
-        "./Assets/Project Vault/24P-C Utopia/3-UTOPIA 06.jpg",
-        "./Assets/Project Vault/24P-C Utopia/3-UTOPIA 07.jpg",
-        "./Assets/Project Vault/24P-C Utopia/3-UTOPIA 08.jpg"
-      ],
-      "embedSrc": "./projects/project-03/?embed=1",
-      "visible": true
+      "visible": true,
+      "imageFolder": "./Assets/Project Vault/24P-C Utopia"
     },
     {
       "id": "04",
       "title": "气：风场交互座舱",
       "year": "2022",
-      "metaTitle": "CIVIC FORMS LAB",
-      "metaSubtitle": "INTERFACE FORMS / 2022",
       "tagline": "Interaction Design / Cockpit UX",
-      "direction": "Interaction Design",
-      "keywords": "Airflow Interface, Cockpit UX, Sensory Feedback",
       "description": "探索以气流为交互媒介的未来座舱方案。通过定向气流将信息转化为身体的本能反馈，解决了辅助驾驶中人机感官疏离的问题，实现了更具直觉性的感官闭环。",
-      "imageFolder": "./Assets/Project Vault/24S-A AeroSense",
-      "coverImage": "./Assets/Project Vault/24S-A AeroSense/4-AeroSense 01.jpg",
-      "images": [
-        "./Assets/Project Vault/24S-A AeroSense/4-AeroSense 01.jpg",
-        "./Assets/Project Vault/24S-A AeroSense/4-AeroSense 02.jpg",
-        "./Assets/Project Vault/24S-A AeroSense/4-AeroSense 03.jpg",
-        "./Assets/Project Vault/24S-A AeroSense/4-AeroSense 04.jpg",
-        "./Assets/Project Vault/24S-A AeroSense/4-AeroSense 05.jpg",
-        "./Assets/Project Vault/24S-A AeroSense/4-AeroSense 06.jpg",
-        "./Assets/Project Vault/24S-A AeroSense/4-AeroSense 07.jpg"
-      ],
-      "embedSrc": "./projects/project-04/?embed=1",
-      "visible": true
+      "visible": true,
+      "imageFolder": "./Assets/Project Vault/24S-A AeroSense"
+    },
+    {
+      "id": "05",
+      "title": "游牧民：餐厅家具",
+      "year": "2023",
+      "tagline": "Furniture",
+      "description": "面向追求高品质生活的新中产家庭，以“克制而温暖的秩序感”为核心：在现代极简空间中保留木材、织物等自然材质的真实肌理，用材质、光影和触感建立丰富的感官层次，同时去除繁复装饰，回归家具与空间最基础的几何构成。",
+      "placeholder": true,
+      "visible": true,
+      "imageFolder": "./Assets/Project Vault/23P-X Nomad"
     }
   ]
 };

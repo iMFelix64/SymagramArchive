@@ -278,6 +278,16 @@
         gap: 10px;
       }
 
+      .edit-section-title {
+        border-top: 1px solid var(--line);
+        color: var(--ink);
+        font-size: 12px;
+        font-weight: 700;
+        margin: 2px 0 -2px;
+        padding-top: 10px;
+        text-transform: uppercase;
+      }
+
       .edit-field {
         display: grid;
         gap: 5px;
@@ -305,10 +315,43 @@
         resize: vertical;
       }
 
+      .edit-textarea--paths {
+        min-height: 160px;
+        white-space: pre;
+      }
+
+      .edit-summary {
+        border: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.35;
+        min-height: 34px;
+        padding: 8px 10px;
+      }
+
       .edit-checks {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
+      }
+
+      .edit-actions-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .edit-mini-button {
+        background: var(--panel);
+        border: 1px solid var(--ink);
+        cursor: pointer;
+        font-size: 12px;
+        min-height: 28px;
+        padding: 4px 8px;
+      }
+
+      .edit-mini-button:hover {
+        background: var(--accent);
       }
 
       .export-panel {
@@ -399,9 +442,11 @@
       </section>
     </main>
 
+    <script src="./project-vault-manifest.js?v=20260515-folder-index"></script>
     <script src="./archive-data.js?v=20260515-project-vault"></script>
     <script>
       const sourceData = window.TDG_ARCHIVE || { groups: [], projects: [] };
+      const projectVault = window.TDG_PROJECT_VAULT || {};
       let draftData = cloneArchiveData(sourceData);
       let dragState = null;
       let selectedProjectId = getFirstProjectId(draftData);
@@ -425,7 +470,7 @@
           projects: (data.projects || []).map((project) => ({
             ...project,
             imageFolder: normalizeFolderPath(project.imageFolder || getCommonImageFolder(project.images || [])),
-            images: [...(project.images || [])],
+            images: getProjectImagesFromFolder(project.imageFolder, project.images),
           })),
         };
       }
@@ -444,6 +489,48 @@
         const slashIndex = firstImage.lastIndexOf("/");
 
         return slashIndex >= 0 ? firstImage.slice(0, slashIndex) : "";
+      }
+
+      function normalizePathList(value) {
+        if (Array.isArray(value)) {
+          return value.map((path) => String(path || "").trim()).filter(Boolean);
+        }
+
+        return String(value || "")
+          .split(/\r?\n/)
+          .map((path) => path.trim())
+          .filter(Boolean);
+      }
+
+      function getProjectImagesFromFolder(folderPath, fallbackImages = []) {
+        const imageFolder = normalizeFolderPath(folderPath);
+        const folderImages = projectVault[imageFolder];
+
+        return folderImages?.length ? [...folderImages] : normalizePathList(fallbackImages);
+      }
+
+      function getImageSummary(project) {
+        const images = getProjectImagesFromFolder(project.imageFolder, project.images);
+
+        if (!project.imageFolder) {
+          return "填写 Project Vault 里的文件夹路径后，图片会从文件夹索引自动读取。";
+        }
+
+        if (!images.length) {
+          return "这个文件夹还没有出现在 project-vault-manifest.js 里。";
+        }
+
+        return `${images.length} images / cover: ${images[0]}`;
+      }
+
+      function syncProjectMediaDefaults(project) {
+        project.imageFolder = normalizeFolderPath(project.imageFolder || getCommonImageFolder(project.images || []));
+        project.images = getProjectImagesFromFolder(project.imageFolder, project.images);
+        project.coverImage = String(project.coverImage || project.images[0] || "").trim();
+
+        if (project.coverImage && !project.images.includes(project.coverImage)) {
+          project.images = [project.coverImage, ...project.images];
+        }
       }
 
       function getFirstProjectId(data) {
@@ -557,11 +644,15 @@
         const projectId = createNewProjectId();
         const newProject = {
           id: projectId,
+          archiveCode: "",
           title: "新项目",
           year: "TBD",
+          category: "P",
           tagline: "Placeholder / Future Entry",
           description: "这里填写项目介绍。",
           imageFolder: "",
+          coverImage: "",
+          images: [],
           placeholder: true,
           visible: true,
         };
@@ -647,7 +738,11 @@
         title.textContent = project.title;
 
         meta.className = "project-meta";
-        meta.textContent = `${project.year || "TBD"} / ${project.tagline || "No tagline"}`;
+        meta.textContent = [
+          project.archiveCode || project.year || "TBD",
+          project.category || project.tagline || "No category",
+          `${(project.images || []).length} img`,
+        ].join(" / ");
 
         copy.append(title, meta);
 
@@ -745,6 +840,8 @@
           return;
         }
 
+        syncProjectMediaDefaults(project);
+
         const editorGrid = document.createElement("div");
         const displayNumber = document.createElement("p");
         const checks = document.createElement("div");
@@ -752,10 +849,11 @@
         const visibleToggle = document.createElement("input");
         const placeholderLabel = document.createElement("label");
         const placeholderToggle = document.createElement("input");
+        const mediaActions = document.createElement("div");
 
         editorGrid.className = "edit-grid";
         displayNumber.className = "edit-empty";
-        displayNumber.textContent = `当前序号 ${getDisplayNumber(project.id)} / 内部 ID ${project.id}`;
+        displayNumber.textContent = `当前排序 ${getDisplayNumber(project.id)} / 稳定 ID ${project.id}`;
 
         visibleToggle.type = "checkbox";
         visibleToggle.checked = project.visible !== false;
@@ -779,8 +877,25 @@
         placeholderLabel.append(placeholderToggle, "Placeholder");
         checks.append(visibleLabel, placeholderLabel);
 
+        mediaActions.className = "edit-actions-row";
+        mediaActions.append(
+          createMiniButton("Refresh folder images", () => {
+            project.images = getProjectImagesFromFolder(project.imageFolder, project.images);
+            project.coverImage = project.images[0] || "";
+            refreshProjectListItem(project);
+            renderEditor();
+            exportArchiveData();
+          }),
+        );
+
         editorGrid.append(
           displayNumber,
+          createSectionTitle("Identity"),
+          createTextField("项目编号 / Archive Code", project.archiveCode || "", (value) => {
+            project.archiveCode = value;
+            refreshProjectListItem(project);
+            exportArchiveData();
+          }),
           createTextField("标题", project.title || "", (value) => {
             project.title = value;
             refreshProjectListItem(project);
@@ -791,6 +906,12 @@
             refreshProjectListItem(project);
             exportArchiveData();
           }),
+          createTextField("类别 / Category (P/S/V)", project.category || "", (value) => {
+            project.category = value;
+            refreshProjectListItem(project);
+            exportArchiveData();
+          }),
+          createSectionTitle("Project Panel"),
           createTextField("方向 / Tagline", project.tagline || "", (value) => {
             project.tagline = value;
             refreshProjectListItem(project);
@@ -800,15 +921,17 @@
             project.description = value;
             exportArchiveData();
           }, true),
-          createTextField("嵌入页面", project.embedSrc || "", (value) => {
-            project.embedSrc = value;
-            exportArchiveData();
-          }),
+          createSectionTitle("Detail Template"),
+          createSummaryField("模板", `Project Panel Mark 1 / 自动根据 ID ${project.id} 加载`),
           createTextField("图片文件夹路径", project.imageFolder || "", (value) => {
             project.imageFolder = normalizeFolderPath(value);
-            project.images = [];
+            project.images = getProjectImagesFromFolder(project.imageFolder, project.images);
+            project.coverImage = project.images[0] || "";
+            refreshProjectListItem(project);
             exportArchiveData();
           }),
+          createSummaryField("详情图片", getImageSummary(project)),
+          mediaActions,
           checks
         );
 
@@ -822,6 +945,38 @@
         empty.textContent = "选择左侧项目后编辑文字、图片文件夹和显示状态。";
 
         return empty;
+      }
+
+      function createSectionTitle(text) {
+        const title = document.createElement("h3");
+
+        title.className = "edit-section-title";
+        title.textContent = text;
+        return title;
+      }
+
+      function createMiniButton(text, onClick) {
+        const button = document.createElement("button");
+
+        button.className = "edit-mini-button";
+        button.type = "button";
+        button.textContent = text;
+        button.addEventListener("click", onClick);
+        return button;
+      }
+
+      function createSummaryField(labelText, value) {
+        const field = document.createElement("div");
+        const label = document.createElement("span");
+        const summary = document.createElement("p");
+
+        field.className = "edit-field";
+        label.className = "edit-label";
+        label.textContent = labelText;
+        summary.className = "edit-summary";
+        summary.textContent = value;
+        field.append(label, summary);
+        return field;
       }
 
       function createTextField(labelText, value, onInput, multiline = false, extraClass = "") {
@@ -856,7 +1011,11 @@
 
         item.classList.toggle("is-hidden", project.visible === false);
         item.querySelector(".project-title").textContent = project.title || "";
-        item.querySelector(".project-meta").textContent = `${project.year || "TBD"} / ${project.tagline || "No tagline"}`;
+        item.querySelector(".project-meta").textContent = [
+          project.archiveCode || project.year || "TBD",
+          project.category || project.tagline || "No category",
+          `${(project.images || []).length} img`,
+        ].join(" / ");
         item.querySelector(".visibility-toggle input").checked = project.visible !== false;
       }
 
@@ -1074,27 +1233,35 @@
 
       function createExportData() {
         const orderedIds = getOrderedProjectIds();
-        const idMap = new Map(orderedIds.map((projectId, index) => [projectId, formatProjectNumber(index)]));
         const orderedProjects = orderedIds.map(getProject).filter(Boolean);
         const groupedIdSet = new Set(orderedIds);
         const orphanProjects = draftData.projects.filter((project) => !groupedIdSet.has(project.id));
-        const exportProjects = [...orderedProjects, ...orphanProjects].map((project, index) => {
-          const { images: projectImages = [], ...projectData } = project;
-          const images = projectImages || [];
-          const imageFolder = normalizeFolderPath(project.imageFolder || getCommonImageFolder(images));
+        const exportProjects = [...orderedProjects, ...orphanProjects].map((project) => {
+          const {
+            imageFolder: projectImageFolder = "",
+            images: _images,
+            coverImage: _coverImage,
+            embedSrc: _embedSrc,
+            metaTitle: _metaTitle,
+            metaSubtitle: _metaSubtitle,
+            direction: _direction,
+            keywords: _keywords,
+            sideDescription: _sideDescription,
+            ...projectData
+          } = project;
+          const imageFolder = normalizeFolderPath(projectImageFolder);
 
           return {
             ...projectData,
-            id: idMap.get(project.id) || formatProjectNumber(index),
+            id: project.id,
             ...(imageFolder ? { imageFolder } : {}),
-            ...(images.length ? { images } : {}),
           };
         });
 
         return {
           groups: draftData.groups.map((group) => ({
             ...group,
-            projectIds: group.projectIds.map((projectId) => idMap.get(projectId) || projectId),
+            projectIds: [...(group.projectIds || [])],
           })),
           projects: exportProjects,
         };

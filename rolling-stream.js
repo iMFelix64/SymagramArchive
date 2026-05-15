@@ -1,10 +1,36 @@
 const archiveData = window.TDG_ARCHIVE || { groups: [], projects: [] };
+const projectVault = window.TDG_PROJECT_VAULT || {};
+
+function normalizeFolderPath(path) {
+  return String(path || "").trim().replace(/\/+$/, "");
+}
+
+function getProjectImages(project) {
+  const imageFolder = normalizeFolderPath(project.imageFolder);
+  const folderImages = projectVault[imageFolder];
+
+  if (folderImages?.length) {
+    return [...folderImages];
+  }
+
+  return [...(project.images || [])];
+}
+
+function createProjectEmbedSrc(projectId) {
+  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1`;
+}
+
 const projectCatalog = (archiveData.projects || [])
   .filter((project) => project && project.visible !== false)
-  .map((project) => ({
-    ...project,
-    images: [...(project.images || [])],
-  }));
+  .map((project) => {
+    const images = getProjectImages(project);
+
+    return {
+      ...project,
+      coverImage: project.coverImage || images[0] || "",
+      images,
+    };
+  });
 const visibleProjectIds = new Set(projectCatalog.map((project) => project.id));
 const projectGroups = (archiveData.groups || [])
   .map((group) => ({
@@ -174,28 +200,23 @@ function buildProjects() {
   const projectsMarkup = projects
     .map((project) => {
       const leadImage = project.images[0] || project.coverImage || "";
+      const embedSrc = createProjectEmbedSrc(project.id);
       const mediaMarkup = project.placeholder
         ? `
           <figure class="rolling-image-media rolling-image-media--placeholder" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
             <div class="rolling-image-placeholder-copy">PLACEHOLDER ${project.displayNumber}</div>
           </figure>
         `
-        : project.embedSrc
+        : leadImage
           ? `
           <figure class="rolling-image-media rolling-image-media--embed" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
             <iframe
               class="rolling-image-embed-frame"
-              src="${project.embedSrc}"
+              src="${embedSrc}"
               title="${project.title} 项目页面"
               loading="eager"
             ></iframe>
             <div class="rolling-image-wheel-layer" aria-hidden="true"></div>
-          </figure>
-        `
-        : leadImage
-          ? `
-          <figure class="rolling-image-media" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
-            <img src="${leadImage}" alt="${project.title} 主图" loading="eager" />
           </figure>
         `
           : `
