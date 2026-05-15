@@ -87,6 +87,163 @@ function buildIndexList() {
 
 buildIndexList();
 
+function getProjectDisplayValue(project, key, fallback = "") {
+  const value = project[key];
+
+  return value === undefined || value === null || value === "" ? fallback : String(value);
+}
+
+function createElementWithClass(tagName, className, textContent = "") {
+  const element = document.createElement(tagName);
+
+  element.className = className;
+
+  if (textContent) {
+    element.textContent = textContent;
+  }
+
+  return element;
+}
+
+function createProjectEmbed(project) {
+  const embed = createElementWithClass("div", "panel-project-embed");
+  const wheelLayer = createElementWithClass("div", "panel-project-embed-wheel-layer");
+  const embedSrc = getProjectDisplayValue(project, "embedSrc");
+
+  embed.setAttribute("aria-label", `${project.title}独立项目容器`);
+  embed.dataset.debugLabel = "div.panel-project-embed";
+  wheelLayer.setAttribute("aria-hidden", "true");
+
+  if (embedSrc) {
+    const frame = document.createElement("iframe");
+
+    frame.className = "panel-project-embed-frame";
+    frame.src = embedSrc;
+    frame.title = `${project.title}项目页面`;
+    frame.loading = "eager";
+    embed.append(frame, wheelLayer);
+    return embed;
+  }
+
+  const placeholder = createElementWithClass("div", "panel-project-embed-placeholder");
+
+  placeholder.textContent = project.placeholder ? "PLACEHOLDER" : project.title;
+  embed.classList.add("panel-project-embed--placeholder");
+  embed.append(placeholder, wheelLayer);
+  return embed;
+}
+
+function createProjectPanel(project, projectIndex) {
+  const displayNumber = project.displayNumber || String(projectIndex + 1).padStart(2, "0");
+  const panel = document.createElement("article");
+  const content = createElementWithClass("div", "panel-content");
+  const meta = createElementWithClass("div", "panel-meta");
+  const body = createElementWithClass("div", "panel-body");
+  const numberColumn = createElementWithClass("div", "panel-number-column");
+  const highlightCard = createElementWithClass("button", "panel-highlight-card panel-expand-toggle");
+  const bandNumber = createElementWithClass("p", "band-number", `${displayNumber}.`);
+  const panelCopy = createElementWithClass("div", "panel-copy");
+  const title = document.createElement("h2");
+  const description = document.createElement("p");
+  const arrow = createElementWithClass("span", "panel-highlight-arrow");
+  const frameShell = createElementWithClass("div", "panel-frame-shell panel-frame-shell--project-embed");
+  const panelFrame = createElementWithClass("div", "panel-frame panel-frame--project-embed");
+  const frameScroll = createElementWithClass("div", "panel-frame-scroll panel-frame-scroll--project-embed");
+  const sideCopy = createElementWithClass("aside", "panel-side-copy");
+  const sideKicker = createElementWithClass("p", "panel-side-copy-kicker", `PROJECT ${displayNumber}`);
+  const sideTitle = createElementWithClass(
+    "h3",
+    "panel-side-copy-title",
+    getProjectDisplayValue(project, "sideTitle", project.title),
+  );
+  const sideDescription = createElementWithClass(
+    "p",
+    "panel-side-copy-description",
+    getProjectDisplayValue(project, "sideDescription", project.description),
+  );
+  const sideYear = createElementWithClass("p", "panel-side-copy-year", getProjectDisplayValue(project, "year", "TBD"));
+  const directionSpec = createProjectSideSpec(
+    "方向",
+    getProjectDisplayValue(project, "direction", getProjectDisplayValue(project, "tagline")),
+  );
+  const keywordSpec = createProjectSideSpec(
+    "关键词",
+    getProjectDisplayValue(project, "keywords", getProjectDisplayValue(project, "tagline")),
+  );
+
+  panel.className = `project-panel project-panel--hero${projectIndex === 0 ? " is-active" : ""}`;
+  panel.dataset.project = project.id;
+  panel.dataset.debugLabel = `article.project-panel[${project.id}]`;
+  panel.setAttribute("aria-label", project.title);
+
+  content.dataset.debugLabel = "div.panel-content";
+  meta.dataset.debugLabel = "div.panel-meta";
+  body.dataset.debugLabel = "div.panel-body";
+  numberColumn.dataset.debugLabel = "div.panel-number-column";
+  highlightCard.type = "button";
+  highlightCard.setAttribute("aria-expanded", "false");
+  highlightCard.dataset.debugLabel = "button.panel-highlight-card";
+  frameShell.dataset.debugLabel = "div.panel-frame-shell";
+  panelFrame.dataset.debugLabel = "div.panel-frame";
+  frameScroll.dataset.debugLabel = "div.panel-frame-scroll";
+  sideCopy.setAttribute("aria-hidden", "true");
+  sideCopy.dataset.debugLabel = "aside.panel-side-copy";
+  arrow.setAttribute("aria-hidden", "true");
+
+  meta.append(
+    createElementWithClass("span", "", getProjectDisplayValue(project, "metaTitle", project.title)),
+    createElementWithClass("span", "", getProjectDisplayValue(project, "metaSubtitle", `${project.tagline || "PROJECT"} / ${project.year || "TBD"}`)),
+  );
+
+  title.textContent = project.title;
+  description.textContent = project.description || "";
+  panelCopy.append(title, description);
+  highlightCard.append(bandNumber, panelCopy, arrow);
+  numberColumn.append(highlightCard);
+  frameScroll.append(createProjectEmbed(project));
+  panelFrame.append(frameScroll);
+  frameShell.append(panelFrame);
+  sideCopy.append(
+    sideKicker,
+    sideTitle,
+    sideDescription,
+    createElementWithClass("span", "panel-side-copy-rule"),
+    sideYear,
+    createElementWithClass("span", "panel-side-copy-rule"),
+    directionSpec,
+    keywordSpec,
+  );
+  sideCopy.querySelectorAll(".panel-side-copy-rule").forEach((rule) => {
+    rule.setAttribute("aria-hidden", "true");
+  });
+  body.append(numberColumn, frameShell, sideCopy);
+  content.append(meta, body);
+  panel.append(content);
+
+  return panel;
+}
+
+function createProjectSideSpec(labelText, valueText) {
+  const spec = createElementWithClass("div", "panel-side-copy-spec");
+  const label = createElementWithClass("p", "panel-side-copy-label", labelText);
+  const value = createElementWithClass("p", "panel-side-copy-value", valueText);
+
+  spec.append(label, value);
+  return spec;
+}
+
+function buildProjectPanels() {
+  const detailTrack = document.getElementById("detail-track");
+
+  if (!detailTrack || orderedArchiveProjects.length === 0) {
+    return;
+  }
+
+  detailTrack.replaceChildren(...orderedArchiveProjects.map(createProjectPanel));
+}
+
+buildProjectPanels();
+
 const projectPanels = Array.from(document.querySelectorAll(".project-panel"));
 const indexItems = Array.from(document.querySelectorAll(".index-item"));
 const currentProject = document.getElementById("current-project");
@@ -1345,8 +1502,26 @@ function measureProjectOffsets() {
   }));
 }
 
+function getRollingFrameActiveProjectId() {
+  const frameDocument = rollingFrame?.contentDocument;
+
+  return frameDocument?.querySelector(".rolling-project.is-active")?.dataset.project || "";
+}
+
 function updateActiveProject() {
   if (isAboutViewActive || !detailScroll || projectPanels.length === 0) {
+    return;
+  }
+
+  if (archiveDetail?.classList.contains("archive-detail--rolling")) {
+    const activeId = getRollingFrameActiveProjectId()
+      || selectedProjectId
+      || orderedArchiveProjects[0]?.id
+      || "";
+
+    if (activeId) {
+      syncVisibleProject(activeId);
+    }
     return;
   }
 
