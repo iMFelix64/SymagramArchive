@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TwoDiskGarage</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20260515-project-images" />
   </head>
   <body>
     <div class="home-transition-stage" id="home-transition-stage">
@@ -418,18 +418,19 @@
                 <section class="about-compact-section">
                   <h2 class="about-panel-title">工具</h2>
                   <div class="about-panel-rule" aria-hidden="true"></div>
-                  <ul class="about-tool-list">
-                    <li>Rhino</li>
-                    <li>Keyshot</li>
-                    <li>Fusion 360</li>
-                    <li>Blender</li>
-                    <li>Figma</li>
-                    <li>OpenAI Codex</li>
-                    <li>Google AI Studio</li>
-                    <li>ChatGPT</li>
-                    <li>Arduino</li>
-                    <li>Adobe：Ps/Ai/Xd</li>
-                    <li>Midjourney</li>
+                  <ul class="about-tool-list" aria-label="工具列表">
+                    <li><img src="./Assets/About/Icons/arduino.svg" alt="Arduino" /></li>
+                    <li><img src="./Assets/About/Icons/rhino.svg" alt="Rhino" /></li>
+                    <li><img src="./Assets/About/Icons/keyshot.svg" alt="Keyshot" /></li>
+                    <li><img src="./Assets/About/Icons/figma.svg" alt="Figma" /></li>
+                    <li><img src="./Assets/About/Icons/blender.svg" alt="Blender" /></li>
+                    <li><img src="./Assets/About/Icons/fusion-360.svg" alt="Fusion 360" /></li>
+                    <li><img src="./Assets/About/Icons/adobe.svg" alt="Adobe" /></li>
+                    <li><img src="./Assets/About/Icons/codex.svg" alt="OpenAI Codex" /></li>
+                    <li><img src="./Assets/About/Icons/google-ai-studio.svg" alt="Google AI Studio" /></li>
+                    <li><img src="./Assets/About/Icons/openai.svg" alt="OpenAI" /></li>
+                    <li><img src="./Assets/About/Icons/nanobanana.svg" alt="Nano Banana" /></li>
+                    <li><img src="./Assets/About/Icons/midjourney.svg" alt="Midjourney" /></li>
                   </ul>
                 </section>
               </section>
@@ -445,10 +446,16 @@
                       <time>2024.06 - 2025.06</time>
                     </header>
                     <p>产品设计-水域设备前期预研与概念方案</p>
-                    <div class="about-work-grid about-work-grid--three" aria-hidden="true">
-                      <span></span>
-                      <span></span>
-                      <span></span>
+                    <div class="about-work-grid about-work-grid--three">
+                      <figure class="about-work-tile">
+                        <img src="./Assets/About/Previous Projects/Foil.png" alt="水域设备概念方案 1" />
+                      </figure>
+                      <figure class="about-work-tile">
+                        <img src="./Assets/About/Previous Projects/Orca.png" alt="水域设备概念方案 2" />
+                      </figure>
+                      <figure class="about-work-tile">
+                        <img src="./Assets/About/Previous Projects/Utopia.png" alt="水域设备概念方案 3" />
+                      </figure>
                     </div>
                   </article>
 
@@ -458,9 +465,13 @@
                       <time>2023.12 - 2024.01</time>
                     </header>
                     <p>产品与动画设计实习生-商业静态图与CG镜头</p>
-                    <div class="about-work-grid about-work-grid--two" aria-hidden="true">
-                      <span></span>
-                      <span></span>
+                    <div class="about-work-grid about-work-grid--two">
+                      <figure class="about-work-tile">
+                        <img src="./Assets/About/Previous Projects/Purifier.png" alt="商业静态图项目" />
+                      </figure>
+                      <figure class="about-work-tile">
+                        <img src="./Assets/About/Previous Projects/Purifier TVC.png" alt="CG 镜头项目" />
+                      </figure>
                     </div>
                   </article>
 
@@ -470,10 +481,13 @@
                       <time>2023.09 - 2023.11</time>
                     </header>
                     <p>产品设计实习生-商业家具需求转译与多品类方案设计</p>
-                    <div class="about-work-grid about-work-grid--three" aria-hidden="true">
-                      <span></span>
-                      <span></span>
-                      <span></span>
+                    <div class="about-work-grid about-work-grid--two">
+                      <figure class="about-work-tile">
+                        <img src="./Assets/About/Previous Projects/Nomad.png" alt="商业家具方案 1" />
+                      </figure>
+                      <figure class="about-work-tile">
+                        <img src="./Assets/About/Previous Projects/Arch.png" alt="商业家具方案 2" />
+                      </figure>
                     </div>
                   </article>
                 </div>
@@ -494,7 +508,14 @@
 
       <nav class="archive-primary-nav" aria-label="Archive menu" data-debug-label="nav.archive-primary-nav">
         <button class="index-link index-link--primary" id="index-home-button" type="button" data-debug-label="button#index-home-button">
-          <span class="index-link-label">首页</span>
+          <span class="index-link-label" aria-label="首页">
+            <span class="nav-bracket" aria-hidden="true">[ </span>
+            <span class="nav-roll-text" aria-hidden="true">
+              <span class="nav-letter" data-char="首" style="--nav-delay: 82.5ms"></span>
+              <span class="nav-letter" data-char="页" style="--nav-delay: 0ms"></span>
+            </span>
+            <span class="nav-bracket" aria-hidden="true"> ]</span>
+          </span>
         </button>
 
         <button
@@ -504,11 +525,26 @@
           aria-expanded="true"
           data-debug-label="button#index-project-toggle"
         >
-          <span class="index-group-label">项目</span>
+          <span class="index-group-label" aria-label="项目">
+            <span class="nav-bracket" aria-hidden="true">[ </span>
+            <span class="nav-roll-text" aria-hidden="true">
+              <span class="nav-letter" data-char="项" style="--nav-delay: 82.5ms"></span>
+              <span class="nav-letter" data-char="目" style="--nav-delay: 0ms"></span>
+            </span>
+            <span class="nav-bracket" aria-hidden="true"> ]</span>
+          </span>
         </button>
 
         <button class="index-link" id="index-about-button" type="button" aria-pressed="false" data-about-page="./about.html" data-debug-label="button#index-about-button">
-          <span class="index-link-label">关于我</span>
+          <span class="index-link-label" aria-label="关于我">
+            <span class="nav-bracket" aria-hidden="true">[ </span>
+            <span class="nav-roll-text" aria-hidden="true">
+              <span class="nav-letter" data-char="关" style="--nav-delay: 165ms"></span>
+              <span class="nav-letter" data-char="于" style="--nav-delay: 82.5ms"></span>
+              <span class="nav-letter" data-char="我" style="--nav-delay: 0ms"></span>
+            </span>
+            <span class="nav-bracket" aria-hidden="true"> ]</span>
+          </span>
         </button>
       </nav>
 
@@ -526,7 +562,7 @@
     </header>
 
     <script src="./archive-data.js"></script>
-    <script src="./script.js?v=about-scroll"></script>
+    <script src="./script.js?v=20260515-about-arrow-color"></script>
     <script>
       (() => {
         const syncIndexSegmentLayout = () => {

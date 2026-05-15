@@ -9,24 +9,6 @@ window.TDG_ARCHIVE = {
         "03",
         "04"
       ]
-    },
-    {
-      "id": "ui",
-      "title": "UI",
-      "projectIds": [
-        "05",
-        "06",
-        "07"
-      ]
-    },
-    {
-      "id": "rendering",
-      "title": "视觉渲染",
-      "projectIds": [
-        "08",
-        "09",
-        "10"
-      ]
     }
   ],
   "projects": [
@@ -68,66 +50,6 @@ window.TDG_ARCHIVE = {
       "description": "探索以气流为交互媒介的未来座舱方案。通过定向气流将信息转化为身体的本能反馈，解决了辅助驾驶中人机感官疏离的问题，实现了更具直觉性的感官闭环。",
       "imageFolder": "./Assets/Project 04",
       "embedSrc": "./projects/project-04/?embed=1",
-      "visible": true
-    },
-    {
-      "id": "05",
-      "title": "待添加项目",
-      "year": "TBD",
-      "tagline": "Placeholder / Future Entry",
-      "description": "这里预留给后续加入的项目内容与主图。",
-      "imageFolder": "",
-      "placeholder": true,
-      "visible": true
-    },
-    {
-      "id": "06",
-      "title": "待添加项目",
-      "year": "TBD",
-      "tagline": "Placeholder / Future Entry",
-      "description": "这里预留给后续加入的项目内容与主图。",
-      "imageFolder": "",
-      "placeholder": true,
-      "visible": true
-    },
-    {
-      "id": "07",
-      "title": "待添加项目",
-      "year": "TBD",
-      "tagline": "Placeholder / Future Entry",
-      "description": "这里预留给后续加入的项目内容与主图。",
-      "imageFolder": "",
-      "placeholder": true,
-      "visible": true
-    },
-    {
-      "id": "08",
-      "title": "待添加项目",
-      "year": "TBD",
-      "tagline": "Placeholder / Future Entry",
-      "description": "这里预留给后续加入的项目内容与主图。",
-      "imageFolder": "",
-      "placeholder": true,
-      "visible": true
-    },
-    {
-      "id": "09",
-      "title": "待添加项目",
-      "year": "TBD",
-      "tagline": "Placeholder / Future Entry",
-      "description": "这里预留给后续加入的项目内容与主图。",
-      "imageFolder": "",
-      "placeholder": true,
-      "visible": true
-    },
-    {
-      "id": "10",
-      "title": "待添加项目",
-      "year": "TBD",
-      "tagline": "Placeholder / Future Entry",
-      "description": "这里预留给后续加入的项目内容与主图。",
-      "imageFolder": "",
-      "placeholder": true,
       "visible": true
     }
   ]

@@ -103,6 +103,78 @@ const homeCursorAsset = "./Assets/Icons/Arrow.svg";
 const homeButton = document.getElementById("index-home-button");
 const aboutButton = document.getElementById("index-about-button");
 const projectGroup = document.getElementById("index-project-group");
+const ABOUT_WORK_ARROW_WHITE_CLASS = "about-work-tile--arrow-white";
+
+function getNumericCssValue(element, propertyName, fallback = 0) {
+  const value = Number.parseFloat(window.getComputedStyle(element).getPropertyValue(propertyName));
+  return Number.isFinite(value) ? value : fallback;
+}
+
+function syncAboutWorkTileArrow(tile) {
+  const image = tile.querySelector("img");
+  const tileWidth = Math.round(tile.clientWidth);
+  const tileHeight = Math.round(tile.clientHeight);
+
+  if (!image || !image.complete || !image.naturalWidth || !tileWidth || !tileHeight) {
+    return;
+  }
+
+  const inset = getNumericCssValue(tile, "--about-work-arrow-inset", 10);
+  const arrowWidth = getNumericCssValue(tile, "--about-work-arrow-width", 26);
+  const arrowHeight = getNumericCssValue(tile, "--about-work-arrow-height", 26);
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+
+  if (!context) {
+    return;
+  }
+
+  canvas.width = tileWidth;
+  canvas.height = tileHeight;
+
+  const scale = Math.max(tileWidth / image.naturalWidth, tileHeight / image.naturalHeight);
+  const drawWidth = image.naturalWidth * scale;
+  const drawHeight = image.naturalHeight * scale;
+  const drawX = (tileWidth - drawWidth) / 2;
+  const drawY = (tileHeight - drawHeight) / 2;
+
+  try {
+    context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+
+    const sampleX = Math.max(0, Math.round(tileWidth - inset - arrowWidth));
+    const sampleY = Math.max(0, Math.round(inset));
+    const sampleWidth = Math.max(1, Math.min(tileWidth - sampleX, Math.round(arrowWidth)));
+    const sampleHeight = Math.max(1, Math.min(tileHeight - sampleY, Math.round(arrowHeight)));
+    const pixels = context.getImageData(sampleX, sampleY, sampleWidth, sampleHeight).data;
+    let luminance = 0;
+
+    for (let index = 0; index < pixels.length; index += 4) {
+      luminance += pixels[index] * 0.2126 + pixels[index + 1] * 0.7152 + pixels[index + 2] * 0.0722;
+    }
+
+    const averageLuminance = luminance / (pixels.length / 4);
+    tile.classList.toggle(ABOUT_WORK_ARROW_WHITE_CLASS, averageLuminance < 145);
+  } catch {
+    tile.classList.remove(ABOUT_WORK_ARROW_WHITE_CLASS);
+  }
+}
+
+function syncAboutWorkTileArrows() {
+  document.querySelectorAll(".about-work-tile").forEach((tile) => {
+    const image = tile.querySelector("img");
+
+    if (!image) {
+      return;
+    }
+
+    if (image.complete && image.naturalWidth) {
+      syncAboutWorkTileArrow(tile);
+      return;
+    }
+
+    image.addEventListener("load", () => syncAboutWorkTileArrow(tile), { once: true });
+  });
+}
 
 function syncStaticProjectPanelNumbers() {
   projectPanels.forEach((panel) => {
@@ -189,6 +261,7 @@ const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, it
 const PANEL_RESET_ANIMATION_MS = 420;
 const HOME_RETURN_SCROLL_MS = 760;
 const HOME_RETURN_OVERLAP_MS = 180;
+const NAV_ROLL_COOLDOWN_MS = 1000;
 const PARAMETERS_OPEN_STORAGE_KEY = "rolling-parameters-open-v1";
 const HOME_INTRO_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*+=?<>[]{}\\/|";
 const HOME_FLOAT_ASSETS = [
@@ -243,6 +316,32 @@ let projectEmbedScrollCursor = null;
 let projectEmbedScrollCursorX = window.innerWidth / 2;
 let projectEmbedScrollCursorY = window.innerHeight / 2;
 let projectEmbedScrollCursorLayer = null;
+
+function triggerPrimaryNavRoll(button) {
+  if (!button) {
+    return;
+  }
+
+  const now = window.performance.now();
+  const nextAllowedAt = Number(button.dataset.nextNavRollAt || 0);
+
+  if (now < nextAllowedAt) {
+    return;
+  }
+
+  button.dataset.nextNavRollAt = String(now + NAV_ROLL_COOLDOWN_MS);
+  button.classList.add("is-nav-resetting");
+  button.classList.remove("is-nav-rolling");
+  void button.offsetWidth;
+  button.classList.remove("is-nav-resetting");
+  void button.offsetWidth;
+  button.classList.add("is-nav-rolling");
+}
+
+document.querySelectorAll(".archive-primary-nav .index-link, .archive-primary-nav .index-group-toggle").forEach((button) => {
+  button.addEventListener("pointerenter", () => triggerPrimaryNavRoll(button));
+  button.addEventListener("focus", () => triggerPrimaryNavRoll(button));
+});
 
 function randomBetween(min, max) {
   return min + Math.random() * (max - min);
@@ -922,6 +1021,7 @@ function setAboutViewActive(active, { deferHide = false, targetView = "projects"
     if (archiveApp) {
       archiveApp.inert = true;
     }
+    window.requestAnimationFrame(syncAboutWorkTileArrows);
   } else {
     if (deferHide) {
       homeTransitionStage?.classList.add("is-about-leaving");
@@ -1677,7 +1777,9 @@ indexItems.forEach((item) => {
 detailScroll?.addEventListener("scroll", requestActiveUpdate, { passive: true });
 document.addEventListener("pointermove", syncArchiveFrameCursorFromPointer, { passive: true });
 window.addEventListener("resize", refreshMeasurements);
+window.addEventListener("resize", syncAboutWorkTileArrows);
 window.addEventListener("load", refreshMeasurements);
+window.addEventListener("load", syncAboutWorkTileArrows);
 window.addEventListener("blur", () => {
   hideArchiveFrameCursor();
   hideProjectEmbedScrollCursor();
@@ -1914,6 +2016,7 @@ projectEmbedWheelLayers.forEach((wheelLayer) => {
 });
 
 syncSelectedProject(indexItems[0]?.dataset.project || "01");
+syncAboutWorkTileArrows();
 initializeHomeIntro();
 applyDebugLabels();
 refreshMeasurements();
