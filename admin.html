@@ -399,7 +399,7 @@
       </section>
     </main>
 
-    <script src="./archive-data.js?v=20260515-project-panels"></script>
+    <script src="./archive-data.js?v=20260515-project-vault"></script>
     <script>
       const sourceData = window.TDG_ARCHIVE || { groups: [], projects: [] };
       let draftData = cloneArchiveData(sourceData);
@@ -1079,13 +1079,15 @@
         const groupedIdSet = new Set(orderedIds);
         const orphanProjects = draftData.projects.filter((project) => !groupedIdSet.has(project.id));
         const exportProjects = [...orderedProjects, ...orphanProjects].map((project, index) => {
-          const { images, ...projectData } = project;
-          const imageFolder = normalizeFolderPath(project.imageFolder || getCommonImageFolder(images || []));
+          const { images: projectImages = [], ...projectData } = project;
+          const images = projectImages || [];
+          const imageFolder = normalizeFolderPath(project.imageFolder || getCommonImageFolder(images));
 
           return {
             ...projectData,
             id: idMap.get(project.id) || formatProjectNumber(index),
             ...(imageFolder ? { imageFolder } : {}),
+            ...(images.length ? { images } : {}),
           };
         });
 
