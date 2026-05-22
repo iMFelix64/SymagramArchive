@@ -2,7 +2,6 @@ const root = document.documentElement;
 const projectPage = document.querySelector(".project-page");
 const projectStream = document.querySelector("[data-project-stream]");
 const archiveData = window.TDG_ARCHIVE || { groups: [], projects: [] };
-const projectVault = window.TDG_PROJECT_VAULT || {};
 const isEmbedded =
   window.self !== window.top || new URLSearchParams(window.location.search).get("embed") === "1";
 const PROJECT_RESET_ANIMATION_MS = 420;
@@ -31,18 +30,7 @@ function getArchiveRootUrl() {
   return new URL("../../", window.location.href);
 }
 
-function normalizeFolderPath(path) {
-  return String(path || "").trim().replace(/\/+$/, "");
-}
-
 function getProjectImages(project) {
-  const imageFolder = normalizeFolderPath(project.imageFolder);
-  const folderImages = projectVault[imageFolder];
-
-  if (folderImages?.length) {
-    return [...folderImages];
-  }
-
   return project.images?.length
     ? project.images
     : [project.coverImage].filter(Boolean);

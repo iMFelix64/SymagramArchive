@@ -22,7 +22,7 @@ body {
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.7), transparent 42%),
     var(--project-paper);
-  font-family: "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", Arial, sans-serif;
+  font-family: "PingFang SC", "PingFang HK", "PingFang TC", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .project-page {

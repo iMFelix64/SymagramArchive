@@ -193,10 +193,10 @@ body {
   margin: 0;
   padding: 0;
   transform: translateY(-1vh);
-  font-size: clamp(4rem, 8.8vw, 8.5rem);
-  line-height: 0.77;
-  font-weight: 800;
-  letter-spacing: -0.055em;
+  font-size: clamp(3rem, 4.975vw, 5.97rem);
+  line-height: 0.783;
+  font-weight: 700;
+  letter-spacing: -0.06em;
   text-transform: uppercase;
   user-select: none;
 }
@@ -308,7 +308,7 @@ body {
 @media (max-width: 700px) {
   .logo-mark {
     transform: translateY(-1vh);
-    font-size: clamp(3rem, 18vw, 5rem);
+    font-size: clamp(2.25rem, 13.5vw, 3.75rem);
   }
 
   .logo-letter {

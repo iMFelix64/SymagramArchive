@@ -1,20 +1,4 @@
 const archiveData = window.TDG_ARCHIVE || { groups: [], projects: [] };
-const projectVault = window.TDG_PROJECT_VAULT || {};
-
-function normalizeFolderPath(path) {
-  return String(path || "").trim().replace(/\/+$/, "");
-}
-
-function getProjectImages(project) {
-  const imageFolder = normalizeFolderPath(project.imageFolder);
-  const folderImages = projectVault[imageFolder];
-
-  if (folderImages?.length) {
-    return [...folderImages];
-  }
-
-  return [...(project.images || [])];
-}
 
 function createProjectEmbedSrc(projectId) {
   return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1`;
@@ -23,7 +7,7 @@ function createProjectEmbedSrc(projectId) {
 const projectCatalog = (archiveData.projects || [])
   .filter((project) => project && project.visible !== false)
   .map((project) => {
-    const images = getProjectImages(project);
+    const images = [...(project.images || [])];
 
     return {
       ...project,

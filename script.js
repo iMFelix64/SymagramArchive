@@ -239,7 +239,12 @@ function createProjectSideSpec(labelText, valueText) {
 function buildProjectPanels() {
   const detailTrack = document.getElementById("detail-track");
 
-  if (!detailTrack || orderedArchiveProjects.length === 0) {
+  if (!detailTrack) {
+    return;
+  }
+
+  if (orderedArchiveProjects.length === 0) {
+    detailTrack.replaceChildren();
     return;
   }
 
@@ -337,6 +342,23 @@ function syncAboutWorkTileArrows() {
   });
 }
 
+function syncAboutSheetScale() {
+  if (!aboutSheet || aboutView?.hidden || window.matchMedia("(max-width: 1180px)").matches) {
+    aboutSheet?.style.setProperty("--about-sheet-scale", "1");
+    aboutSheet?.style.setProperty("--about-sheet-scale-inverse", "1");
+    return;
+  }
+
+  const paddingTop = getNumericCssValue(aboutSheet, "padding-top");
+  const paddingBottom = getNumericCssValue(aboutSheet, "padding-bottom");
+  const availableHeight = aboutSheet.clientHeight - paddingTop - paddingBottom;
+  const scale = Math.min(1, Math.max(0.5, availableHeight / ABOUT_DESIGN_CONTENT_HEIGHT));
+  const inverseScale = 1 / scale;
+
+  aboutSheet.style.setProperty("--about-sheet-scale", scale.toFixed(4));
+  aboutSheet.style.setProperty("--about-sheet-scale-inverse", inverseScale.toFixed(4));
+}
+
 function syncStaticProjectPanelNumbers() {
   projectPanels.forEach((panel) => {
     const displayNumber = archiveProjectDisplayNumberById.get(panel.dataset.project);
@@ -416,6 +438,7 @@ const frameShells = Array.from(document.querySelectorAll(".panel-frame-shell"));
 const projectEmbedFrames = Array.from(document.querySelectorAll(".panel-project-embed-frame"));
 const projectEmbedWheelLayers = Array.from(document.querySelectorAll(".panel-project-embed-wheel-layer"));
 const aboutView = document.getElementById("about-view");
+const aboutSheet = document.querySelector(".about-sheet");
 const archiveDetail = document.querySelector(".archive-detail");
 const panelByProject = new Map(projectPanels.map((panel) => [panel.dataset.project, panel]));
 const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, item]));
@@ -424,6 +447,7 @@ const HOME_RETURN_SCROLL_MS = 760;
 const HOME_RETURN_OVERLAP_MS = 180;
 const NAV_ROLL_COOLDOWN_MS = 1000;
 const PARAMETERS_OPEN_STORAGE_KEY = "rolling-parameters-open-v1";
+const ABOUT_DESIGN_CONTENT_HEIGHT = 772.2574462890625;
 const HOME_INTRO_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&*+=?<>[]{}\\/|";
 const HOME_FLOAT_ASSETS = [
   "./Assets/Home/截屏2026-04-30 11.27.38 1.png",
@@ -1003,8 +1027,8 @@ function prepareHomeIntro() {
     const { width } = letter.getBoundingClientRect();
 
     if (letter.dataset.letter === "I") {
-      const diskLine = letter.closest(".home-intro-line");
-      const widthReference = diskLine?.querySelector('.home-intro-letter[data-letter="S"]');
+      const logo = letter.closest(".home-intro-logo");
+      const widthReference = logo?.querySelector('.home-intro-letter[data-letter="S"]');
       const scrambleWidth = widthReference?.getBoundingClientRect().width || width;
 
       letter.style.removeProperty("--letter-width");
@@ -1182,7 +1206,10 @@ function setAboutViewActive(active, { deferHide = false, targetView = "projects"
     if (archiveApp) {
       archiveApp.inert = true;
     }
-    window.requestAnimationFrame(syncAboutWorkTileArrows);
+    window.requestAnimationFrame(() => {
+      syncAboutSheetScale();
+      syncAboutWorkTileArrows();
+    });
   } else {
     if (deferHide) {
       homeTransitionStage?.classList.add("is-about-leaving");
@@ -1956,8 +1983,10 @@ indexItems.forEach((item) => {
 detailScroll?.addEventListener("scroll", requestActiveUpdate, { passive: true });
 document.addEventListener("pointermove", syncArchiveFrameCursorFromPointer, { passive: true });
 window.addEventListener("resize", refreshMeasurements);
+window.addEventListener("resize", syncAboutSheetScale);
 window.addEventListener("resize", syncAboutWorkTileArrows);
 window.addEventListener("load", refreshMeasurements);
+window.addEventListener("load", syncAboutSheetScale);
 window.addEventListener("load", syncAboutWorkTileArrows);
 window.addEventListener("blur", () => {
   hideArchiveFrameCursor();
@@ -2195,6 +2224,7 @@ projectEmbedWheelLayers.forEach((wheelLayer) => {
 });
 
 syncSelectedProject(indexItems[0]?.dataset.project || "01");
+syncAboutSheetScale();
 syncAboutWorkTileArrows();
 initializeHomeIntro();
 applyDebugLabels();

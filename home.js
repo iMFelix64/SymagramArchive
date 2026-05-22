@@ -238,8 +238,8 @@ letters.forEach((letter) => {
   const { width } = letter.getBoundingClientRect();
 
   if (letter.dataset.letter === "I") {
-    const diskLine = letter.closest(".logo-line");
-    const widthReference = diskLine?.querySelector('.logo-letter[data-letter="S"]');
+    const logo = letter.closest(".logo-mark");
+    const widthReference = logo?.querySelector('.logo-letter[data-letter="S"]');
     const scrambleWidth = widthReference?.getBoundingClientRect().width || width;
 
     letter.style.removeProperty("--letter-width");

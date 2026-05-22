@@ -442,11 +442,9 @@
       </section>
     </main>
 
-    <script src="./project-vault-manifest.js?v=20260515-folder-index"></script>
-    <script src="./archive-data.js?v=20260515-project-vault"></script>
+    <script src="./archive-data.js?v=20260519-single-source"></script>
     <script>
       const sourceData = window.TDG_ARCHIVE || { groups: [], projects: [] };
-      const projectVault = window.TDG_PROJECT_VAULT || {};
       let draftData = cloneArchiveData(sourceData);
       let dragState = null;
       let selectedProjectId = getFirstProjectId(draftData);
@@ -470,7 +468,7 @@
           projects: (data.projects || []).map((project) => ({
             ...project,
             imageFolder: normalizeFolderPath(project.imageFolder || getCommonImageFolder(project.images || [])),
-            images: getProjectImagesFromFolder(project.imageFolder, project.images),
+            images: normalizePathList(project.images || []),
           })),
         };
       }
@@ -502,22 +500,15 @@
           .filter(Boolean);
       }
 
-      function getProjectImagesFromFolder(folderPath, fallbackImages = []) {
-        const imageFolder = normalizeFolderPath(folderPath);
-        const folderImages = projectVault[imageFolder];
-
-        return folderImages?.length ? [...folderImages] : normalizePathList(fallbackImages);
-      }
-
       function getImageSummary(project) {
-        const images = getProjectImagesFromFolder(project.imageFolder, project.images);
+        const images = normalizePathList(project.images);
 
         if (!project.imageFolder) {
-          return "填写 Project Vault 里的文件夹路径后，图片会从文件夹索引自动读取。";
+          return "填写 Project Vault 里的文件夹路径后，点击 Refresh folder images 读取图片。";
         }
 
         if (!images.length) {
-          return "这个文件夹还没有出现在 project-vault-manifest.js 里。";
+          return "还没有读取到图片。确认本地服务器已启动后点击 Refresh folder images。";
         }
 
         return `${images.length} images / cover: ${images[0]}`;
@@ -525,12 +516,58 @@
 
       function syncProjectMediaDefaults(project) {
         project.imageFolder = normalizeFolderPath(project.imageFolder || getCommonImageFolder(project.images || []));
-        project.images = getProjectImagesFromFolder(project.imageFolder, project.images);
+        project.images = normalizePathList(project.images || []);
         project.coverImage = String(project.coverImage || project.images[0] || "").trim();
 
         if (project.coverImage && !project.images.includes(project.coverImage)) {
           project.images = [project.coverImage, ...project.images];
         }
+      }
+
+      function isImagePath(path) {
+        return /\.(avif|gif|jpe?g|png|webp)$/i.test(path);
+      }
+
+      function getFolderIndexUrl(folderPath) {
+        const imageFolder = normalizeFolderPath(folderPath);
+
+        return imageFolder ? new URL(`${imageFolder}/`, window.location.href) : null;
+      }
+
+      async function readImagesFromFolder(folderPath) {
+        const imageFolder = normalizeFolderPath(folderPath);
+        const folderUrl = getFolderIndexUrl(imageFolder);
+
+        if (!folderUrl) {
+          return [];
+        }
+
+        const response = await fetch(folderUrl.href, { cache: "no-store" });
+
+        if (!response.ok) {
+          throw new Error(`Cannot read folder: ${imageFolder}`);
+        }
+
+        const html = await response.text();
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const imageNames = Array.from(doc.querySelectorAll("a[href]"))
+          .map((link) => decodeURIComponent(link.getAttribute("href") || ""))
+          .map((href) => href.split(/[?#]/)[0].replace(/^\.?\//, ""))
+          .filter((href) => href && !href.includes("/") && isImagePath(href))
+          .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+        return imageNames.map((name) => `${imageFolder}/${name}`);
+      }
+
+      async function refreshProjectImagesFromFolder(project) {
+        const images = await readImagesFromFolder(project.imageFolder);
+
+        project.images = images;
+        project.coverImage = images[0] || "";
+        refreshProjectListItem(project);
+        renderEditor();
+        exportArchiveData();
+        return images;
       }
 
       function getFirstProjectId(data) {
@@ -879,12 +916,13 @@
 
         mediaActions.className = "edit-actions-row";
         mediaActions.append(
-          createMiniButton("Refresh folder images", () => {
-            project.images = getProjectImagesFromFolder(project.imageFolder, project.images);
-            project.coverImage = project.images[0] || "";
-            refreshProjectListItem(project);
-            renderEditor();
-            exportArchiveData();
+          createMiniButton("Refresh folder images", async () => {
+            try {
+              const images = await refreshProjectImagesFromFolder(project);
+              showExportFeedback(`Loaded ${images.length} images from folder.`, { selectOutput: false });
+            } catch (error) {
+              showExportFeedback("Could not read folder. Use the local server URL, then retry.", { selectOutput: false });
+            }
           }),
         );
 
@@ -925,8 +963,6 @@
           createSummaryField("模板", `Project Panel Mark 1 / 自动根据 ID ${project.id} 加载`),
           createTextField("图片文件夹路径", project.imageFolder || "", (value) => {
             project.imageFolder = normalizeFolderPath(value);
-            project.images = getProjectImagesFromFolder(project.imageFolder, project.images);
-            project.coverImage = project.images[0] || "";
             refreshProjectListItem(project);
             exportArchiveData();
           }),
@@ -1239,8 +1275,8 @@
         const exportProjects = [...orderedProjects, ...orphanProjects].map((project) => {
           const {
             imageFolder: projectImageFolder = "",
-            images: _images,
-            coverImage: _coverImage,
+            images: projectImages = [],
+            coverImage: projectCoverImage = "",
             embedSrc: _embedSrc,
             metaTitle: _metaTitle,
             metaSubtitle: _metaSubtitle,
@@ -1250,11 +1286,15 @@
             ...projectData
           } = project;
           const imageFolder = normalizeFolderPath(projectImageFolder);
+          const images = normalizePathList(projectImages);
+          const coverImage = String(projectCoverImage || images[0] || "").trim();
 
           return {
             ...projectData,
             id: project.id,
             ...(imageFolder ? { imageFolder } : {}),
+            ...(coverImage ? { coverImage } : {}),
+            ...(images.length ? { images } : {}),
           };
         });
 

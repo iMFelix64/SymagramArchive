@@ -16,6 +16,7 @@
   --rolling-project-gap: 10px;
   --rolling-detail-gap: 10px;
   --rolling-detail-copy-width: 318px;
+  --font-sans: "PingFang SC", "PingFang HK", "PingFang TC", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 * {
@@ -43,7 +44,7 @@ body.is-panel-embed {
 body {
   background: var(--rolling-bg);
   color: var(--rolling-text);
-  font-family: "Helvetica Neue", "PingFang SC", "Noto Sans SC", Arial, sans-serif;
+  font-family: var(--font-sans);
   overflow: hidden;
 }
 
@@ -185,7 +186,7 @@ body.is-rolling-scroll-cursor-active .rolling-scroll-cursor-arrow-shell {
   border: 0;
   color: #fff;
   display: inline-block;
-  font-family: "SF Mono", "Menlo", "Monaco", monospace;
+  font-family: var(--font-sans);
   font-size: 10px;
   letter-spacing: 0.06em;
   line-height: 1;
@@ -219,7 +220,7 @@ body.is-rolling-scroll-cursor-active .rolling-scroll-cursor-arrow-shell {
 .rolling-size-label,
 .rolling-size-value {
   color: #111;
-  font-family: "SF Mono", "Menlo", "Monaco", monospace;
+  font-family: var(--font-sans);
   font-size: 10px;
   line-height: 1;
 }
@@ -261,7 +262,7 @@ body.debug-outlines *::after {
   padding: 3px 7px;
   background: rgba(255, 62, 62, 0.96);
   color: #fff;
-  font-family: "SF Mono", "Menlo", "Monaco", monospace;
+  font-family: var(--font-sans);
   font-size: 11px;
   line-height: 1.2;
   white-space: nowrap;
@@ -390,7 +391,7 @@ img {
 }
 
 .rolling-title {
-  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(32px, 4vw, 54px);
   font-weight: 700;
   line-height: 0.82;
@@ -399,7 +400,7 @@ img {
 
 .rolling-intro {
   color: var(--rolling-muted);
-  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 11px;
   line-height: 1.6;
   margin: 0;
@@ -448,7 +449,7 @@ img {
 
 .rolling-segment-label {
   color: #000;
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 54px;
   font-weight: 700;
   letter-spacing: 0;
@@ -612,7 +613,7 @@ img {
 
 .rolling-project-index {
   color: #000;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 76px;
   font-weight: 700;
   letter-spacing: -0.06em;
@@ -637,7 +638,7 @@ img {
 }
 
 .rolling-project-name {
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 18px;
   font-weight: 500;
   line-height: 1;
@@ -646,7 +647,7 @@ img {
 
 .rolling-project-description {
   color: var(--rolling-muted);
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
   font-weight: 300;
   line-height: 1.5;
@@ -833,7 +834,7 @@ body.is-rolling-scroll-cursor-active .rolling-project.is-detail-expanded .rollin
 .rolling-detail-kicker,
 .rolling-detail-year {
   color: #000;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   font-weight: 700;
   line-height: 1;
@@ -841,7 +842,7 @@ body.is-rolling-scroll-cursor-active .rolling-project.is-detail-expanded .rollin
 
 .rolling-detail-title {
   color: #000;
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 37.5px;
   font-weight: 700;
   line-height: 0.92;
@@ -850,7 +851,7 @@ body.is-rolling-scroll-cursor-active .rolling-project.is-detail-expanded .rollin
 
 .rolling-detail-description {
   color: rgba(0, 0, 0, 0.8);
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
   font-weight: 300;
   line-height: 1.5;
@@ -870,7 +871,7 @@ body.is-rolling-scroll-cursor-active .rolling-project.is-detail-expanded .rollin
 
 .rolling-detail-label {
   color: rgba(0, 0, 0, 0.7);
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
   font-weight: 700;
   line-height: 1.1;
@@ -878,7 +879,7 @@ body.is-rolling-scroll-cursor-active .rolling-project.is-detail-expanded .rollin
 
 .rolling-detail-value {
   color: #000;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   font-weight: 500;
   line-height: 1.05;

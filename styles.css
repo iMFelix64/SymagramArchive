@@ -7,6 +7,7 @@
   --rule-soft: rgba(0, 0, 0, 0.3);
   --accent: #fa2b1f;
   --placeholder: #5b5b5b;
+  --font-sans: "PingFang SC", "PingFang HK", "PingFang TC", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   /* 左侧目录栏宽度 */
   --index-column-width: 350px;
@@ -200,7 +201,7 @@ body.debug-outlines .panel-frame::after {
   padding: 3px 7px;
   background: rgba(255, 62, 62, 0.96);
   color: #fff;
-  font-family: "SF Mono", "Menlo", "Monaco", monospace;
+  font-family: var(--font-sans);
   font-size: 11px;
   line-height: 1.2;
   white-space: nowrap;
@@ -258,7 +259,7 @@ body.debug-labels [data-debug-label]:hover {
   top: 50%;
   right: 15px;
   color: #474747;
-  font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 15.238px;
   line-height: 15.238px;
   font-weight: 400;
@@ -296,7 +297,7 @@ body.debug-labels [data-debug-label]:hover {
   color: inherit;
   display: inline-grid;
   grid-auto-rows: 0.78em;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 20px;
   font-weight: 700;
   height: max-content;
@@ -338,7 +339,7 @@ body.debug-labels [data-debug-label]:hover {
   border: 0;
   color: var(--ink);
   cursor: pointer;
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
   font-weight: 400;
   line-height: 1;
@@ -614,11 +615,11 @@ body.is-project-embed-scroll-cursor-active .project-embed-scroll-cursor-arrow-sh
   margin: 0;
   padding: 0;
   transform: translateY(-1vh);
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: clamp(4rem, 8.8vw, 8.5rem);
-  line-height: 0.77;
-  font-weight: 800;
-  letter-spacing: -0.055em;
+  font-family: var(--font-sans);
+  font-size: clamp(3rem, 4.975vw, 5.97rem);
+  line-height: 0.783;
+  font-weight: 700;
+  letter-spacing: -0.06em;
   text-transform: uppercase;
   user-select: none;
 }
@@ -758,7 +759,7 @@ body {
   overflow: hidden;
   background: var(--paper);
   color: var(--ink);
-  font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
 }
 
 .archive-app {
@@ -767,9 +768,7 @@ body {
   max-width: 100%;
   min-height: 100dvh;
   height: 100dvh;
-  border: 1px solid rgba(18, 18, 18, 0.95);
-  border-left: 0;
-  border-right: 0;
+  border: 0;
   overflow: hidden;
   background: var(--paper);
 }
@@ -855,23 +854,10 @@ body {
   width: max-content;
 }
 
-.index-header h1 {
-  display: inline-grid;
-  grid-auto-rows: 0.78em;
-  margin: 0;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 20px;
-  line-height: 0.78;
-  font-weight: 700;
-  letter-spacing: 0;
-  width: max-content;
-}
-
-.index-header h1 span {
+.index-header-icon {
   display: block;
-  height: 0.78em;
-  line-height: 0.78;
-  white-space: nowrap;
+  width: 109px;
+  height: 31px;
 }
 
 .archive-primary-nav {
@@ -897,7 +883,7 @@ body {
   border: 0;
   padding: 10px 5px;
   background: transparent;
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   line-height: 16px;
   font-weight: 800;
@@ -1036,7 +1022,7 @@ body {
 }
 
 .index-panel-title {
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 20px;
   font-weight: 800;
   line-height: 1;
@@ -1109,7 +1095,7 @@ body {
   align-self: start;
   min-width: 104px;
   padding: 14px 4px 0 5px;
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   font-weight: 800;
   line-height: 16px;
@@ -1133,7 +1119,7 @@ body {
   column-gap: 10px;
   min-height: 38px;
   padding: 14px 5px;
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   line-height: 16px;
   font-weight: 300;
@@ -1372,24 +1358,31 @@ body {
 }
 
 .about-sheet {
+  --about-sheet-scale: 1;
+  --about-sheet-scale-inverse: 1;
+  --about-body-font-size: 15px;
+  --about-detail-font-size: 13px;
   position: relative;
-  height: calc(100dvh - var(--archive-top-nav-height));
-  padding: 20px clamp(38px, 2.6vw, 50px) 16px;
+  height: calc(100dvh - var(--archive-top-nav-height) - 12.698px);
+  margin: 0 15px 12.698px;
+  padding: 35px 75px;
   overflow: hidden;
 }
 
 .about-resume-grid {
   display: grid;
   grid-template-columns:
-    minmax(210px, 17.47%)
-    minmax(180px, 15.6%)
-    minmax(330px, 28.46%)
-    minmax(350px, 29.3%);
+    minmax(210px, 18.275862%)
+    minmax(180px, 16.321839%)
+    minmax(330px, 29.770115%)
+    minmax(350px, 30.574713%);
   column-gap: 0;
   justify-content: space-between;
   align-items: start;
-  width: 100%;
-  height: 100%;
+  width: calc(100% * var(--about-sheet-scale-inverse));
+  height: calc(100% * var(--about-sheet-scale-inverse));
+  transform: scale(var(--about-sheet-scale));
+  transform-origin: top left;
 }
 
 .about-panel {
@@ -1399,9 +1392,9 @@ body {
 .about-panel-title {
   margin: 0;
   color: var(--ink);
-  font-family: "SF Pro Display", "SF Pro", "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: clamp(1.48rem, 1.56vw, 1.875rem);
-  line-height: 57px;
+  font-family: var(--font-sans);
+  font-size: 25px;
+  line-height: 57.115px;
   font-weight: 590;
   letter-spacing: 0;
 }
@@ -1428,14 +1421,25 @@ body {
   background: #d8d8d8;
 }
 
+.about-profile-name {
+  margin: 0 0 5px;
+  color: #171717;
+  font-family: var(--font-sans);
+  font-size: 25px;
+  line-height: 57.115px;
+  font-weight: 590;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
 .about-contact-list {
   display: grid;
   grid-template-columns: 27px max-content;
   gap: 19px 15px;
-  margin-top: 35px;
+  margin-top: 0;
   color: #171717;
   font-style: normal;
-  font-size: clamp(0.86rem, 0.94vw, 1.122rem);
+  font-size: var(--about-detail-font-size);
   line-height: 24.478px;
 }
 
@@ -1446,7 +1450,7 @@ body {
 }
 
 .about-contact-list a > span:last-child {
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-weight: 300;
   white-space: nowrap;
 }
@@ -1503,8 +1507,8 @@ body {
   border: 1px solid #171717;
   border-radius: 50%;
   color: #303038;
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: clamp(0.82rem, 0.89vw, 1.0625rem);
+  font-family: var(--font-sans);
+  font-size: var(--about-body-font-size);
   line-height: 26.11px;
   font-weight: 600;
   white-space: nowrap;
@@ -1584,8 +1588,8 @@ body {
   padding-top: 15px;
   padding-bottom: 15px;
   color: #303038;
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: clamp(0.78rem, 0.85vw, 1.02rem);
+  font-family: var(--font-sans);
+  font-size: var(--about-body-font-size);
   line-height: 26.11px;
   font-weight: 500;
 }
@@ -1608,7 +1612,7 @@ body {
 .about-skill-metrics strong {
   margin-left: auto;
   color: #303038;
-  font-size: inherit;
+  font-size: var(--about-detail-font-size);
   font-weight: 500;
 }
 
@@ -1634,8 +1638,8 @@ body {
 .about-experience-item h3 {
   margin: 0;
   color: #303038;
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: clamp(0.82rem, 0.89vw, 1.0625rem);
+  font-family: var(--font-sans);
+  font-size: var(--about-body-font-size);
   line-height: 26.11px;
   font-weight: 600;
   letter-spacing: 0;
@@ -1646,8 +1650,8 @@ body {
 .about-experience-item p {
   margin: 0;
   color: #303038;
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: clamp(0.76rem, 0.83vw, 1rem);
+  font-family: var(--font-sans);
+  font-size: var(--about-detail-font-size);
   line-height: 26.11px;
   font-weight: 400;
   letter-spacing: 0;
@@ -1657,8 +1661,8 @@ body {
 .about-award-item time,
 .about-experience-item time {
   color: #303038;
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: clamp(0.78rem, 0.885vw, 1.0625rem);
+  font-family: var(--font-sans);
+  font-size: var(--about-detail-font-size);
   line-height: 26.11px;
   font-weight: 500;
   white-space: nowrap;
@@ -1729,26 +1733,27 @@ body {
 
 .about-experience-item h3 {
   color: #171717;
-  font-size: clamp(0.84rem, 0.892vw, 1.071rem);
+  font-size: var(--about-body-font-size);
   line-height: 24.267px;
   font-weight: 800;
 }
 
 .about-experience-item h3 span {
   color: rgba(18, 18, 18, 0.55);
+  font-size: var(--about-detail-font-size);
   font-weight: 700;
 }
 
 .about-experience-item time {
   color: #171717;
-  font-size: clamp(0.72rem, 0.78vw, 0.9375rem);
+  font-size: var(--about-detail-font-size);
   line-height: 24.267px;
   font-weight: 400;
 }
 
 .about-experience-item p {
   color: rgba(0, 0, 0, 0.85);
-  font-size: clamp(0.72rem, 0.78vw, 0.9375rem);
+  font-size: var(--about-detail-font-size);
   line-height: 22.839px;
   font-weight: 400;
 }
@@ -1808,25 +1813,12 @@ body {
 }
 
 @media (max-width: 1500px) {
-  .about-sheet {
-    padding-inline: 34px;
-  }
-
   .about-resume-grid {
     grid-template-columns:
-      minmax(190px, 17.47%)
-      minmax(162px, 15.6%)
-      minmax(305px, 28.46%)
-      minmax(315px, 29.3%);
-  }
-
-  .about-panel-title {
-    line-height: 50px;
-  }
-
-  .about-portrait,
-  .about-contact-list {
-    margin-top: 28px;
+      minmax(190px, 18.275862%)
+      minmax(162px, 16.321839%)
+      minmax(305px, 29.770115%)
+      minmax(315px, 30.574713%);
   }
 
   .about-keyword-stack {
@@ -1836,12 +1828,17 @@ body {
 
 @media (max-width: 1180px) {
   .about-sheet {
+    height: calc(100dvh - var(--archive-top-nav-height));
+    margin: 0;
     padding: 20px 24px 24px;
   }
 
   .about-resume-grid {
     grid-template-columns: minmax(205px, 0.9fr) minmax(165px, 0.7fr) minmax(0, 1.5fr);
     row-gap: 36px;
+    width: 100%;
+    height: 100%;
+    transform: none;
   }
 
   .about-experience-panel {
@@ -1875,10 +1872,6 @@ body {
 
   .about-portrait {
     max-width: 360px;
-  }
-
-  .about-contact-list {
-    margin-top: 24px;
   }
 
   .about-keyword-stack {
@@ -2211,7 +2204,7 @@ body {
 
 .band-number {
   margin: -5px 0 0;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 76px;
   line-height: 0.86;
   font-weight: 700;
@@ -2480,7 +2473,7 @@ body {
 }
 
 .panel-side-copy-kicker {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1;
   font-weight: 700;
@@ -2489,7 +2482,7 @@ body {
 
 .panel-side-copy-title {
   margin: 0;
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 37.5px;
   line-height: 0.92;
   font-weight: 700;
@@ -2497,7 +2490,7 @@ body {
 }
 
 .panel-side-copy-description {
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
   line-height: 1.5;
   font-weight: 300;
@@ -2512,7 +2505,7 @@ body {
 }
 
 .panel-side-copy-year {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1;
   font-weight: 700;
@@ -2525,7 +2518,7 @@ body {
 }
 
 .panel-side-copy-label {
-  font-family: "PingFang SC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 12px;
   line-height: 1.1;
   font-weight: 700;
@@ -2533,7 +2526,7 @@ body {
 }
 
 .panel-side-copy-value {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 15px;
   line-height: 1.05;
   font-weight: 500;
@@ -2893,7 +2886,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     width: 100%;
     min-height: 100dvh;
     height: 100dvh;
-    border-width: 1px;
+    border-width: 0;
     grid-template-columns: 1fr;
   }
 
@@ -3018,7 +3011,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
 @media (max-width: 700px) {
   .home-intro-logo {
     transform: translateY(-1vh);
-    font-size: clamp(3rem, 18vw, 5rem);
+    font-size: clamp(2.25rem, 13.5vw, 3.75rem);
   }
 
   .home-intro-letter {
