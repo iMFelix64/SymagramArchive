@@ -253,19 +253,6 @@ body.debug-labels [data-debug-label]:hover {
   outline: none;
 }
 
-.home-transition-stage.is-about-visible + .archive-top-nav::before {
-  content: "en/zh";
-  position: absolute;
-  top: 50%;
-  right: 15px;
-  color: #474747;
-  font-family: var(--font-sans);
-  font-size: 15.238px;
-  line-height: 15.238px;
-  font-weight: 400;
-  transform: translateY(-50%);
-}
-
 .home-transition-stage.is-about-visible + .archive-top-nav .archive-debug-controls {
   right: 74px;
 }
