@@ -33,4 +33,4 @@
 
 ## Implementation target in this repo
 
-Implemented as `olha-effect.html`, with companion `olha-effect.css` and `olha-effect.js`, preserving the existing TwoDiskGarage archive page.
+Implemented as `olha-effect.html`, with companion `olha-effect.css` and `olha-effect.js`, preserving the existing SymagramArchive archive page.
