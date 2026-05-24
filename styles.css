@@ -1596,11 +1596,11 @@ body {
   justify-content: space-between;
 }
 
-.about-skill-metrics strong {
+.about-ielts-score {
   margin-left: auto;
   color: #303038;
-  font-size: var(--about-detail-font-size);
-  font-weight: 500;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .about-award-list {
