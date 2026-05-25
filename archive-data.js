@@ -9,7 +9,8 @@ window.TDG_ARCHIVE = {
         "03",
         "04",
         "05",
-        "06"
+        "06",
+        "07"
       ]
     }
   ],
@@ -21,17 +22,17 @@ window.TDG_ARCHIVE = {
       "tagline": "Lighting / Field Kit / Industrial Design",
       "description": "兼顾了户外探索的照明安全与专业拍摄的补光需求，在严苛环境下为摄影师提供可靠保障与精准的创作支持。",
       "visible": true,
-      "imageFolder": "./Assets/Project Vault/25P-A EarthExplorer",
-      "coverImage": "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 01.jpg",
+      "imageFolder": "./Assets/Project Vault/25P-B EarthExplorer",
+      "coverImage": "./Assets/Project Vault/25P-B EarthExplorer/1-EARTH EXPLORER 01.jpg",
       "images": [
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 01.jpg",
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 02.jpg",
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 03.jpg",
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 04.jpg",
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 05.jpg",
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 06.jpg",
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 07.jpg",
-        "./Assets/Project Vault/25P-A EarthExplorer/1-EARTH EXPLORER 08.jpg"
+        "./Assets/Project Vault/25P-B EarthExplorer/1-EARTH EXPLORER 01.jpg",
+        "./Assets/Project Vault/25P-B EarthExplorer/1-EARTH EXPLORER 02.jpg",
+        "./Assets/Project Vault/25P-B EarthExplorer/1-EARTH EXPLORER 03.jpg",
+        "./Assets/Project Vault/25P-B EarthExplorer/1-EARTH EXPLORER 04.jpg",
+        "./Assets/Project Vault/25P-B EarthExplorer/1-EARTH EXPLORER 05.jpg",
+        "./Assets/Project Vault/25P-B EarthExplorer/1-EARTH EXPLORER 06.jpg",
+        "./Assets/Project Vault/25P-B EarthExplorer/1-EARTH EXPLORER 07.jpg",
+        "./Assets/Project Vault/25P-B EarthExplorer/1-EARTH EXPLORER 08.jpg"
       ]
     },
     {
@@ -137,6 +138,26 @@ window.TDG_ARCHIVE = {
         "./Assets/Project Vault/26P-A DotGO/DotGO - 07.jpg",
         "./Assets/Project Vault/26P-A DotGO/DotGO - 08.jpg",
         "./Assets/Project Vault/26P-A DotGO/DotGO - 09.jpg"
+      ]
+    },
+    {
+      "id": "07",
+      "archiveCode": "",
+      "title": "Volante 水翼船",
+      "year": "2024",
+      "category": "",
+      "tagline": "Project / Direction",
+      "description": "重新定义了短途海上交通体验。克制而现代的设计语言勾勒出简洁流线的船体，封闭式座舱提供全天候舒适性，宽大的侧窗则加强了乘客与海面之间的视觉连接。设计强调速度、安静与优雅之间的平衡，呈现更高效、更平稳，也更具未来感的海上出行方式。",
+      "visible": true,
+      "placeholder": false,
+      "imageFolder": "./Assets/Project Vault/24P-B Volante",
+      "coverImage": "./Assets/Project Vault/24P-B Volante/Template01.jpg",
+      "images": [
+        "./Assets/Project Vault/24P-B Volante/Template01.jpg",
+        "./Assets/Project Vault/24P-B Volante/Template02.jpg",
+        "./Assets/Project Vault/24P-B Volante/Template03.jpg",
+        "./Assets/Project Vault/24P-B Volante/Template04.jpg",
+        "./Assets/Project Vault/24P-B Volante/Template05.jpg"
       ]
     }
   ]
