@@ -6,12 +6,16 @@
     <title>SymagramArchive Admin</title>
     <style>
       :root {
-        --bg: #f7f7f4;
-        --ink: #111;
-        --muted: #666;
-        --line: #9a9a94;
-        --panel: #fff;
-        --accent: #ffe100;
+        --bg: #f4f3ee;
+        --ink: #141414;
+        --muted: #66645d;
+        --line: #cbc7bb;
+        --line-strong: #141414;
+        --panel: #fffefa;
+        --panel-alt: #ebe8dc;
+        --accent: #f2d331;
+        --danger: #c83d25;
+        --shadow: 0 18px 50px rgba(20, 20, 20, 0.08);
       }
 
       * {
@@ -19,7 +23,11 @@
       }
 
       body {
-        background: var(--bg);
+        background:
+          linear-gradient(rgba(20, 20, 20, 0.035) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(20, 20, 20, 0.025) 1px, transparent 1px),
+          var(--bg);
+        background-size: 28px 28px;
         color: var(--ink);
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
         margin: 0;
@@ -31,377 +39,437 @@
         font: inherit;
       }
 
+      button {
+        align-items: center;
+        background: var(--panel);
+        border: 1px solid var(--line-strong);
+        color: var(--ink);
+        cursor: pointer;
+        display: inline-flex;
+        justify-content: center;
+        min-height: 30px;
+        padding: 5px 10px;
+      }
+
+      button:hover {
+        background: var(--accent);
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+      }
+
       input,
       textarea {
+        background: #fff;
         border: 1px solid var(--line);
         border-radius: 0;
+        color: var(--ink);
+        min-height: 34px;
+        padding: 7px 9px;
+        width: 100%;
+      }
+
+      textarea {
+        line-height: 1.45;
+        resize: vertical;
       }
 
       .admin-shell {
-        display: grid;
-        grid-template-rows: auto 1fr;
         min-height: 100vh;
       }
 
       .admin-header {
         align-items: end;
-        border-bottom: 1px solid var(--ink);
+        background: rgba(244, 243, 238, 0.92);
+        border-bottom: 1px solid var(--line-strong);
         display: grid;
-        gap: 16px;
+        gap: 18px;
         grid-template-columns: minmax(0, 1fr) auto;
         padding: 18px 20px 14px;
+        position: sticky;
+        top: 0;
+        z-index: 20;
       }
 
       .admin-kicker {
         color: var(--muted);
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 700;
+        letter-spacing: 0.08em;
         margin: 0 0 6px;
         text-transform: uppercase;
       }
 
       .admin-title {
-        font-size: 32px;
-        line-height: 0.95;
+        font-size: clamp(28px, 4vw, 48px);
+        letter-spacing: -0.03em;
+        line-height: 0.92;
         margin: 0;
       }
 
       .admin-actions {
         display: flex;
+        flex-wrap: wrap;
         gap: 8px;
+        justify-content: flex-end;
       }
 
-      .admin-button {
-        background: var(--panel);
-        border: 1px solid var(--ink);
-        cursor: pointer;
-        min-height: 34px;
-        padding: 5px 12px;
+      .admin-action--primary {
+        background: var(--ink);
+        color: var(--panel);
       }
 
-      .admin-button:hover {
+      .admin-action--primary:hover {
         background: var(--accent);
+        color: var(--ink);
       }
 
       .admin-main {
         display: grid;
-        gap: 18px;
-        grid-template-columns: minmax(0, 1fr) minmax(360px, 0.42fr);
-        padding: 18px 20px 24px;
+        gap: 14px;
+        grid-template-columns: minmax(280px, 0.82fr) minmax(360px, 1fr) minmax(360px, 1.1fr);
+        padding: 14px 20px 24px;
       }
 
-      .group-board {
-        display: grid;
-        gap: 15px;
-      }
-
-      .group-panel {
+      .admin-panel {
         background: var(--panel);
-        border: 1px solid var(--line);
-        min-height: 160px;
+        border: 1px solid var(--line-strong);
+        box-shadow: var(--shadow);
+        min-width: 0;
       }
 
-      .group-header {
-        align-items: center;
-        border-bottom: 1px solid var(--line);
+      .panel-header {
+        align-items: start;
+        border-bottom: 1px solid var(--line-strong);
         display: flex;
+        gap: 12px;
         justify-content: space-between;
-        padding: 10px 12px;
+        padding: 12px;
       }
 
-      .group-title {
-        font-size: 24px;
-        line-height: 1;
+      .panel-title {
+        font-size: 17px;
+        line-height: 1.1;
         margin: 0;
       }
 
-      .group-count {
+      .panel-note,
+      .empty-note,
+      .status-text {
         color: var(--muted);
         font-size: 12px;
+        line-height: 1.45;
+        margin: 5px 0 0;
       }
 
-      .group-tools {
-        align-items: center;
-        display: flex;
-        gap: 8px;
-      }
-
-      .group-add-button,
-      .group-delete-button,
-      .project-delete-button {
-        background: var(--panel);
-        border: 1px solid var(--ink);
-        cursor: pointer;
-        line-height: 1;
-      }
-
-      .group-add-button,
-      .group-delete-button {
-        min-height: 26px;
-        padding: 4px 9px;
-      }
-
-      .group-add-button:hover,
-      .group-delete-button:hover,
-      .project-delete-button:hover {
-        background: var(--accent);
-      }
-
-      .project-list {
-        display: grid;
-        gap: 8px;
-        list-style: none;
-        margin: 0;
-        min-height: 70px;
-        padding: 10px;
-      }
-
-      .project-list.is-drag-over {
-        background: rgba(255, 225, 0, 0.16);
-      }
-
-      .project-item {
-        align-items: center;
-        background: #fdfdfb;
-        border: 1px solid var(--line);
-        cursor: grab;
-        display: grid;
-        gap: 10px;
-        grid-template-columns: 58px minmax(0, 1fr) auto 30px;
-        min-height: 54px;
-        padding: 8px 10px;
-        touch-action: none;
-        transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
-        user-select: none;
-      }
-
-      .project-item.is-selected {
-        background: var(--accent);
-        border-color: var(--ink);
-      }
-
-      .project-item:active {
-        cursor: grabbing;
-      }
-
-      .project-item.is-hidden {
-        opacity: 0.42;
-      }
-
-      .project-item.is-pointer-dragging {
-        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
-        cursor: grabbing;
-        left: var(--drag-left);
-        opacity: 0.96;
-        pointer-events: none;
-        position: fixed;
-        top: var(--drag-top);
-        width: var(--drag-width);
-        z-index: 1000;
-      }
-
-      .project-placeholder {
-        background: rgba(255, 225, 0, 0.22);
-        border: 1px dashed var(--ink);
-        min-height: var(--placeholder-height, 54px);
-      }
-
-      .project-id {
-        font-size: 22px;
-        font-weight: 700;
-        letter-spacing: -0.04em;
-      }
-
-      .project-title {
-        font-size: 15px;
-        font-weight: 700;
-        line-height: 1.2;
-      }
-
-      .project-meta {
-        color: var(--muted);
-        font-size: 11px;
-        line-height: 1.35;
-        margin-top: 3px;
-      }
-
-      .visibility-toggle {
-        align-items: center;
-        color: var(--muted);
-        display: flex;
-        font-size: 12px;
-        gap: 6px;
-        white-space: nowrap;
-      }
-
-      .project-delete-button {
-        align-items: center;
-        display: inline-flex;
-        font-size: 20px;
-        font-weight: 700;
-        height: 30px;
-        justify-content: center;
-        padding: 0;
-        width: 30px;
-      }
-
-      .side-column {
-        align-self: start;
-        display: grid;
-        gap: 15px;
-        position: sticky;
-        top: 18px;
-      }
-
-      .edit-panel {
-        background: var(--panel);
-        border: 1px solid var(--ink);
+      .panel-body {
         display: grid;
         gap: 12px;
         padding: 12px;
       }
 
-      .edit-title {
-        font-size: 16px;
-        margin: 0;
+      .manager-stats {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
-      .edit-empty {
+      .stat-box {
+        background: var(--panel-alt);
+        border: 1px solid var(--line);
+        min-height: 62px;
+        padding: 9px;
+      }
+
+      .stat-value {
+        display: block;
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      .stat-label {
         color: var(--muted);
-        font-size: 12px;
-        line-height: 1.5;
-        margin: 0;
+        display: block;
+        font-size: 11px;
+        margin-top: 6px;
+        text-transform: uppercase;
       }
 
-      .edit-grid {
+      .group-stack {
         display: grid;
         gap: 10px;
       }
 
-      .edit-section-title {
-        border-top: 1px solid var(--line);
-        color: var(--ink);
-        font-size: 12px;
-        font-weight: 700;
-        margin: 2px 0 -2px;
-        padding-top: 10px;
-        text-transform: uppercase;
-      }
-
-      .edit-field {
-        display: grid;
-        gap: 5px;
-      }
-
-      .edit-label {
-        color: var(--muted);
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-      }
-
-      .edit-input,
-      .edit-textarea {
-        background: #fdfdfb;
-        color: var(--ink);
-        min-height: 32px;
-        padding: 7px 8px;
-        width: 100%;
-      }
-
-      .edit-textarea {
-        line-height: 1.45;
-        min-height: 82px;
-        resize: vertical;
-      }
-
-      .edit-textarea--paths {
-        min-height: 160px;
-        white-space: pre;
-      }
-
-      .edit-summary {
+      .group-card {
+        background: #fff;
         border: 1px solid var(--line);
-        color: var(--muted);
-        font-size: 13px;
-        line-height: 1.35;
-        min-height: 34px;
-        padding: 8px 10px;
       }
 
-      .edit-checks {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
+      .group-card.is-drag-over {
+        border-color: var(--line-strong);
+        box-shadow: inset 0 0 0 3px rgba(242, 211, 49, 0.5);
       }
 
-      .edit-actions-row {
-        display: flex;
-        flex-wrap: wrap;
+      .group-top {
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+        display: grid;
         gap: 8px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        padding: 8px;
       }
 
-      .edit-mini-button {
-        background: var(--panel);
-        border: 1px solid var(--ink);
-        cursor: pointer;
+      .group-name-input {
+        border-color: transparent;
+        font-size: 18px;
+        font-weight: 700;
+        min-height: 30px;
+        padding: 4px 6px;
+      }
+
+      .group-name-input:focus {
+        border-color: var(--line-strong);
+        outline: none;
+      }
+
+      .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .mini-button {
         font-size: 12px;
         min-height: 28px;
         padding: 4px 8px;
       }
 
-      .edit-mini-button:hover {
-        background: var(--accent);
+      .danger-button:hover {
+        background: var(--danger);
+        color: #fff;
       }
 
-      .export-panel {
-        background: var(--panel);
-        border: 1px solid var(--ink);
+      .project-list {
+        display: grid;
+        gap: 6px;
+        list-style: none;
+        margin: 0;
+        min-height: 54px;
+        padding: 8px;
+      }
+
+      .project-item {
+        align-items: center;
+        background: #fdfcf8;
+        border: 1px solid var(--line);
+        cursor: grab;
+        display: grid;
+        gap: 8px;
+        grid-template-columns: 42px minmax(0, 1fr) auto;
+        min-height: 48px;
+        padding: 7px;
+      }
+
+      .project-item:hover,
+      .project-item.is-selected {
+        background: var(--accent);
+        border-color: var(--line-strong);
+      }
+
+      .project-item.is-hidden {
+        opacity: 0.48;
+      }
+
+      .project-number {
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      .project-copy {
+        min-width: 0;
+      }
+
+      .project-title {
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.2;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .project-meta {
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.3;
+        margin-top: 3px;
+      }
+
+      .project-quick {
+        display: flex;
+        gap: 4px;
+      }
+
+      .field-grid {
         display: grid;
         gap: 10px;
-        padding: 12px;
       }
 
-      .export-title {
-        font-size: 16px;
-        margin: 0;
+      .field-row {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .export-note {
+      .field {
+        display: grid;
+        gap: 5px;
+      }
+
+      .field-label {
         color: var(--muted);
-        font-size: 12px;
-        line-height: 1.5;
-        margin: 0;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
       }
 
-      .export-status {
-        color: var(--muted);
+      .section-rule {
+        align-items: center;
+        color: var(--ink);
+        display: grid;
         font-size: 12px;
-        margin: 0;
-        min-height: 16px;
+        font-weight: 700;
+        gap: 9px;
+        grid-template-columns: auto 1fr;
+        letter-spacing: 0.06em;
+        margin-top: 2px;
+        text-transform: uppercase;
+      }
+
+      .section-rule::after {
+        background: var(--line);
+        content: "";
+        height: 1px;
+      }
+
+      .check-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+
+      .check-label {
+        align-items: center;
+        color: var(--muted);
+        display: inline-flex;
+        font-size: 12px;
+        gap: 7px;
+      }
+
+      .check-label input {
+        min-height: auto;
+        width: auto;
+      }
+
+      .image-toolbar {
+        display: grid;
+        gap: 8px;
+      }
+
+      .image-actions {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .image-list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .image-row {
+        background: #fff;
+        border: 1px solid var(--line);
+        display: grid;
+        gap: 8px;
+        grid-template-columns: 78px minmax(0, 1fr);
+        padding: 8px;
+      }
+
+      .image-row.is-cover {
+        border-color: var(--line-strong);
+        box-shadow: inset 0 0 0 3px rgba(242, 211, 49, 0.45);
+      }
+
+      .image-thumb {
+        background: var(--panel-alt);
+        border: 1px solid var(--line);
+        height: 74px;
+        object-fit: cover;
+        width: 74px;
+      }
+
+      .image-fields {
+        display: grid;
+        gap: 7px;
+        min-width: 0;
+      }
+
+      .image-path {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 12px;
+      }
+
+      .image-row-tools {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .paste-area {
+        min-height: 98px;
+        white-space: pre;
       }
 
       .export-output {
-        border: 1px solid var(--line);
-        min-height: 520px;
-        padding: 10px;
-        resize: vertical;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 12px;
+        min-height: 260px;
         white-space: pre;
-        width: 100%;
       }
 
-      .export-output.is-updated {
-        border-color: var(--ink);
-        box-shadow: 0 0 0 3px rgba(255, 225, 0, 0.55);
+      .status-text.is-active {
+        color: var(--ink);
+        font-weight: 700;
       }
 
-      @media (max-width: 980px) {
+      @media (max-width: 1160px) {
+        .admin-main {
+          grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1fr);
+        }
+
+        .media-panel {
+          grid-column: 1 / -1;
+        }
+      }
+
+      @media (max-width: 760px) {
+        .admin-header,
         .admin-main {
           grid-template-columns: 1fr;
         }
 
-        .side-column {
-          position: static;
+        .admin-actions {
+          justify-content: start;
+        }
+
+        .field-row,
+        .image-actions,
+        .manager-stats {
+          grid-template-columns: 1fr;
         }
       }
     </style>
@@ -410,83 +478,117 @@
     <main class="admin-shell">
       <header class="admin-header">
         <div>
-          <p class="admin-kicker">SymagramArchive / Archive Admin</p>
-          <h1 class="admin-title">目录排序导出</h1>
+          <p class="admin-kicker">SymagramArchive / Archive Data Manager</p>
+          <h1 class="admin-title">Archive 管理台</h1>
         </div>
         <div class="admin-actions">
-          <button class="admin-button" id="add-group-button" type="button">Add Group</button>
-          <button class="admin-button" id="reset-button" type="button">Reset</button>
-          <button class="admin-button" id="export-button" type="button">Export</button>
-          <button class="admin-button" id="copy-button" type="button">Copy</button>
+          <button id="add-group-button" type="button">Add Group</button>
+          <button id="add-project-button" type="button">Add Project</button>
+          <button id="reset-button" type="button">Reset</button>
+          <button id="copy-button" type="button">Copy</button>
+          <button class="admin-action--primary" id="save-button" type="button">Save Export</button>
         </div>
       </header>
 
       <section class="admin-main">
-        <div class="group-board" id="group-board" aria-label="项目分组排序"></div>
+        <section class="admin-panel" aria-label="分组与项目排序">
+          <header class="panel-header">
+            <div>
+              <h2 class="panel-title">Groups & Order</h2>
+              <p class="panel-note">分组可上下移动，项目可拖入不同分组，也可用 Up / Down 微调。</p>
+            </div>
+          </header>
+          <div class="panel-body">
+            <div class="manager-stats" id="manager-stats"></div>
+            <div class="group-stack" id="group-stack"></div>
+          </div>
+        </section>
 
-        <aside class="side-column">
-          <section class="edit-panel" aria-label="编辑项目内容">
-            <h2 class="edit-title">Project Editor</h2>
-            <div id="project-editor"></div>
-          </section>
+        <section class="admin-panel" aria-label="项目文字内容">
+          <header class="panel-header">
+            <div>
+              <h2 class="panel-title">Project Text</h2>
+              <p class="panel-note">编辑单个项目的标题、描述和侧边栏文字；编号 ID 保持稳定。</p>
+            </div>
+          </header>
+          <div class="panel-body" id="project-editor"></div>
+        </section>
 
-          <section class="export-panel" aria-label="导出 archive-data.js">
-            <h2 class="export-title">archive-data.js</h2>
-            <p class="export-note">
-              拖动项目调整顺序或分组，勾选 Visible 控制是否显示。点击 Export 后复制下面内容，替换 archive-data.js。
-            </p>
-            <p class="export-status" id="export-status" aria-live="polite"></p>
+        <section class="admin-panel media-panel" aria-label="项目图片与来源">
+          <header class="panel-header">
+            <div>
+              <h2 class="panel-title">Images & Sources</h2>
+              <p class="panel-note">调整图片顺序、封面、文件路径和来源备注。第一张会默认作为详情页主图。</p>
+            </div>
+          </header>
+          <div class="panel-body">
+            <div id="media-editor"></div>
+            <div class="section-rule">Export</div>
+            <p class="status-text" id="export-status" aria-live="polite"></p>
             <textarea class="export-output" id="export-output" spellcheck="false"></textarea>
-          </section>
-        </aside>
+          </div>
+        </section>
       </section>
     </main>
 
-    <script src="./archive-data.js?v=20260519-single-source"></script>
+    <script src="./archive-data.js?v=20260525-admin-manager-2"></script>
     <script>
       const sourceData = window.TDG_ARCHIVE || { groups: [], projects: [] };
       let draftData = cloneArchiveData(sourceData);
-      let dragState = null;
       let selectedProjectId = getFirstProjectId(draftData);
+      let draggedProjectId = "";
+      let exportStatusTimer = 0;
 
-      const groupBoard = document.getElementById("group-board");
+      const groupStack = document.getElementById("group-stack");
+      const managerStats = document.getElementById("manager-stats");
       const projectEditor = document.getElementById("project-editor");
+      const mediaEditor = document.getElementById("media-editor");
       const exportOutput = document.getElementById("export-output");
       const exportStatus = document.getElementById("export-status");
       const addGroupButton = document.getElementById("add-group-button");
-      const exportButton = document.getElementById("export-button");
-      const copyButton = document.getElementById("copy-button");
+      const addProjectButton = document.getElementById("add-project-button");
       const resetButton = document.getElementById("reset-button");
-      let exportStatusTimer = 0;
+      const copyButton = document.getElementById("copy-button");
+      const saveButton = document.getElementById("save-button");
 
       function cloneArchiveData(data) {
-        return {
-          groups: (data.groups || []).map((group) => ({
-            ...group,
-            projectIds: [...(group.projectIds || [])],
-          })),
-          projects: (data.projects || []).map((project) => ({
-            ...project,
-            imageFolder: normalizeFolderPath(project.imageFolder || getCommonImageFolder(project.images || [])),
-            images: normalizePathList(project.images || []),
-          })),
-        };
+        const projects = (data.projects || []).map((project) => ({
+          ...project,
+          imageFolder: normalizeFolderPath(project.imageFolder || getCommonImageFolder(project.images || [])),
+          images: normalizePathList(project.images || []),
+          imageSources: { ...(project.imageSources || {}) },
+        }));
+        const projectIds = new Set(projects.map((project) => project.id));
+        const groups = (data.groups || []).map((group) => ({
+          ...group,
+          id: group.id || createSlug(group.title || "group"),
+          title: group.title || "Untitled",
+          projectIds: [...new Set(group.projectIds || [])].filter((id) => projectIds.has(id)),
+        }));
+        const groupedIds = new Set(groups.flatMap((group) => group.projectIds));
+        const orphanIds = projects.map((project) => project.id).filter((id) => !groupedIds.has(id));
+
+        if (orphanIds.length) {
+          groups.push({
+            id: createUniqueGroupId(groups, "ungrouped"),
+            title: "未分组",
+            projectIds: orphanIds,
+          });
+        }
+
+        return { groups, projects };
+      }
+
+      function createSlug(value) {
+        return String(value || "group")
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "") || "group";
       }
 
       function normalizeFolderPath(path) {
         return String(path || "").trim().replace(/\/+$/, "");
-      }
-
-      function getCommonImageFolder(images) {
-        const firstImage = images.find(Boolean);
-
-        if (!firstImage) {
-          return "";
-        }
-
-        const slashIndex = firstImage.lastIndexOf("/");
-
-        return slashIndex >= 0 ? firstImage.slice(0, slashIndex) : "";
       }
 
       function normalizePathList(value) {
@@ -500,37 +602,347 @@
           .filter(Boolean);
       }
 
-      function getImageSummary(project) {
-        const images = normalizePathList(project.images);
+      function getCommonImageFolder(images) {
+        const firstImage = normalizePathList(images).find(Boolean);
 
-        if (!project.imageFolder) {
-          return "填写 Project Vault 里的文件夹路径后，点击 Refresh folder images 读取图片。";
+        if (!firstImage) {
+          return "";
         }
 
-        if (!images.length) {
-          return "还没有读取到图片。确认本地服务器已启动后点击 Refresh folder images。";
-        }
-
-        return `${images.length} images / cover: ${images[0]}`;
-      }
-
-      function syncProjectMediaDefaults(project) {
-        project.imageFolder = normalizeFolderPath(project.imageFolder || getCommonImageFolder(project.images || []));
-        project.images = normalizePathList(project.images || []);
-        project.coverImage = String(project.coverImage || project.images[0] || "").trim();
-
-        if (project.coverImage && !project.images.includes(project.coverImage)) {
-          project.images = [project.coverImage, ...project.images];
-        }
+        const slashIndex = firstImage.lastIndexOf("/");
+        return slashIndex >= 0 ? firstImage.slice(0, slashIndex) : "";
       }
 
       function isImagePath(path) {
         return /\.(avif|gif|jpe?g|png|webp)$/i.test(path);
       }
 
+      function getFirstProjectId(data) {
+        return (data.groups || []).find((group) => group.projectIds.length)?.projectIds[0]
+          || data.projects?.[0]?.id
+          || "";
+      }
+
+      function getProject(projectId = selectedProjectId) {
+        return draftData.projects.find((project) => project.id === projectId) || null;
+      }
+
+      function getGroup(groupId) {
+        return draftData.groups.find((group) => group.id === groupId) || null;
+      }
+
+      function getProjectGroup(projectId) {
+        return draftData.groups.find((group) => group.projectIds.includes(projectId)) || null;
+      }
+
+      function getOrderedProjectIds() {
+        return draftData.groups.flatMap((group) => group.projectIds);
+      }
+
+      function getDisplayNumber(projectId) {
+        const index = getOrderedProjectIds().indexOf(projectId);
+        return index >= 0 ? String(index + 1).padStart(2, "0") : projectId;
+      }
+
+      function createUniqueGroupId(groups, title) {
+        const existingIds = new Set(groups.map((group) => group.id));
+        const baseId = createSlug(title);
+        let nextId = baseId;
+        let suffix = 2;
+
+        while (existingIds.has(nextId)) {
+          nextId = `${baseId}-${suffix}`;
+          suffix += 1;
+        }
+
+        return nextId;
+      }
+
+      function createProjectId() {
+        const numericIds = draftData.projects
+          .map((project) => Number(project.id))
+          .filter((id) => Number.isFinite(id));
+
+        return String(Math.max(0, ...numericIds) + 1).padStart(2, "0");
+      }
+
+      function selectProject(projectId) {
+        if (!getProject(projectId)) {
+          return;
+        }
+
+        selectedProjectId = projectId;
+        renderAdmin();
+      }
+
+      function moveGroup(groupId, direction) {
+        const index = draftData.groups.findIndex((group) => group.id === groupId);
+        const nextIndex = index + direction;
+
+        if (index < 0 || nextIndex < 0 || nextIndex >= draftData.groups.length) {
+          return;
+        }
+
+        const [group] = draftData.groups.splice(index, 1);
+        draftData.groups.splice(nextIndex, 0, group);
+        renderAdmin();
+      }
+
+      function addGroup() {
+        const title = window.prompt("输入新分组名称", "新分组");
+
+        if (title === null || !title.trim()) {
+          return;
+        }
+
+        draftData.groups.push({
+          id: createUniqueGroupId(draftData.groups, title),
+          title: title.trim(),
+          projectIds: [],
+        });
+        renderAdmin();
+      }
+
+      function deleteGroup(groupId) {
+        const group = getGroup(groupId);
+
+        if (!group) {
+          return;
+        }
+
+        if (group.projectIds.length) {
+          const shouldContinue = window.confirm(`删除分组「${group.title}」并删除其中 ${group.projectIds.length} 个项目？`);
+
+          if (!shouldContinue) {
+            return;
+          }
+        }
+
+        const deletedIds = new Set(group.projectIds);
+        draftData.groups = draftData.groups.filter((currentGroup) => currentGroup.id !== groupId);
+        draftData.projects = draftData.projects.filter((project) => !deletedIds.has(project.id));
+
+        if (deletedIds.has(selectedProjectId)) {
+          selectedProjectId = getFirstProjectId(draftData);
+        }
+
+        renderAdmin();
+      }
+
+      function addProject(groupId = draftData.groups[0]?.id) {
+        let targetGroup = getGroup(groupId);
+
+        if (!targetGroup) {
+          draftData.groups.push({
+            id: createUniqueGroupId(draftData.groups, "product"),
+            title: "产品",
+            projectIds: [],
+          });
+          targetGroup = draftData.groups[draftData.groups.length - 1];
+        }
+
+        const projectId = createProjectId();
+        const project = {
+          id: projectId,
+          archiveCode: "",
+          title: "新项目",
+          year: "TBD",
+          category: "",
+          tagline: "Project / Direction",
+          description: "这里填写项目介绍。",
+          visible: true,
+          placeholder: true,
+          imageFolder: "",
+          coverImage: "",
+          images: [],
+          imageSources: {},
+        };
+
+        draftData.projects.push(project);
+        targetGroup.projectIds.push(projectId);
+        selectedProjectId = projectId;
+        renderAdmin();
+      }
+
+      function deleteProject(projectId) {
+        const project = getProject(projectId);
+
+        if (!project) {
+          return;
+        }
+
+        const shouldDelete = window.confirm(`删除项目「${project.title}」？`);
+
+        if (!shouldDelete) {
+          return;
+        }
+
+        draftData.projects = draftData.projects.filter((currentProject) => currentProject.id !== projectId);
+        draftData.groups.forEach((group) => {
+          group.projectIds = group.projectIds.filter((id) => id !== projectId);
+        });
+
+        if (selectedProjectId === projectId) {
+          selectedProjectId = getFirstProjectId(draftData);
+        }
+
+        renderAdmin();
+      }
+
+      function moveProject(projectId, direction) {
+        const group = getProjectGroup(projectId);
+
+        if (!group) {
+          return;
+        }
+
+        const index = group.projectIds.indexOf(projectId);
+        const nextIndex = index + direction;
+
+        if (index < 0 || nextIndex < 0 || nextIndex >= group.projectIds.length) {
+          return;
+        }
+
+        group.projectIds.splice(index, 1);
+        group.projectIds.splice(nextIndex, 0, projectId);
+        renderAdmin();
+      }
+
+      function moveProjectToGroup(projectId, targetGroupId, beforeProjectId = "") {
+        const targetGroup = getGroup(targetGroupId);
+
+        if (!targetGroup || !getProject(projectId)) {
+          return;
+        }
+
+        draftData.groups.forEach((group) => {
+          group.projectIds = group.projectIds.filter((id) => id !== projectId);
+        });
+
+        const beforeIndex = beforeProjectId ? targetGroup.projectIds.indexOf(beforeProjectId) : -1;
+
+        if (beforeIndex >= 0) {
+          targetGroup.projectIds.splice(beforeIndex, 0, projectId);
+        } else {
+          targetGroup.projectIds.push(projectId);
+        }
+
+        selectedProjectId = projectId;
+        renderAdmin();
+      }
+
+      function moveImage(project, index, direction) {
+        const nextIndex = index + direction;
+
+        if (nextIndex < 0 || nextIndex >= project.images.length) {
+          return;
+        }
+
+        [project.images[index], project.images[nextIndex]] = [project.images[nextIndex], project.images[index]];
+        syncProjectMedia(project);
+        renderAdmin();
+      }
+
+      function deleteImage(project, index) {
+        const [path] = project.images.splice(index, 1);
+
+        if (project.imageSources) {
+          delete project.imageSources[path];
+        }
+
+        syncProjectMedia(project);
+        renderAdmin();
+      }
+
+      function setImagePath(project, index, nextPath) {
+        const oldPath = project.images[index];
+        const cleanPath = String(nextPath || "").trim();
+
+        if (!cleanPath) {
+          deleteImage(project, index);
+          return;
+        }
+
+        project.images[index] = cleanPath;
+
+        if (project.imageSources?.[oldPath] && oldPath !== cleanPath) {
+          project.imageSources[cleanPath] = project.imageSources[oldPath];
+          delete project.imageSources[oldPath];
+        }
+
+        syncProjectMedia(project);
+        renderAdmin();
+      }
+
+      function setImageSource(project, path, source) {
+        project.imageSources = project.imageSources || {};
+
+        if (source.trim()) {
+          project.imageSources[path] = source.trim();
+        } else {
+          delete project.imageSources[path];
+        }
+
+        exportArchiveData();
+      }
+
+      function syncProjectMedia(project) {
+        project.images = normalizePathList(project.images);
+        project.imageFolder = normalizeFolderPath(project.imageFolder || getCommonImageFolder(project.images));
+        project.coverImage = project.images[0] || "";
+      }
+
+      function addImagePath(project, path) {
+        const cleanPath = String(path || "").trim();
+
+        if (!cleanPath) {
+          return;
+        }
+
+        project.images.push(cleanPath);
+        syncProjectMedia(project);
+        renderAdmin();
+      }
+
+      function replaceImagesFromText(project, text) {
+        const images = normalizePathList(text);
+
+        project.images = images;
+        project.coverImage = images[0] || "";
+        project.imageFolder = project.imageFolder || getCommonImageFolder(images);
+        renderAdmin();
+      }
+
+      function getImageFolderBase(project) {
+        const currentFolder = normalizeFolderPath(project.imageFolder);
+        const slashIndex = currentFolder.lastIndexOf("/");
+
+        if (slashIndex > 0) {
+          return currentFolder.slice(0, slashIndex);
+        }
+
+        return "./Assets/Project Vault";
+      }
+
+      function createSelectedFolderPath(project, folderName) {
+        return `${getImageFolderBase(project)}/${folderName}`.replace(/\/+/g, "/").replace(/^\.\//, "./");
+      }
+
+      function applySelectedFolder(project, folderName, imageNames) {
+        const imageFolder = createSelectedFolderPath(project, folderName);
+        const sortedImageNames = [...imageNames]
+          .filter((name) => isImagePath(name))
+          .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+        project.imageFolder = imageFolder;
+        project.images = sortedImageNames.map((name) => `${imageFolder}/${name}`);
+        project.coverImage = project.images[0] || "";
+        showStatus(`Selected ${folderName} / ${project.images.length} images.`);
+        renderAdmin();
+      }
+
       function getFolderIndexUrl(folderPath) {
         const imageFolder = normalizeFolderPath(folderPath);
-
         return imageFolder ? new URL(`${imageFolder}/`, window.location.href) : null;
       }
 
@@ -559,685 +971,591 @@
         return imageNames.map((name) => `${imageFolder}/${name}`);
       }
 
-      async function refreshProjectImagesFromFolder(project) {
+      async function refreshImagesFromFolder(project) {
         const images = await readImagesFromFolder(project.imageFolder);
 
         project.images = images;
         project.coverImage = images[0] || "";
-        refreshProjectListItem(project);
-        renderEditor();
-        exportArchiveData();
-        return images;
-      }
-
-      function getFirstProjectId(data) {
-        return (data.groups || []).find((group) => group.projectIds?.length)?.projectIds[0] || "";
-      }
-
-      function getOrderedProjectIds(data = draftData) {
-        return data.groups.flatMap((group) => group.projectIds);
-      }
-
-      function formatProjectNumber(index) {
-        return String(index + 1).padStart(2, "0");
-      }
-
-      function getDisplayNumber(projectId) {
-        const index = getOrderedProjectIds().indexOf(projectId);
-
-        return index >= 0 ? formatProjectNumber(index) : projectId;
-      }
-
-      function getProject(projectId) {
-        return draftData.projects.find((project) => project.id === projectId);
-      }
-
-      function getGroup(groupId) {
-        return draftData.groups.find((group) => group.id === groupId);
-      }
-
-      function createGroupId(title) {
-        const baseId = String(title || "")
-          .trim()
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, "") || "group";
-        const existingIds = new Set(draftData.groups.map((group) => group.id));
-        let nextId = baseId;
-        let suffix = 2;
-
-        while (existingIds.has(nextId)) {
-          nextId = `${baseId}-${suffix}`;
-          suffix += 1;
-        }
-
-        return nextId;
-      }
-
-      function addGroup() {
-        const title = window.prompt("输入新分组名称", "新分组");
-
-        if (title === null) {
-          return;
-        }
-
-        const trimmedTitle = title.trim();
-
-        if (!trimmedTitle) {
-          return;
-        }
-
-        draftData.groups.push({
-          id: createGroupId(trimmedTitle),
-          title: trimmedTitle,
-          projectIds: [],
-        });
+        showStatus(`Loaded ${images.length} images.`);
         renderAdmin();
       }
 
-      function removeProjectFromGroups(projectId) {
-        draftData.groups.forEach((group) => {
-          group.projectIds = group.projectIds.filter((id) => id !== projectId);
-        });
-      }
+      async function chooseImageFolder(project) {
+        if ("showDirectoryPicker" in window) {
+          try {
+            const directoryHandle = await window.showDirectoryPicker({ mode: "read" });
+            const imageNames = [];
 
-      function insertProject(targetGroupId, projectId, beforeProjectId = "") {
-        const group = getGroup(targetGroupId);
-
-        if (!group) {
-          return;
-        }
-
-        removeProjectFromGroups(projectId);
-
-        const nextIds = [...group.projectIds];
-        const beforeIndex = beforeProjectId ? nextIds.indexOf(beforeProjectId) : -1;
-
-        if (beforeIndex >= 0) {
-          nextIds.splice(beforeIndex, 0, projectId);
-        } else {
-          nextIds.push(projectId);
-        }
-
-        group.projectIds = nextIds;
-      }
-
-      function createNewProjectId() {
-        const numericIds = draftData.projects
-          .map((project) => Number(project.id))
-          .filter((id) => Number.isFinite(id));
-        const nextNumber = Math.max(0, ...numericIds) + 1;
-
-        return String(nextNumber).padStart(2, "0");
-      }
-
-      function addProjectToGroup(groupId) {
-        const group = getGroup(groupId);
-
-        if (!group) {
-          return;
-        }
-
-        const projectId = createNewProjectId();
-        const newProject = {
-          id: projectId,
-          archiveCode: "",
-          title: "新项目",
-          year: "TBD",
-          category: "P",
-          tagline: "Placeholder / Future Entry",
-          description: "这里填写项目介绍。",
-          imageFolder: "",
-          coverImage: "",
-          images: [],
-          placeholder: true,
-          visible: true,
-        };
-
-        draftData.projects.push(newProject);
-        group.projectIds.push(projectId);
-        selectedProjectId = projectId;
-        renderAdmin();
-      }
-
-      function deleteProject(projectId) {
-        draftData.projects = draftData.projects.filter((project) => project.id !== projectId);
-        removeProjectFromGroups(projectId);
-
-        if (selectedProjectId === projectId) {
-          selectedProjectId = getFirstProjectId(draftData);
-        }
-
-        renderAdmin();
-      }
-
-      function deleteGroup(groupId) {
-        const group = getGroup(groupId);
-
-        if (!group) {
-          return;
-        }
-
-        if (group.projectIds.length > 0) {
-          const shouldDelete = window.confirm(
-            `删除分组「${group.title}」和其中 ${group.projectIds.length} 个项目？`
-          );
-
-          if (!shouldDelete) {
-            return;
-          }
-        }
-
-        const deletedProjectIds = new Set(group.projectIds);
-
-        draftData.groups = draftData.groups.filter((currentGroup) => currentGroup.id !== groupId);
-        draftData.projects = draftData.projects.filter((project) => !deletedProjectIds.has(project.id));
-
-        if (deletedProjectIds.has(selectedProjectId)) {
-          selectedProjectId = getFirstProjectId(draftData);
-        }
-
-        renderAdmin();
-      }
-
-      function selectProject(projectId) {
-        if (!getProject(projectId)) {
-          return;
-        }
-
-        selectedProjectId = projectId;
-        groupBoard.querySelectorAll(".project-item").forEach((item) => {
-          item.classList.toggle("is-selected", item.dataset.projectId === projectId);
-        });
-        renderEditor();
-      }
-
-      function createProjectItem(project, groupId) {
-        const item = document.createElement("li");
-        const id = document.createElement("div");
-        const copy = document.createElement("div");
-        const title = document.createElement("div");
-        const meta = document.createElement("div");
-        const toggleLabel = document.createElement("label");
-        const toggle = document.createElement("input");
-        const deleteButton = document.createElement("button");
-
-        item.className = "project-item";
-        item.classList.toggle("is-hidden", project.visible === false);
-        item.classList.toggle("is-selected", project.id === selectedProjectId);
-        item.dataset.projectId = project.id;
-        item.dataset.groupId = groupId;
-
-        id.className = "project-id";
-        id.textContent = `${getDisplayNumber(project.id)}.`;
-
-        title.className = "project-title";
-        title.textContent = project.title;
-
-        meta.className = "project-meta";
-        meta.textContent = [
-          project.archiveCode || project.year || "TBD",
-          project.category || project.tagline || "No category",
-          `${(project.images || []).length} img`,
-        ].join(" / ");
-
-        copy.append(title, meta);
-
-        toggle.type = "checkbox";
-        toggle.checked = project.visible !== false;
-        toggle.addEventListener("change", () => {
-          project.visible = toggle.checked;
-          item.classList.toggle("is-hidden", !toggle.checked);
-          exportArchiveData();
-        });
-
-        toggleLabel.className = "visibility-toggle";
-        toggleLabel.append(toggle, "Visible");
-
-        deleteButton.className = "project-delete-button";
-        deleteButton.type = "button";
-        deleteButton.setAttribute("aria-label", `Delete ${project.title}`);
-        deleteButton.textContent = "-";
-        deleteButton.addEventListener("click", (event) => {
-          event.stopPropagation();
-          deleteProject(project.id);
-        });
-
-        item.append(id, copy, toggleLabel, deleteButton);
-
-        item.addEventListener("pointerdown", (event) => {
-          startProjectDrag(event, item);
-        });
-
-        item.addEventListener("click", () => {
-          selectProject(project.id);
-        });
-
-        return item;
-      }
-
-      function createGroupPanel(group) {
-        const panel = document.createElement("section");
-        const header = document.createElement("header");
-        const title = document.createElement("h2");
-        const tools = document.createElement("div");
-        const count = document.createElement("span");
-        const addButton = document.createElement("button");
-        const deleteButton = document.createElement("button");
-        const list = document.createElement("ol");
-
-        panel.className = "group-panel";
-        panel.dataset.groupId = group.id;
-
-        header.className = "group-header";
-        title.className = "group-title";
-        title.textContent = group.title;
-        count.className = "group-count";
-        count.textContent = `${group.projectIds.length} items`;
-
-        addButton.className = "group-add-button";
-        addButton.type = "button";
-        addButton.textContent = "Add Project";
-        addButton.addEventListener("click", () => {
-          addProjectToGroup(group.id);
-        });
-
-        deleteButton.className = "group-delete-button";
-        deleteButton.type = "button";
-        deleteButton.textContent = "Delete Group";
-        deleteButton.setAttribute("aria-label", `Delete group ${group.title}`);
-        deleteButton.addEventListener("click", () => {
-          deleteGroup(group.id);
-        });
-
-        tools.className = "group-tools";
-        tools.append(count, addButton, deleteButton);
-        header.append(title, tools);
-
-        list.className = "project-list";
-        list.dataset.groupId = group.id;
-
-        group.projectIds.forEach((projectId) => {
-          const project = getProject(projectId);
-
-          if (project) {
-            list.append(createProjectItem(project, group.id));
-          }
-        });
-
-        panel.append(header, list);
-        return panel;
-      }
-
-      function renderEditor() {
-        const project = getProject(selectedProjectId);
-
-        if (!project) {
-          projectEditor.replaceChildren(createEmptyEditor());
-          return;
-        }
-
-        syncProjectMediaDefaults(project);
-
-        const editorGrid = document.createElement("div");
-        const displayNumber = document.createElement("p");
-        const checks = document.createElement("div");
-        const visibleLabel = document.createElement("label");
-        const visibleToggle = document.createElement("input");
-        const placeholderLabel = document.createElement("label");
-        const placeholderToggle = document.createElement("input");
-        const mediaActions = document.createElement("div");
-
-        editorGrid.className = "edit-grid";
-        displayNumber.className = "edit-empty";
-        displayNumber.textContent = `当前排序 ${getDisplayNumber(project.id)} / 稳定 ID ${project.id}`;
-
-        visibleToggle.type = "checkbox";
-        visibleToggle.checked = project.visible !== false;
-        visibleToggle.addEventListener("change", () => {
-          project.visible = visibleToggle.checked;
-          refreshProjectListItem(project);
-          exportArchiveData();
-        });
-
-        placeholderToggle.type = "checkbox";
-        placeholderToggle.checked = project.placeholder === true;
-        placeholderToggle.addEventListener("change", () => {
-          project.placeholder = placeholderToggle.checked;
-          exportArchiveData();
-        });
-
-        checks.className = "edit-checks";
-        visibleLabel.className = "visibility-toggle";
-        visibleLabel.append(visibleToggle, "Visible");
-        placeholderLabel.className = "visibility-toggle";
-        placeholderLabel.append(placeholderToggle, "Placeholder");
-        checks.append(visibleLabel, placeholderLabel);
-
-        mediaActions.className = "edit-actions-row";
-        mediaActions.append(
-          createMiniButton("Refresh folder images", async () => {
-            try {
-              const images = await refreshProjectImagesFromFolder(project);
-              showExportFeedback(`Loaded ${images.length} images from folder.`, { selectOutput: false });
-            } catch (error) {
-              showExportFeedback("Could not read folder. Use the local server URL, then retry.", { selectOutput: false });
+            for await (const [name, handle] of directoryHandle.entries()) {
+              if (handle.kind === "file" && isImagePath(name)) {
+                imageNames.push(name);
+              }
             }
-          }),
-        );
 
-        editorGrid.append(
-          displayNumber,
-          createSectionTitle("Identity"),
-          createTextField("项目编号 / Archive Code", project.archiveCode || "", (value) => {
-            project.archiveCode = value;
-            refreshProjectListItem(project);
-            exportArchiveData();
-          }),
-          createTextField("标题", project.title || "", (value) => {
-            project.title = value;
-            refreshProjectListItem(project);
-            exportArchiveData();
-          }),
-          createTextField("年份", project.year || "", (value) => {
-            project.year = value;
-            refreshProjectListItem(project);
-            exportArchiveData();
-          }),
-          createTextField("类别 / Category (P/S/V)", project.category || "", (value) => {
-            project.category = value;
-            refreshProjectListItem(project);
-            exportArchiveData();
-          }),
-          createSectionTitle("Project Panel"),
-          createTextField("方向 / Tagline", project.tagline || "", (value) => {
-            project.tagline = value;
-            refreshProjectListItem(project);
-            exportArchiveData();
-          }),
-          createTextField("介绍", project.description || "", (value) => {
-            project.description = value;
-            exportArchiveData();
-          }, true),
-          createSectionTitle("Detail Template"),
-          createSummaryField("模板", `Project Panel Mark 1 / 自动根据 ID ${project.id} 加载`),
-          createTextField("图片文件夹路径", project.imageFolder || "", (value) => {
-            project.imageFolder = normalizeFolderPath(value);
-            refreshProjectListItem(project);
-            exportArchiveData();
-          }),
-          createSummaryField("详情图片", getImageSummary(project)),
-          mediaActions,
-          checks
-        );
+            applySelectedFolder(project, directoryHandle.name, imageNames);
+          } catch (error) {
+            if (error.name !== "AbortError") {
+              showStatus("Folder picker failed. Use the path field instead.");
+            }
+          }
+          return;
+        }
 
-        projectEditor.replaceChildren(editorGrid);
+        openFallbackFolderInput(project);
       }
 
-      function createEmptyEditor() {
-        const empty = document.createElement("p");
+      function openFallbackFolderInput(project) {
+        const input = document.createElement("input");
 
-        empty.className = "edit-empty";
-        empty.textContent = "选择左侧项目后编辑文字、图片文件夹和显示状态。";
+        input.type = "file";
+        input.accept = "image/*";
+        input.multiple = true;
+        input.webkitdirectory = true;
+        input.style.position = "fixed";
+        input.style.left = "-9999px";
+        input.addEventListener("change", () => {
+          const files = Array.from(input.files || []);
+          const firstPath = files[0]?.webkitRelativePath || files[0]?.name || "";
+          const folderName = firstPath.split("/")[0] || "Selected Folder";
+          const imageNames = files
+            .map((file) => file.webkitRelativePath?.split("/").slice(1).join("/") || file.name)
+            .filter(Boolean);
 
-        return empty;
+          applySelectedFolder(project, folderName, imageNames);
+          input.remove();
+        });
+        document.body.append(input);
+        input.click();
       }
 
-      function createSectionTitle(text) {
-        const title = document.createElement("h3");
-
-        title.className = "edit-section-title";
-        title.textContent = text;
-        return title;
-      }
-
-      function createMiniButton(text, onClick) {
-        const button = document.createElement("button");
-
-        button.className = "edit-mini-button";
-        button.type = "button";
-        button.textContent = text;
-        button.addEventListener("click", onClick);
-        return button;
-      }
-
-      function createSummaryField(labelText, value) {
-        const field = document.createElement("div");
-        const label = document.createElement("span");
-        const summary = document.createElement("p");
-
-        field.className = "edit-field";
-        label.className = "edit-label";
-        label.textContent = labelText;
-        summary.className = "edit-summary";
-        summary.textContent = value;
-        field.append(label, summary);
-        return field;
-      }
-
-      function createTextField(labelText, value, onInput, multiline = false, extraClass = "") {
+      function createField(labelText, value, onInput, options = {}) {
         const field = document.createElement("label");
         const label = document.createElement("span");
-        const input = document.createElement(multiline ? "textarea" : "input");
+        const input = document.createElement(options.multiline ? "textarea" : "input");
 
-        field.className = "edit-field";
-        label.className = "edit-label";
+        field.className = "field";
+        label.className = "field-label";
         label.textContent = labelText;
-        input.className = multiline ? `edit-textarea ${extraClass}`.trim() : "edit-input";
-        input.value = value;
+        input.value = value || "";
 
-        if (!multiline) {
+        if (options.multiline) {
+          input.style.minHeight = options.minHeight || "88px";
+        } else {
           input.type = "text";
         }
 
         input.addEventListener("input", () => {
           onInput(input.value);
+          exportArchiveData();
         });
 
         field.append(label, input);
         return field;
       }
 
-      function refreshProjectListItem(project) {
-        const item = groupBoard.querySelector(`.project-item[data-project-id="${project.id}"]`);
+      function createCheckbox(labelText, checked, onChange) {
+        const label = document.createElement("label");
+        const input = document.createElement("input");
 
-        if (!item) {
-          return;
-        }
+        label.className = "check-label";
+        input.type = "checkbox";
+        input.checked = checked;
+        input.addEventListener("change", () => {
+          onChange(input.checked);
+          renderAdmin();
+        });
+        label.append(input, labelText);
+        return label;
+      }
 
+      function createButton(text, onClick, className = "mini-button") {
+        const button = document.createElement("button");
+
+        button.className = className;
+        button.type = "button";
+        button.textContent = text;
+        button.addEventListener("click", onClick);
+        return button;
+      }
+
+      function createSectionRule(text) {
+        const title = document.createElement("div");
+
+        title.className = "section-rule";
+        title.textContent = text;
+        return title;
+      }
+
+      function renderStats() {
+        const visibleCount = draftData.projects.filter((project) => project.visible !== false).length;
+        const imageCount = draftData.projects.reduce((total, project) => total + (project.images || []).length, 0);
+        const stats = [
+          ["Groups", draftData.groups.length],
+          ["Projects", visibleCount],
+          ["Images", imageCount],
+        ].map(([label, value]) => {
+          const box = document.createElement("div");
+          const valueEl = document.createElement("span");
+          const labelEl = document.createElement("span");
+
+          box.className = "stat-box";
+          valueEl.className = "stat-value";
+          valueEl.textContent = value;
+          labelEl.className = "stat-label";
+          labelEl.textContent = label;
+          box.append(valueEl, labelEl);
+          return box;
+        });
+
+        managerStats.replaceChildren(...stats);
+      }
+
+      function renderGroups() {
+        groupStack.replaceChildren(...draftData.groups.map((group, groupIndex) => {
+          const card = document.createElement("section");
+          const top = document.createElement("div");
+          const name = document.createElement("input");
+          const tools = document.createElement("div");
+          const list = document.createElement("ol");
+
+          card.className = "group-card";
+          card.dataset.groupId = group.id;
+          card.addEventListener("dragover", (event) => {
+            event.preventDefault();
+            card.classList.add("is-drag-over");
+          });
+          card.addEventListener("dragleave", () => {
+            card.classList.remove("is-drag-over");
+          });
+          card.addEventListener("drop", (event) => {
+            event.preventDefault();
+            card.classList.remove("is-drag-over");
+            moveProjectToGroup(draggedProjectId, group.id);
+          });
+
+          top.className = "group-top";
+          name.className = "group-name-input";
+          name.value = group.title;
+          name.setAttribute("aria-label", "Group title");
+          name.addEventListener("input", () => {
+            group.title = name.value;
+            exportArchiveData();
+          });
+
+          tools.className = "button-row";
+          tools.append(
+            createButton("Up", () => moveGroup(group.id, -1)),
+            createButton("Down", () => moveGroup(group.id, 1)),
+            createButton("Add", () => addProject(group.id)),
+            createButton("Delete", () => deleteGroup(group.id), "mini-button danger-button"),
+          );
+          tools.children[0].disabled = groupIndex === 0;
+          tools.children[1].disabled = groupIndex === draftData.groups.length - 1;
+
+          list.className = "project-list";
+          list.dataset.groupId = group.id;
+
+          group.projectIds.forEach((projectId) => {
+            const project = getProject(projectId);
+
+            if (project) {
+              list.append(createProjectItem(project));
+            }
+          });
+
+          top.append(name, tools);
+          card.append(top, list);
+          return card;
+        }));
+      }
+
+      function createProjectItem(project) {
+        const item = document.createElement("li");
+        const number = document.createElement("span");
+        const copy = document.createElement("div");
+        const title = document.createElement("div");
+        const meta = document.createElement("div");
+        const tools = document.createElement("div");
+
+        item.className = "project-item";
+        item.classList.toggle("is-selected", project.id === selectedProjectId);
         item.classList.toggle("is-hidden", project.visible === false);
-        item.querySelector(".project-title").textContent = project.title || "";
-        item.querySelector(".project-meta").textContent = [
+        item.draggable = true;
+        item.dataset.projectId = project.id;
+        item.addEventListener("click", () => selectProject(project.id));
+        item.addEventListener("dragstart", (event) => {
+          draggedProjectId = project.id;
+          event.dataTransfer?.setData("text/plain", project.id);
+          event.dataTransfer?.setDragImage(item, 18, 18);
+        });
+        item.addEventListener("dragend", () => {
+          draggedProjectId = "";
+        });
+        item.addEventListener("dragover", (event) => {
+          event.preventDefault();
+        });
+        item.addEventListener("drop", (event) => {
+          const targetGroup = event.currentTarget.closest(".group-card")?.dataset.groupId;
+
+          event.preventDefault();
+          event.stopPropagation();
+          moveProjectToGroup(draggedProjectId, targetGroup, project.id);
+        });
+
+        number.className = "project-number";
+        number.textContent = `${getDisplayNumber(project.id)}.`;
+
+        copy.className = "project-copy";
+        title.className = "project-title";
+        title.textContent = project.title || "Untitled";
+        meta.className = "project-meta";
+        meta.textContent = [
           project.archiveCode || project.year || "TBD",
           project.category || project.tagline || "No category",
           `${(project.images || []).length} img`,
         ].join(" / ");
-        item.querySelector(".visibility-toggle input").checked = project.visible !== false;
+        copy.append(title, meta);
+
+        tools.className = "project-quick";
+        tools.append(
+          createButton("Up", (event) => {
+            event.stopPropagation();
+            moveProject(project.id, -1);
+          }),
+          createButton("Down", (event) => {
+            event.stopPropagation();
+            moveProject(project.id, 1);
+          }),
+        );
+
+        item.append(number, copy, tools);
+        return item;
       }
 
-      function isInteractiveDragTarget(target) {
-        return Boolean(target.closest("button, input, label, select, textarea"));
-      }
+      function renderProjectEditor() {
+        const project = getProject();
 
-      function startProjectDrag(event, item) {
-        if (event.button !== 0 || isInteractiveDragTarget(event.target) || dragState) {
+        if (!project) {
+          projectEditor.replaceChildren(createEmptyNote("还没有项目。先创建分组和项目。"));
           return;
         }
 
-        event.preventDefault();
-        selectProject(item.dataset.projectId);
+        const grid = document.createElement("div");
+        const rowOne = document.createElement("div");
+        const rowTwo = document.createElement("div");
+        const checks = document.createElement("div");
+        const footer = document.createElement("div");
 
-        const rect = item.getBoundingClientRect();
-        const placeholder = document.createElement("li");
-        const originList = item.closest(".project-list");
+        grid.className = "field-grid";
+        rowOne.className = "field-row";
+        rowTwo.className = "field-row";
+        checks.className = "check-row";
+        footer.className = "button-row";
 
-        placeholder.className = "project-placeholder";
-        placeholder.style.setProperty("--placeholder-height", `${rect.height}px`);
-        item.after(placeholder);
-        document.body.append(item);
+        rowOne.append(
+          createField("Stable ID", project.id, (value) => {
+            const nextId = value.trim();
 
-        dragState = {
-          item,
-          originList,
-          placeholder,
-          projectId: item.dataset.projectId,
-          pointerOffsetX: event.clientX - rect.left,
-          pointerOffsetY: event.clientY - rect.top,
+            if (!nextId || nextId === project.id || getProject(nextId)) {
+              return;
+            }
+
+            draftData.groups.forEach((group) => {
+              group.projectIds = group.projectIds.map((id) => id === project.id ? nextId : id);
+            });
+            project.id = nextId;
+            selectedProjectId = nextId;
+          }),
+          createField("Archive Code", project.archiveCode || "", (value) => {
+            project.archiveCode = value;
+          }),
+        );
+
+        rowTwo.append(
+          createField("Year", project.year || "", (value) => {
+            project.year = value;
+          }),
+          createField("Category", project.category || "", (value) => {
+            project.category = value;
+          }),
+        );
+
+        checks.append(
+          createCheckbox("Visible", project.visible !== false, (checked) => {
+            project.visible = checked;
+          }),
+          createCheckbox("Placeholder", project.placeholder === true, (checked) => {
+            project.placeholder = checked;
+          }),
+        );
+
+        footer.append(
+          createButton("Duplicate Project", () => duplicateProject(project.id)),
+          createButton("Delete Project", () => deleteProject(project.id), "mini-button danger-button"),
+        );
+
+        grid.append(
+          createEmptyNote(`当前排序 ${getDisplayNumber(project.id)} / 所在分组 ${getProjectGroup(project.id)?.title || "未分组"}`),
+          createSectionRule("Identity"),
+          rowOne,
+          rowTwo,
+          checks,
+          createSectionRule("Main Copy"),
+          createField("Title", project.title || "", (value) => {
+            project.title = value;
+          }),
+          createField("Tagline", project.tagline || "", (value) => {
+            project.tagline = value;
+          }),
+          createField("Description", project.description || "", (value) => {
+            project.description = value;
+          }, { multiline: true, minHeight: "116px" }),
+          createSectionRule("Panel Detail Copy"),
+          createField("Side Title", project.sideTitle || "", (value) => {
+            project.sideTitle = value;
+          }),
+          createField("Side Description", project.sideDescription || "", (value) => {
+            project.sideDescription = value;
+          }, { multiline: true }),
+          createField("Direction", project.direction || "", (value) => {
+            project.direction = value;
+          }),
+          createField("Keywords", project.keywords || "", (value) => {
+            project.keywords = value;
+          }),
+          footer,
+        );
+
+        projectEditor.replaceChildren(grid);
+      }
+
+      function duplicateProject(projectId) {
+        const sourceProject = getProject(projectId);
+        const group = getProjectGroup(projectId);
+
+        if (!sourceProject || !group) {
+          return;
+        }
+
+        const newId = createProjectId();
+        const newProject = {
+          ...JSON.parse(JSON.stringify(sourceProject)),
+          id: newId,
+          title: `${sourceProject.title || "项目"} Copy`,
         };
+        const sourceIndex = group.projectIds.indexOf(projectId);
 
-        item.classList.add("is-pointer-dragging");
-        item.style.setProperty("--drag-width", `${rect.width}px`);
-        item.setPointerCapture?.(event.pointerId);
-
-        moveProjectDrag(event);
-        window.addEventListener("pointermove", moveProjectDrag);
-        window.addEventListener("pointerup", finishProjectDrag, { once: true });
-        window.addEventListener("pointercancel", cancelProjectDrag, { once: true });
-      }
-
-      function moveProjectDrag(event) {
-        if (!dragState) {
-          return;
-        }
-
-        const left = event.clientX - dragState.pointerOffsetX;
-        const top = event.clientY - dragState.pointerOffsetY;
-        const targetList = getListUnderPointer(event.clientX, event.clientY)
-          || dragState.placeholder.closest(".project-list")
-          || dragState.originList;
-
-        dragState.item.style.setProperty("--drag-left", `${left}px`);
-        dragState.item.style.setProperty("--drag-top", `${top}px`);
-
-        document.querySelectorAll(".project-list.is-drag-over").forEach((list) => {
-          list.classList.remove("is-drag-over");
-        });
-
-        if (!targetList) {
-          return;
-        }
-
-        targetList.classList.add("is-drag-over");
-        targetList.insertBefore(dragState.placeholder, getPlaceholderReference(targetList, event.clientY));
-      }
-
-      function finishProjectDrag() {
-        if (!dragState) {
-          return;
-        }
-
-        const targetList = dragState.placeholder.closest(".project-list");
-        const beforeProjectId = dragState.placeholder.nextElementSibling?.dataset?.projectId || "";
-        const targetGroupId = targetList?.dataset.groupId || dragState.originList?.dataset.groupId || "";
-        const projectId = dragState.projectId;
-
-        cleanupProjectDrag();
-
-        if (targetGroupId && projectId) {
-          insertProject(targetGroupId, projectId, beforeProjectId);
-        }
-
+        draftData.projects.push(newProject);
+        group.projectIds.splice(sourceIndex + 1, 0, newId);
+        selectedProjectId = newId;
         renderAdmin();
       }
 
-      function cancelProjectDrag() {
-        cleanupProjectDrag();
-        renderAdmin();
-      }
+      function renderMediaEditor() {
+        const project = getProject();
 
-      function cleanupProjectDrag() {
-        if (!dragState) {
+        if (!project) {
+          mediaEditor.replaceChildren(createEmptyNote("选择一个项目后管理图片。"));
           return;
         }
 
-        const { item, placeholder } = dragState;
+        syncProjectMedia(project);
 
-        window.removeEventListener("pointermove", moveProjectDrag);
-        document.querySelectorAll(".project-list.is-drag-over").forEach((list) => {
-          list.classList.remove("is-drag-over");
+        const shell = document.createElement("div");
+        const folderActions = document.createElement("div");
+        const addActions = document.createElement("div");
+        const pasteField = document.createElement("label");
+        const pasteLabel = document.createElement("span");
+        const pasteArea = document.createElement("textarea");
+        const imageList = document.createElement("div");
+
+        shell.className = "image-toolbar";
+        folderActions.className = "image-actions";
+        addActions.className = "image-actions";
+        imageList.className = "image-list";
+        pasteField.className = "field";
+        pasteLabel.className = "field-label";
+        pasteLabel.textContent = "Bulk Paths";
+        pasteArea.className = "paste-area";
+        pasteArea.spellcheck = false;
+        pasteArea.value = (project.images || []).join("\n");
+        pasteArea.addEventListener("change", () => {
+          replaceImagesFromText(project, pasteArea.value);
         });
-        item.classList.remove("is-pointer-dragging");
-        item.style.removeProperty("--drag-left");
-        item.style.removeProperty("--drag-top");
-        item.style.removeProperty("--drag-width");
-        item.remove();
-        placeholder.remove();
-        dragState = null;
-      }
+        pasteField.append(pasteLabel, pasteArea);
 
-      function getListUnderPointer(x, y) {
-        const listUnderPointer = Array.from(document.querySelectorAll(".project-list")).find((list) => {
-          const rect = list.getBoundingClientRect();
-
-          return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+        const newPathInput = document.createElement("input");
+        newPathInput.placeholder = "./Assets/Project Vault/.../image.jpg";
+        newPathInput.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            addImagePath(project, newPathInput.value);
+            newPathInput.value = "";
+          }
         });
 
-        if (listUnderPointer) {
-          return listUnderPointer;
+        const folderButtons = document.createElement("div");
+
+        folderButtons.className = "button-row";
+        folderButtons.append(
+          createButton("Choose Folder", () => {
+            chooseImageFolder(project);
+          }),
+          createButton("Refresh Folder", async () => {
+            try {
+              await refreshImagesFromFolder(project);
+            } catch (error) {
+              showStatus("Folder read failed. Start a local server, then retry.");
+            }
+          }),
+        );
+
+        folderActions.append(
+          createField("Image Folder", project.imageFolder || "", (value) => {
+            project.imageFolder = normalizeFolderPath(value);
+          }),
+          folderButtons,
+        );
+
+        addActions.append(
+          newPathInput,
+          createButton("Add Image", () => {
+            addImagePath(project, newPathInput.value);
+            newPathInput.value = "";
+          }),
+        );
+
+        if (project.images.length) {
+          project.images.forEach((path, index) => {
+            imageList.append(createImageRow(project, path, index));
+          });
+        } else {
+          imageList.append(createEmptyNote("还没有图片。填写文件夹后刷新，或手动添加路径。"));
         }
 
-        const panelUnderPointer = Array.from(document.querySelectorAll(".group-panel")).find((panel) => {
-          const rect = panel.getBoundingClientRect();
+        shell.append(
+          folderActions,
+          addActions,
+          pasteField,
+          createSectionRule(`Image Queue / ${project.images.length}`),
+          imageList,
+        );
+        mediaEditor.replaceChildren(shell);
+      }
 
-          return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+      function createImageRow(project, path, index) {
+        const row = document.createElement("article");
+        const thumb = document.createElement("img");
+        const fields = document.createElement("div");
+        const pathInput = document.createElement("input");
+        const sourceInput = document.createElement("input");
+        const tools = document.createElement("div");
+
+        row.className = "image-row";
+        row.classList.toggle("is-cover", index === 0);
+
+        thumb.className = "image-thumb";
+        thumb.src = path;
+        thumb.alt = "";
+        thumb.loading = "lazy";
+
+        fields.className = "image-fields";
+        pathInput.className = "image-path";
+        pathInput.value = path;
+        pathInput.setAttribute("aria-label", `Image ${index + 1} path`);
+        pathInput.addEventListener("change", () => {
+          setImagePath(project, index, pathInput.value);
         });
 
-        return panelUnderPointer?.querySelector(".project-list") || null;
+        sourceInput.value = project.imageSources?.[path] || "";
+        sourceInput.placeholder = "来源备注，例如 render / photo / Behance reference";
+        sourceInput.setAttribute("aria-label", `Image ${index + 1} source`);
+        sourceInput.addEventListener("input", () => {
+          setImageSource(project, path, sourceInput.value);
+        });
+
+        tools.className = "image-row-tools";
+        tools.append(
+          createButton("Up", () => moveImage(project, index, -1)),
+          createButton("Down", () => moveImage(project, index, 1)),
+          createButton("Cover", () => moveImageToCover(project, index)),
+          createButton("Delete", () => deleteImage(project, index), "mini-button danger-button"),
+        );
+        tools.children[0].disabled = index === 0;
+        tools.children[1].disabled = index === project.images.length - 1;
+        tools.children[2].disabled = index === 0;
+
+        fields.append(pathInput, sourceInput, tools);
+        row.append(thumb, fields);
+        return row;
       }
 
-      function getPlaceholderReference(list, pointerY) {
-        return Array.from(list.querySelectorAll(".project-item:not(.is-pointer-dragging)")).find((item) => {
-          const rect = item.getBoundingClientRect();
-
-          return pointerY < rect.top + rect.height * 0.5;
-        }) || null;
-      }
-
-      function renderAdmin() {
-        groupBoard.replaceChildren(...draftData.groups.map(createGroupPanel));
-        renderEditor();
-        exportArchiveData();
-      }
-
-      function setTemporaryButtonText(button, text, originalText = button.textContent) {
-        button.textContent = text;
-        window.setTimeout(() => {
-          button.textContent = originalText;
-        }, 1200);
-      }
-
-      function showExportFeedback(message, options = {}) {
-        window.clearTimeout(exportStatusTimer);
-        exportStatus.textContent = message;
-        exportOutput.classList.add("is-updated");
-
-        if (options.selectOutput !== false) {
-          exportOutput.focus();
-          exportOutput.select();
-          exportOutput.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      function moveImageToCover(project, index) {
+        if (index <= 0) {
+          return;
         }
 
-        exportStatusTimer = window.setTimeout(() => {
-          exportStatus.textContent = "";
-          exportOutput.classList.remove("is-updated");
-        }, 1600);
+        const [image] = project.images.splice(index, 1);
+        project.images.unshift(image);
+        syncProjectMedia(project);
+        renderAdmin();
       }
 
-      function exportArchiveData(options = {}) {
+      function createEmptyNote(text) {
+        const note = document.createElement("p");
+
+        note.className = "empty-note";
+        note.textContent = text;
+        return note;
+      }
+
+      function createExportData() {
+        const orderedIds = getOrderedProjectIds();
+        const groupedIds = new Set(orderedIds);
+        const orderedProjects = orderedIds.map(getProject).filter(Boolean);
+        const orphanProjects = draftData.projects.filter((project) => !groupedIds.has(project.id));
+
+        return {
+          groups: draftData.groups.map((group) => ({
+            ...group,
+            projectIds: [...group.projectIds],
+          })),
+          projects: [...orderedProjects, ...orphanProjects].map((project) => {
+            const imageFolder = normalizeFolderPath(project.imageFolder);
+            const images = normalizePathList(project.images);
+            const imageSources = Object.fromEntries(
+              Object.entries(project.imageSources || {})
+                .filter(([path, source]) => images.includes(path) && String(source || "").trim())
+                .map(([path, source]) => [path, String(source).trim()]),
+            );
+            const {
+              imageFolder: _imageFolder,
+              images: _images,
+              coverImage: _coverImage,
+              imageSources: _imageSources,
+              ...projectData
+            } = project;
+
+            return {
+              ...projectData,
+              id: project.id,
+              ...(imageFolder ? { imageFolder } : {}),
+              ...(images.length ? { coverImage: images[0], images } : {}),
+              ...(Object.keys(imageSources).length ? { imageSources } : {}),
+            };
+          }),
+        };
+      }
+
+      function exportArchiveData() {
         exportOutput.value = `window.TDG_ARCHIVE = ${JSON.stringify(createExportData(), null, 2)};\n`;
-
-        if (options.feedback) {
-          showExportFeedback("Exported. Copy the selected content into archive-data.js.");
-        }
       }
 
       async function saveExportFile() {
-        const fileName = "archive-data.js";
-        const fileContent = exportOutput.value;
+        exportArchiveData();
 
         if ("showSaveFilePicker" in window) {
           const fileHandle = await window.showSaveFilePicker({
-            suggestedName: fileName,
+            suggestedName: "archive-data.js",
             types: [
               {
                 description: "JavaScript file",
@@ -1249,103 +1567,75 @@
           });
           const writable = await fileHandle.createWritable();
 
-          await writable.write(fileContent);
+          await writable.write(exportOutput.value);
           await writable.close();
+          showStatus("Saved archive-data.js.");
           return;
         }
 
-        const downloadLink = document.createElement("a");
-        const fileBlob = new Blob([fileContent], { type: "text/javascript" });
+        const fileBlob = new Blob([exportOutput.value], { type: "text/javascript" });
+        const link = document.createElement("a");
 
-        downloadLink.href = URL.createObjectURL(fileBlob);
-        downloadLink.download = fileName;
-        document.body.append(downloadLink);
-        downloadLink.click();
-        downloadLink.remove();
-        window.setTimeout(() => {
-          URL.revokeObjectURL(downloadLink.href);
-        }, 0);
+        link.href = URL.createObjectURL(fileBlob);
+        link.download = "archive-data.js";
+        document.body.append(link);
+        link.click();
+        link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(link.href), 0);
+        showStatus("Downloaded archive-data.js.");
       }
 
-      function createExportData() {
-        const orderedIds = getOrderedProjectIds();
-        const orderedProjects = orderedIds.map(getProject).filter(Boolean);
-        const groupedIdSet = new Set(orderedIds);
-        const orphanProjects = draftData.projects.filter((project) => !groupedIdSet.has(project.id));
-        const exportProjects = [...orderedProjects, ...orphanProjects].map((project) => {
-          const {
-            imageFolder: projectImageFolder = "",
-            images: projectImages = [],
-            coverImage: projectCoverImage = "",
-            embedSrc: _embedSrc,
-            metaTitle: _metaTitle,
-            metaSubtitle: _metaSubtitle,
-            direction: _direction,
-            keywords: _keywords,
-            sideDescription: _sideDescription,
-            ...projectData
-          } = project;
-          const imageFolder = normalizeFolderPath(projectImageFolder);
-          const images = normalizePathList(projectImages);
-          const coverImage = String(projectCoverImage || images[0] || "").trim();
-
-          return {
-            ...projectData,
-            id: project.id,
-            ...(imageFolder ? { imageFolder } : {}),
-            ...(coverImage ? { coverImage } : {}),
-            ...(images.length ? { images } : {}),
-          };
-        });
-
-        return {
-          groups: draftData.groups.map((group) => ({
-            ...group,
-            projectIds: [...(group.projectIds || [])],
-          })),
-          projects: exportProjects,
-        };
-      }
-
-      addGroupButton.addEventListener("click", addGroup);
-
-      exportButton.addEventListener("click", async () => {
-        exportArchiveData();
-
-        try {
-          await saveExportFile();
-          setTemporaryButtonText(exportButton, "Saved");
-          showExportFeedback("Saved archive-data.js.", { selectOutput: false });
-        } catch (error) {
-          if (error.name === "AbortError") {
-            showExportFeedback("Save canceled.", { selectOutput: false });
-            return;
-          }
-
-          setTemporaryButtonText(exportButton, "Exported");
-          showExportFeedback("Exported. Select and copy the content below.");
-        }
-      });
-
-      copyButton.addEventListener("click", async () => {
+      async function copyExport() {
         exportArchiveData();
         exportOutput.select();
 
         try {
           await navigator.clipboard.writeText(exportOutput.value);
-          setTemporaryButtonText(copyButton, "Copied");
-          showExportFeedback("Copied to clipboard.");
         } catch (error) {
           document.execCommand("copy");
-          setTemporaryButtonText(copyButton, "Copied");
-          showExportFeedback("Copied to clipboard.");
         }
-      });
 
+        showStatus("Copied export content.");
+      }
+
+      function showStatus(message) {
+        window.clearTimeout(exportStatusTimer);
+        exportStatus.textContent = message;
+        exportStatus.classList.add("is-active");
+        exportStatusTimer = window.setTimeout(() => {
+          exportStatus.textContent = "";
+          exportStatus.classList.remove("is-active");
+        }, 1800);
+      }
+
+      function renderAdmin() {
+        if (!selectedProjectId || !getProject(selectedProjectId)) {
+          selectedProjectId = getFirstProjectId(draftData);
+        }
+
+        renderStats();
+        renderGroups();
+        renderProjectEditor();
+        renderMediaEditor();
+        exportArchiveData();
+      }
+
+      addGroupButton.addEventListener("click", addGroup);
+      addProjectButton.addEventListener("click", () => addProject(getProjectGroup(selectedProjectId)?.id));
       resetButton.addEventListener("click", () => {
         draftData = cloneArchiveData(sourceData);
         selectedProjectId = getFirstProjectId(draftData);
         renderAdmin();
+      });
+      copyButton.addEventListener("click", copyExport);
+      saveButton.addEventListener("click", async () => {
+        try {
+          await saveExportFile();
+        } catch (error) {
+          if (error.name !== "AbortError") {
+            showStatus("Save failed. Copy the export content instead.");
+          }
+        }
       });
 
       renderAdmin();
