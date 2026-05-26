@@ -36,8 +36,26 @@ function getProjectImages(project) {
     : [project.coverImage].filter(Boolean);
 }
 
+function encodeArchivePath(path) {
+  return String(path || "")
+    .trim()
+    .split("/")
+    .map((segment) => {
+      if (!segment || segment === "." || segment === "..") {
+        return segment;
+      }
+
+      try {
+        return encodeURIComponent(decodeURIComponent(segment));
+      } catch (error) {
+        return encodeURIComponent(segment);
+      }
+    })
+    .join("/");
+}
+
 function resolveArchivePath(path) {
-  return new URL(String(path || ""), getArchiveRootUrl()).href;
+  return new URL(encodeArchivePath(path), getArchiveRootUrl()).href;
 }
 
 function createProjectImage(project, src, index) {

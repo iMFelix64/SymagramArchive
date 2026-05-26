@@ -1,7 +1,7 @@
 const archiveData = window.TDG_ARCHIVE || { groups: [], projects: [] };
 
 function createProjectEmbedSrc(projectId) {
-  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1`;
+  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1&v=20260526-asset-paths-1`;
 }
 
 const projectCatalog = (archiveData.projects || [])

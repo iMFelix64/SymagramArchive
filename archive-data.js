@@ -10,7 +10,8 @@ window.TDG_ARCHIVE = {
         "04",
         "05",
         "06",
-        "07"
+        "07",
+        "08"
       ]
     }
   ],
@@ -125,7 +126,7 @@ window.TDG_ARCHIVE = {
       "tagline": "Child equipments",
       "description": "专为2-6岁儿童打造的二合一陪伴型滑板车。创新的翻转式隐形坐鞍设计，加宽避震车轮与全车零锐角包裹，在不同成长阶段为孩子的户外探索提供最稳固、精准的安全保障。",
       "placeholder": false,
-      "visible": true,
+      "visible": false,
       "imageFolder": "./Assets/Project Vault/26P-A DotGO",
       "coverImage": "./Assets/Project Vault/26P-A DotGO/DotGO - 01.jpg",
       "images": [
@@ -146,7 +147,7 @@ window.TDG_ARCHIVE = {
       "title": "Volante 水翼船",
       "year": "2024",
       "category": "",
-      "tagline": "Project / Direction",
+      "tagline": "Future Marine Mobility / Electric Hydrofoil",
       "description": "重新定义了短途海上交通体验。克制而现代的设计语言勾勒出简洁流线的船体，封闭式座舱提供全天候舒适性，宽大的侧窗则加强了乘客与海面之间的视觉连接。设计强调速度、安静与优雅之间的平衡，呈现更高效、更平稳，也更具未来感的海上出行方式。",
       "visible": true,
       "placeholder": false,
@@ -158,6 +159,24 @@ window.TDG_ARCHIVE = {
         "./Assets/Project Vault/24P-B Volante/Template03.jpg",
         "./Assets/Project Vault/24P-B Volante/Template04.jpg",
         "./Assets/Project Vault/24P-B Volante/Template05.jpg"
+      ]
+    },
+    {
+      "id": "08",
+      "archiveCode": "",
+      "title": "OrcaJet 水翼摩托艇",
+      "year": "2025",
+      "category": "",
+      "tagline": "Future Marine Mobility / Electric Hydrofoil",
+      "description": "面向未来水上运动与休闲出行的概念摩托艇。设计以仿生流线造型为核心，结合低伏船身、开放式骑行姿态和紧凑动力布局，呈现出速度感与科技感兼具的水上载具形象。强调轻量、灵活与高机动性，带来更自由、更直接的水面驾驶体验。",
+      "visible": true,
+      "placeholder": false,
+      "imageFolder": "./Assets/Project Vault/25P-A OrcaJet",
+      "coverImage": "./Assets/Project Vault/25P-A OrcaJet/#1.jpg",
+      "images": [
+        "./Assets/Project Vault/25P-A OrcaJet/#1.jpg",
+        "./Assets/Project Vault/25P-A OrcaJet/#2.png",
+        "./Assets/Project Vault/25P-A OrcaJet/#3.png"
       ]
     }
   ]
