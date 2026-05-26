@@ -641,8 +641,12 @@ img {
   font-family: var(--font-sans);
   font-size: 18px;
   font-weight: 500;
-  line-height: 1;
+  line-height: 1.25;
   margin: 0 0 14px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .rolling-project-description {
@@ -843,10 +847,12 @@ body.is-rolling-scroll-cursor-active .rolling-project.is-detail-expanded .rollin
 .rolling-detail-title {
   color: #000;
   font-family: var(--font-sans);
-  font-size: 37.5px;
+  font-size: 35px;
   font-weight: 700;
-  line-height: 0.92;
+  line-height: 1.25;
   margin: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
 }
 
 .rolling-detail-description {

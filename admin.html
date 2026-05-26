@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SymagramArchive Admin</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <style>
       :root {
         --bg: #f4f3ee;
@@ -531,7 +532,7 @@
       </section>
     </main>
 
-    <script src="./archive-data.js?v=20260525-volante-1"></script>
+    <script src="./archive-data.js?v=20260526-title-wrap-1"></script>
     <script>
       const sourceData = window.TDG_ARCHIVE || { groups: [], projects: [] };
       let draftData = cloneArchiveData(sourceData);
@@ -600,6 +601,28 @@
           .split(/\r?\n/)
           .map((path) => path.trim())
           .filter(Boolean);
+      }
+
+      function encodeAssetPath(path) {
+        return String(path || "")
+          .trim()
+          .split("/")
+          .map((segment) => {
+            if (!segment || segment === "." || segment === "..") {
+              return segment;
+            }
+
+            try {
+              return encodeURIComponent(decodeURIComponent(segment));
+            } catch (error) {
+              return encodeURIComponent(segment);
+            }
+          })
+          .join("/");
+      }
+
+      function resolveAssetPath(path) {
+        return new URL(encodeAssetPath(path), window.location.href).href;
       }
 
       function getCommonImageFolder(images) {
@@ -943,7 +966,7 @@
 
       function getFolderIndexUrl(folderPath) {
         const imageFolder = normalizeFolderPath(folderPath);
-        return imageFolder ? new URL(`${imageFolder}/`, window.location.href) : null;
+        return imageFolder ? new URL(`${encodeAssetPath(imageFolder)}/`, window.location.href) : null;
       }
 
       async function readImagesFromFolder(folderPath) {
@@ -1303,7 +1326,7 @@
           createSectionRule("Main Copy"),
           createField("Title", project.title || "", (value) => {
             project.title = value;
-          }),
+          }, { multiline: true, minHeight: "72px" }),
           createField("Tagline", project.tagline || "", (value) => {
             project.tagline = value;
           }),
@@ -1311,6 +1334,9 @@
             project.description = value;
           }, { multiline: true, minHeight: "116px" }),
           createSectionRule("Panel Detail Copy"),
+          createField("Detail Title", project.detailTitle || "", (value) => {
+            project.detailTitle = value;
+          }, { multiline: true, minHeight: "72px" }),
           createField("Side Title", project.sideTitle || "", (value) => {
             project.sideTitle = value;
           }),
@@ -1454,7 +1480,7 @@
         row.classList.toggle("is-cover", index === 0);
 
         thumb.className = "image-thumb";
-        thumb.src = path;
+        thumb.src = resolveAssetPath(path);
         thumb.alt = "";
         thumb.loading = "lazy";
 

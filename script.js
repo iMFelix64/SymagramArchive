@@ -93,8 +93,20 @@ function getProjectDisplayValue(project, key, fallback = "") {
   return value === undefined || value === null || value === "" ? fallback : String(value);
 }
 
+function getProjectDetailTitle(project) {
+  return getProjectDisplayValue(
+    project,
+    "detailTitle",
+    getProjectDisplayValue(project, "sideTitle", project.title),
+  );
+}
+
+function getProjectCardTitle(project) {
+  return getProjectDisplayValue(project, "title").replace(/\s+/g, " ").trim();
+}
+
 function createProjectEmbedSrc(projectId) {
-  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1`;
+  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1&v=20260526-card-title-1`;
 }
 
 function createElementWithClass(tagName, className, textContent = "") {
@@ -158,7 +170,7 @@ function createProjectPanel(project, projectIndex) {
   const sideTitle = createElementWithClass(
     "h3",
     "panel-side-copy-title",
-    getProjectDisplayValue(project, "sideTitle", project.title),
+    getProjectDetailTitle(project),
   );
   const sideDescription = createElementWithClass(
     "p",
@@ -199,7 +211,7 @@ function createProjectPanel(project, projectIndex) {
     createElementWithClass("span", "", getProjectDisplayValue(project, "metaSubtitle", `${project.tagline || "PROJECT"} / ${project.year || "TBD"}`)),
   );
 
-  title.textContent = project.title;
+  title.textContent = getProjectCardTitle(project);
   description.textContent = project.description || "";
   panelCopy.append(title, description);
   highlightCard.append(bandNumber, panelCopy, arrow);

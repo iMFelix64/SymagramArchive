@@ -1,7 +1,7 @@
 const archiveData = window.TDG_ARCHIVE || { groups: [], projects: [] };
 
 function createProjectEmbedSrc(projectId) {
-  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1`;
+  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1&v=20260526-card-title-1`;
 }
 
 const projectCatalog = (archiveData.projects || [])
@@ -34,6 +34,41 @@ const segmentById = new Map(projectSegments.map((segment) => [segment.id, segmen
 const segmentIdByProjectId = new Map(
   projectSegments.flatMap((segment) => segment.projectIds.map((projectId) => [projectId, segment.id])),
 );
+
+function getProjectDisplayValue(project, key, fallback = "") {
+  const value = project[key];
+
+  return value === undefined || value === null || value === "" ? fallback : String(value);
+}
+
+function getProjectDetailTitle(project) {
+  return getProjectDisplayValue(
+    project,
+    "detailTitle",
+    getProjectDisplayValue(project, "sideTitle", project.title),
+  );
+}
+
+function getProjectCardTitle(project) {
+  return getProjectDisplayValue(project, "title").replace(/\s+/g, " ").trim();
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function formatMultilineText(value) {
+  return escapeHtml(value).replace(/\r\n?/g, "\n");
+}
+
+function formatSingleLineText(value) {
+  return escapeHtml(String(value || "").replace(/\s+/g, " ").trim());
+}
 
 projects.forEach((project) => {
   const segmentId = segmentIdByProjectId.get(project.id) || projectSegments[0].id;
@@ -185,6 +220,8 @@ function buildProjects() {
     .map((project) => {
       const leadImage = project.images[0] || project.coverImage || "";
       const embedSrc = createProjectEmbedSrc(project.id);
+      const cardTitle = formatSingleLineText(getProjectCardTitle(project));
+      const detailTitle = formatMultilineText(getProjectDetailTitle(project));
       const mediaMarkup = project.placeholder
         ? `
           <figure class="rolling-image-media rolling-image-media--placeholder" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
@@ -214,7 +251,7 @@ function buildProjects() {
           <aside class="rolling-project-card" aria-label="${project.title} 项目信息" data-debug-label="aside.rolling-project-card[${project.id}]">
             <p class="rolling-project-index">${project.displayNumber}.</p>
             <div class="rolling-project-copy">
-              <h2 class="rolling-project-name">${project.title}</h2>
+              <h2 class="rolling-project-name">${cardTitle}</h2>
               <p class="rolling-project-description">${project.description}</p>
             </div>
             <div class="rolling-project-arrow" aria-hidden="true">→</div>
@@ -228,7 +265,7 @@ function buildProjects() {
 
           <aside class="rolling-detail-copy" aria-hidden="true" data-debug-label="aside.rolling-detail-copy[${project.id}]">
             <p class="rolling-detail-kicker">PROJECT ${project.displayNumber}</p>
-            <h3 class="rolling-detail-title">${project.title}</h3>
+            <h3 class="rolling-detail-title">${detailTitle}</h3>
             <p class="rolling-detail-description">${project.description}</p>
             <span class="rolling-detail-rule" aria-hidden="true"></span>
             <p class="rolling-detail-year">${project.year}</p>

@@ -36,8 +36,26 @@ function getProjectImages(project) {
     : [project.coverImage].filter(Boolean);
 }
 
+function encodeArchivePath(path) {
+  return String(path || "")
+    .trim()
+    .split("/")
+    .map((segment) => {
+      if (!segment || segment === "." || segment === "..") {
+        return segment;
+      }
+
+      try {
+        return encodeURIComponent(decodeURIComponent(segment));
+      } catch (error) {
+        return encodeURIComponent(segment);
+      }
+    })
+    .join("/");
+}
+
 function resolveArchivePath(path) {
-  return new URL(String(path || ""), getArchiveRootUrl()).href;
+  return new URL(encodeArchivePath(path), getArchiveRootUrl()).href;
 }
 
 function createProjectImage(project, src, index) {
@@ -52,6 +70,124 @@ function createProjectImage(project, src, index) {
   image.loading = index === 0 ? "eager" : "lazy";
 
   return image;
+}
+
+function createProjectTextElement(tagName, className, textContent = "") {
+  const element = document.createElement(tagName);
+
+  element.className = className;
+  element.textContent = textContent;
+
+  return element;
+}
+
+function createProjectArticleFigure(project, entry, className = "project-article-figure") {
+  const figure = document.createElement("figure");
+  const image = document.createElement("img");
+  const source = typeof entry === "string" ? entry : entry.src;
+
+  figure.className = className;
+  image.className = "project-article-image";
+  image.src = resolveArchivePath(source);
+  image.alt = typeof entry === "string" ? `${project.title}文章插图` : entry.alt || `${project.title}文章插图`;
+  image.loading = className.includes("cover") ? "eager" : "lazy";
+
+  figure.append(image);
+
+  if (typeof entry !== "string" && entry.caption) {
+    figure.append(createProjectTextElement("figcaption", "project-article-caption", entry.caption));
+  }
+
+  return figure;
+}
+
+function createProjectArticleAside(entry) {
+  const aside = document.createElement("aside");
+  const title = createProjectTextElement("h3", "project-article-aside-title", entry.title || "Notes");
+  const list = document.createElement("ul");
+
+  aside.className = "project-article-aside";
+
+  (entry.items || []).forEach((itemText) => {
+    const item = document.createElement("li");
+
+    item.textContent = itemText;
+    list.append(item);
+  });
+
+  aside.append(title, list);
+  return aside;
+}
+
+function createProjectArticleBlock(project, entry) {
+  if (!entry || !entry.type) {
+    return null;
+  }
+
+  switch (entry.type) {
+    case "lead":
+      return createProjectTextElement("p", "project-article-lead", entry.text || "");
+    case "paragraph":
+      return createProjectTextElement("p", "project-article-paragraph", entry.text || "");
+    case "heading":
+      return createProjectTextElement("h2", "project-article-heading", entry.text || "");
+    case "image":
+      return createProjectArticleFigure(project, entry);
+    case "quote":
+      return createProjectTextElement("blockquote", "project-article-quote", entry.text || "");
+    case "aside":
+      return createProjectArticleAside(entry);
+    default:
+      return null;
+  }
+}
+
+function renderProjectArticle(project) {
+  const article = project.article || {};
+  const shell = document.createElement("article");
+  const hero = document.createElement("header");
+  const meta = document.createElement("div");
+  const titleBlock = document.createElement("div");
+  const body = document.createElement("div");
+  const coverSource = article.coverImage || project.coverImage || project.images?.[0];
+
+  shell.className = "project-article";
+  hero.className = "project-article-hero";
+  meta.className = "project-article-meta";
+  titleBlock.className = "project-article-title-block";
+  body.className = "project-article-body";
+
+  meta.append(
+    createProjectTextElement("span", "project-article-eyebrow", article.eyebrow || project.category || "ARTICLE"),
+    createProjectTextElement("span", "project-article-reading-time", article.readingTime || project.year || ""),
+  );
+
+  titleBlock.append(
+    createProjectTextElement("h1", "project-article-title", project.title),
+    createProjectTextElement("p", "project-article-subtitle", article.subtitle || project.description || ""),
+  );
+
+  hero.append(meta, titleBlock);
+
+  if (coverSource) {
+    hero.append(createProjectArticleFigure(
+      project,
+      {
+        src: coverSource,
+        alt: `${project.title}文章封面`,
+        caption: article.coverCaption,
+      },
+      "project-article-cover",
+    ));
+  }
+
+  (article.body || [])
+    .map((entry) => createProjectArticleBlock(project, entry))
+    .filter(Boolean)
+    .forEach((block) => body.append(block));
+
+  shell.append(hero, body);
+  projectStream.replaceChildren(shell);
 }
 
 function renderProjectStream() {
@@ -70,6 +206,14 @@ function renderProjectStream() {
     "aria-label",
     `${project.title}内容流`,
   );
+
+  if (project.contentType === "article") {
+    projectPage?.classList.add("project-page--article");
+    renderProjectArticle(project);
+    return;
+  }
+
+  projectPage?.classList.remove("project-page--article");
 
   const imageNodes = images.map((src, index) => {
     const image = createProjectImage(project, src, index);
