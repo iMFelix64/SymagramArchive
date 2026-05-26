@@ -172,11 +172,11 @@ window.TDG_ARCHIVE = {
       "visible": true,
       "placeholder": false,
       "imageFolder": "./Assets/Project Vault/25P-A OrcaJet",
-      "coverImage": "./Assets/Project Vault/25P-A OrcaJet/#1.jpg",
+      "coverImage": "./Assets/Project Vault/25P-A OrcaJet/orcajet-01.jpg",
       "images": [
-        "./Assets/Project Vault/25P-A OrcaJet/#1.jpg",
-        "./Assets/Project Vault/25P-A OrcaJet/#2.png",
-        "./Assets/Project Vault/25P-A OrcaJet/#3.png"
+        "./Assets/Project Vault/25P-A OrcaJet/orcajet-01.jpg",
+        "./Assets/Project Vault/25P-A OrcaJet/orcajet-02.png",
+        "./Assets/Project Vault/25P-A OrcaJet/orcajet-03.png"
       ]
     }
   ]
