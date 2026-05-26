@@ -2003,8 +2003,10 @@ body {
 .panel-copy h2 {
   margin: 0 0 4px;
   font-size: 14px;
-  line-height: 0.98;
+  line-height: 1.25;
   font-weight: 400;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
 }
 
 .panel-copy p {
@@ -2155,7 +2157,7 @@ body {
 .project-panel--hero .panel-copy h2 {
   margin-bottom: 14px;
   font-size: 18px;
-  line-height: 1;
+  line-height: 1.25;
   font-weight: 500;
 }
 
@@ -2470,10 +2472,12 @@ body {
 .panel-side-copy-title {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 37.5px;
-  line-height: 0.92;
+  font-size: 35px;
+  line-height: 1.25;
   font-weight: 700;
   color: #000;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
 }
 
 .panel-side-copy-description {

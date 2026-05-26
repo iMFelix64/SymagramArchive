@@ -59,7 +59,7 @@ window.TDG_ARCHIVE = {
     },
     {
       "id": "03",
-      "title": "乌托邦：水上静居",
+      "title": "乌托邦：\n水上静居",
       "year": "2023",
       "tagline": "Concept Yacht / Marine Living",
       "description": "受逆戟鲸仿生美学启发的先锋居住空间概念游艇。在 20 米级船身内平衡了极致的动力学流线外观与现代居住空间，探索了未来海上生活的新形态。",
@@ -79,7 +79,7 @@ window.TDG_ARCHIVE = {
     },
     {
       "id": "04",
-      "title": "气：风场交互座舱",
+      "title": "气：\n风场交互座舱",
       "year": "2022",
       "tagline": "Interaction Design / Cockpit UX",
       "description": "探索以气流为交互媒介的未来座舱方案。通过定向气流将信息转化为身体的本能反馈，解决了辅助驾驶中人机感官疏离的问题，实现了更具直觉性的感官闭环。",
@@ -98,7 +98,7 @@ window.TDG_ARCHIVE = {
     },
     {
       "id": "05",
-      "title": "游牧民：餐厅家具",
+      "title": "游牧民：\n餐厅家具",
       "year": "2023",
       "tagline": "Furniture",
       "description": "面向追求高品质生活的新中产家庭，以“克制而温暖的秩序感”为核心：在现代极简空间中保留木材、织物等自然材质的真实肌理，用材质、光影和触感建立丰富的感官层次，同时去除繁复装饰，回归家具与空间最基础的几何构成。",
@@ -120,7 +120,7 @@ window.TDG_ARCHIVE = {
     {
       "id": "06",
       "archiveCode": "",
-      "title": "圆点点儿童滑板车",
+      "title": "圆点点\n儿童滑板车",
       "year": "2026",
       "category": "",
       "tagline": "Child equipments",
@@ -144,7 +144,7 @@ window.TDG_ARCHIVE = {
     {
       "id": "07",
       "archiveCode": "",
-      "title": "Volante 水翼船",
+      "title": "Volante\n水翼船",
       "year": "2024",
       "category": "",
       "tagline": "Future Marine Mobility / Electric Hydrofoil",
@@ -164,7 +164,8 @@ window.TDG_ARCHIVE = {
     {
       "id": "08",
       "archiveCode": "",
-      "title": "OrcaJet 水翼摩托艇",
+      "title": "OrcaJet\n水翼摩托艇",
+      "detailTitle": "OrcaJet\n水翼摩托艇",
       "year": "2025",
       "category": "",
       "tagline": "Future Marine Mobility / Electric Hydrofoil",

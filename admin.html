@@ -532,7 +532,7 @@
       </section>
     </main>
 
-    <script src="./archive-data.js?v=20260526-orca-paths-1"></script>
+    <script src="./archive-data.js?v=20260526-title-wrap-1"></script>
     <script>
       const sourceData = window.TDG_ARCHIVE || { groups: [], projects: [] };
       let draftData = cloneArchiveData(sourceData);
@@ -1326,7 +1326,7 @@
           createSectionRule("Main Copy"),
           createField("Title", project.title || "", (value) => {
             project.title = value;
-          }),
+          }, { multiline: true, minHeight: "72px" }),
           createField("Tagline", project.tagline || "", (value) => {
             project.tagline = value;
           }),
@@ -1334,6 +1334,9 @@
             project.description = value;
           }, { multiline: true, minHeight: "116px" }),
           createSectionRule("Panel Detail Copy"),
+          createField("Detail Title", project.detailTitle || "", (value) => {
+            project.detailTitle = value;
+          }, { multiline: true, minHeight: "72px" }),
           createField("Side Title", project.sideTitle || "", (value) => {
             project.sideTitle = value;
           }),

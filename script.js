@@ -93,8 +93,16 @@ function getProjectDisplayValue(project, key, fallback = "") {
   return value === undefined || value === null || value === "" ? fallback : String(value);
 }
 
+function getProjectDetailTitle(project) {
+  return getProjectDisplayValue(
+    project,
+    "detailTitle",
+    getProjectDisplayValue(project, "sideTitle", project.title),
+  );
+}
+
 function createProjectEmbedSrc(projectId) {
-  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1&v=20260526-asset-paths-1`;
+  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1&v=20260526-title-wrap-1`;
 }
 
 function createElementWithClass(tagName, className, textContent = "") {
@@ -158,7 +166,7 @@ function createProjectPanel(project, projectIndex) {
   const sideTitle = createElementWithClass(
     "h3",
     "panel-side-copy-title",
-    getProjectDisplayValue(project, "sideTitle", project.title),
+    getProjectDetailTitle(project),
   );
   const sideDescription = createElementWithClass(
     "p",
