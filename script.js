@@ -101,8 +101,12 @@ function getProjectDetailTitle(project) {
   );
 }
 
+function getProjectCardTitle(project) {
+  return getProjectDisplayValue(project, "title").replace(/\s+/g, " ").trim();
+}
+
 function createProjectEmbedSrc(projectId) {
-  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1&v=20260526-title-wrap-1`;
+  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1&v=20260526-card-title-1`;
 }
 
 function createElementWithClass(tagName, className, textContent = "") {
@@ -207,7 +211,7 @@ function createProjectPanel(project, projectIndex) {
     createElementWithClass("span", "", getProjectDisplayValue(project, "metaSubtitle", `${project.tagline || "PROJECT"} / ${project.year || "TBD"}`)),
   );
 
-  title.textContent = project.title;
+  title.textContent = getProjectCardTitle(project);
   description.textContent = project.description || "";
   panelCopy.append(title, description);
   highlightCard.append(bandNumber, panelCopy, arrow);

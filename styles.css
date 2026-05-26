@@ -2005,8 +2005,10 @@ body {
   font-size: 14px;
   line-height: 1.25;
   font-weight: 400;
-  overflow-wrap: anywhere;
-  white-space: pre-line;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .panel-copy p {

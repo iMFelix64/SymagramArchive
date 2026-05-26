@@ -643,8 +643,10 @@ img {
   font-weight: 500;
   line-height: 1.25;
   margin: 0 0 14px;
-  overflow-wrap: anywhere;
-  white-space: pre-line;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .rolling-project-description {

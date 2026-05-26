@@ -1,7 +1,7 @@
 const archiveData = window.TDG_ARCHIVE || { groups: [], projects: [] };
 
 function createProjectEmbedSrc(projectId) {
-  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1&v=20260526-title-wrap-1`;
+  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1&v=20260526-card-title-1`;
 }
 
 const projectCatalog = (archiveData.projects || [])
@@ -49,6 +49,10 @@ function getProjectDetailTitle(project) {
   );
 }
 
+function getProjectCardTitle(project) {
+  return getProjectDisplayValue(project, "title").replace(/\s+/g, " ").trim();
+}
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -60,6 +64,10 @@ function escapeHtml(value) {
 
 function formatMultilineText(value) {
   return escapeHtml(value).replace(/\r\n?/g, "\n");
+}
+
+function formatSingleLineText(value) {
+  return escapeHtml(String(value || "").replace(/\s+/g, " ").trim());
 }
 
 projects.forEach((project) => {
@@ -212,6 +220,7 @@ function buildProjects() {
     .map((project) => {
       const leadImage = project.images[0] || project.coverImage || "";
       const embedSrc = createProjectEmbedSrc(project.id);
+      const cardTitle = formatSingleLineText(getProjectCardTitle(project));
       const detailTitle = formatMultilineText(getProjectDetailTitle(project));
       const mediaMarkup = project.placeholder
         ? `
@@ -242,7 +251,7 @@ function buildProjects() {
           <aside class="rolling-project-card" aria-label="${project.title} 项目信息" data-debug-label="aside.rolling-project-card[${project.id}]">
             <p class="rolling-project-index">${project.displayNumber}.</p>
             <div class="rolling-project-copy">
-              <h2 class="rolling-project-name">${project.title}</h2>
+              <h2 class="rolling-project-name">${cardTitle}</h2>
               <p class="rolling-project-description">${project.description}</p>
             </div>
             <div class="rolling-project-arrow" aria-hidden="true">→</div>
