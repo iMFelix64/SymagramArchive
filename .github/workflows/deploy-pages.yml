@@ -1,5 +1,6 @@
 name: Deploy GitHub Pages
 
+# Static site deployment for symagram.com.
 on:
   push:
     branches:
