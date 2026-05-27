@@ -3300,7 +3300,30 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     display: flex;
     flex-direction: column;
     margin: 0 0 5px;
+    max-height: 620px;
     background: #fff;
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    transition:
+      max-height 680ms cubic-bezier(0.19, 1, 0.22, 1),
+      margin 520ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 420ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 620ms cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .archive-app.is-mobile-project-expanded .mobile-project-card:not(.is-mobile-expanded) {
+    max-height: 0;
+    margin-bottom: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(0, 18px, 0) scale(0.985);
+  }
+
+  .mobile-project-card.is-mobile-expanded {
+    min-height: 100%;
+    max-height: 6000px;
+    margin-bottom: 0;
   }
 
   .mobile-project-card-header {
@@ -3311,12 +3334,31 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     padding: 7px 0 7px 10px;
     border: 1px solid #dedede;
     background: #fff;
+    cursor: pointer;
+    overflow: hidden;
     transition:
-      background-color 420ms ease,
-      border-color 420ms ease;
+      min-height 680ms cubic-bezier(0.19, 1, 0.22, 1),
+      padding 680ms cubic-bezier(0.19, 1, 0.22, 1),
+      grid-template-columns 680ms cubic-bezier(0.19, 1, 0.22, 1),
+      gap 680ms cubic-bezier(0.19, 1, 0.22, 1),
+      background-color 520ms cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 520ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .mobile-project-card.is-mobile-centered .mobile-project-card-header {
+    border-color: #ffef11;
+    background: #ffef11;
+  }
+
+  .mobile-project-card.is-mobile-expanded .mobile-project-card-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    grid-template-columns: 32.329px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    min-height: 84px;
+    padding: 10px;
     border-color: #ffef11;
     background: #ffef11;
   }
@@ -3329,6 +3371,37 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     font-weight: 700;
     line-height: 0.783;
     white-space: nowrap;
+    transform-origin: left center;
+    transition:
+      margin 620ms cubic-bezier(0.19, 1, 0.22, 1),
+      opacity 420ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 680ms cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .mobile-project-card.is-mobile-expanded .mobile-project-number {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate3d(-3px, -4px, 0) scale(0.18);
+  }
+
+  .mobile-project-text {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0;
+    transition:
+      gap 620ms cubic-bezier(0.19, 1, 0.22, 1),
+      transform 620ms cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .mobile-project-card.is-mobile-expanded .mobile-project-text {
+    grid-column: 2;
+    grid-row: 1;
+    gap: 10px;
+    overflow: hidden;
   }
 
   .mobile-project-title {
@@ -3344,17 +3417,73 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     text-overflow: ellipsis;
   }
 
+  .mobile-project-card.is-mobile-expanded .mobile-project-title {
+    width: min(194px, 100%);
+  }
+
+  .mobile-project-description {
+    margin: 0;
+    max-height: 0;
+    color: rgba(0, 0, 0, 0.8);
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 300;
+    line-height: 1.5;
+    opacity: 0;
+    overflow: hidden;
+    transform: translate3d(0, -6px, 0);
+    transition:
+      max-height 720ms cubic-bezier(0.19, 1, 0.22, 1),
+      opacity 420ms cubic-bezier(0.16, 1, 0.3, 1) 90ms,
+      transform 620ms cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .mobile-project-card.is-mobile-expanded .mobile-project-description {
+    max-height: 82px;
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
   .mobile-project-arrow {
+    appearance: none;
+    border: 0;
+    padding: 0;
+    border-radius: 0;
+    color: inherit;
     justify-self: center;
     width: 24px;
     height: 24px;
     background: url("./Assets/Icons/Arrow.svg") center / contain no-repeat;
+    background-color: transparent;
     transform: rotate(45deg);
-    transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+    transform-origin: center;
+    transition:
+      width 680ms cubic-bezier(0.19, 1, 0.22, 1),
+      height 680ms cubic-bezier(0.19, 1, 0.22, 1),
+      background-size 680ms cubic-bezier(0.19, 1, 0.22, 1),
+      opacity 360ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 680ms cubic-bezier(0.19, 1, 0.22, 1);
   }
 
   .mobile-project-card.is-mobile-centered .mobile-project-arrow {
     transform: rotate(90deg);
+  }
+
+  .mobile-project-card.is-mobile-expanded .mobile-project-arrow,
+  .mobile-project-card.is-mobile-expanded.is-mobile-centered .mobile-project-arrow {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    justify-self: start;
+    width: 32.329px;
+    height: 32.329px;
+    background-size: 22.928px 22.793px;
+    cursor: pointer;
+    transform: rotate(180deg);
+  }
+
+  .archive-app.is-mobile-project-expanding .mobile-project-card.is-mobile-expanded .mobile-project-arrow {
+    animation: mobile-project-arrow-reveal 680ms cubic-bezier(0.19, 1, 0.22, 1) both;
   }
 
   .mobile-project-media {
@@ -3387,6 +3516,58 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
 
   .mobile-project-card[data-project="02"] .mobile-project-media img {
     object-position: 54% center;
+  }
+
+  .mobile-project-detail-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 0;
+    padding-top: 10px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translate3d(0, -10px, 0);
+    transition:
+      max-height 860ms cubic-bezier(0.19, 1, 0.22, 1),
+      opacity 420ms cubic-bezier(0.16, 1, 0.3, 1) 120ms,
+      transform 720ms cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .mobile-project-card.is-mobile-expanded .mobile-project-detail-gallery {
+    max-height: 5200px;
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .mobile-project-detail-frame {
+    display: block;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: #f2f2f2;
+  }
+
+  .mobile-project-detail-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @keyframes mobile-project-arrow-reveal {
+    0% {
+      opacity: 0;
+      transform: rotate(180deg) scale(0.18);
+    }
+
+    48% {
+      opacity: 1;
+      transform: rotate(180deg) scale(1.18);
+    }
+
+    100% {
+      opacity: 1;
+      transform: rotate(180deg) scale(1);
+    }
   }
 
   .about-view {

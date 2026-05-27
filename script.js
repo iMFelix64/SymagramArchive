@@ -265,6 +265,27 @@ function buildProjectPanels() {
 
 buildProjectPanels();
 
+function createMobileProjectDetailGallery(project, projectIndex) {
+  const gallery = createElementWithClass("div", "mobile-project-detail-gallery");
+  const detailImages = Array.isArray(project.images) ? project.images.slice(1) : [];
+
+  gallery.setAttribute("aria-label", `${project.title.replace(/\s+/g, " ")} 项目图片`);
+
+  detailImages.forEach((imageSrc, imageIndex) => {
+    const frame = createElementWithClass("figure", "mobile-project-detail-frame");
+    const image = document.createElement("img");
+
+    image.src = imageSrc;
+    image.alt = `${project.title} ${String(imageIndex + 2).padStart(2, "0")}`;
+    image.loading = projectIndex === 0 && imageIndex < 2 ? "eager" : "lazy";
+    image.decoding = "async";
+    frame.append(image);
+    gallery.append(frame);
+  });
+
+  return gallery;
+}
+
 function buildMobileProjectList() {
   const archiveDetail = document.querySelector(".archive-detail");
 
@@ -281,22 +302,31 @@ function buildMobileProjectList() {
     const card = createElementWithClass("article", "mobile-project-card");
     const header = createElementWithClass("div", "mobile-project-card-header");
     const number = createElementWithClass("p", "mobile-project-number", `${displayNumber}.`);
+    const text = createElementWithClass("div", "mobile-project-text");
     const title = createElementWithClass("h2", "mobile-project-title", getProjectCardTitle(project));
-    const arrow = createElementWithClass("span", "mobile-project-arrow");
+    const description = createElementWithClass("p", "mobile-project-description", project.description || "");
+    const arrow = createElementWithClass("button", "mobile-project-arrow");
     const media = createElementWithClass("div", "mobile-project-media");
     const image = document.createElement("img");
+    const gallery = createMobileProjectDetailGallery(project, projectIndex);
 
     card.dataset.project = project.id;
     card.classList.toggle("is-featured", projectIndex === 0);
-    arrow.setAttribute("aria-hidden", "true");
+    header.setAttribute("role", "button");
+    header.setAttribute("tabindex", "0");
+    header.setAttribute("aria-expanded", "false");
+    header.setAttribute("aria-label", `展开项目：${project.title.replace(/\s+/g, " ")}`);
+    arrow.type = "button";
+    arrow.setAttribute("aria-label", `展开项目：${project.title.replace(/\s+/g, " ")}`);
     image.src = project.coverImage || project.images?.[0] || "";
     image.alt = project.title;
     image.loading = projectIndex < 2 ? "eager" : "lazy";
     image.decoding = "async";
 
-    header.append(number, title, arrow);
+    text.append(title, description);
+    header.append(number, text, arrow);
     media.append(image);
-    card.append(header, media);
+    card.append(header, media, gallery);
     list.append(card);
   });
 
@@ -324,6 +354,9 @@ const homeButton = document.getElementById("index-home-button");
 const aboutButton = document.getElementById("index-about-button");
 const projectGroup = document.getElementById("index-project-group");
 const ABOUT_WORK_ARROW_WHITE_CLASS = "about-work-tile--arrow-white";
+let mobileExpandedProjectId = "";
+let mobileProjectRestoreScrollTop = 0;
+let mobileProjectTransitionTimer = 0;
 
 function getNumericCssValue(element, propertyName, fallback = 0) {
   const value = Number.parseFloat(window.getComputedStyle(element).getPropertyValue(propertyName));
@@ -603,6 +636,87 @@ function syncMobileCenteredProjectCard() {
 
 function queueMobileCenteredProjectCardSync() {
   window.requestAnimationFrame(syncMobileCenteredProjectCard);
+}
+
+function getMobileProjectHeader(card) {
+  return card?.querySelector(".mobile-project-card-header") || null;
+}
+
+function getMobileProjectArrow(card) {
+  return card?.querySelector(".mobile-project-arrow") || null;
+}
+
+function setMobileProjectCardExpandedState(card, expanded) {
+  const header = getMobileProjectHeader(card);
+  const arrow = getMobileProjectArrow(card);
+  const projectTitle = orderedArchiveProjects
+    .find((project) => project.id === card?.dataset.project)
+    ?.title
+    .replace(/\s+/g, " ");
+  const actionLabel = expanded ? "返回项目列表" : `展开项目：${projectTitle || ""}`;
+
+  card?.classList.toggle("is-mobile-expanded", expanded);
+  header?.setAttribute("aria-expanded", String(expanded));
+  header?.setAttribute("aria-label", actionLabel);
+  arrow?.setAttribute("aria-label", actionLabel);
+}
+
+function expandMobileProjectCard(card) {
+  if (!card || !mobileProjectList || !archiveApp || !window.matchMedia("(max-width: 700px)").matches) {
+    return;
+  }
+
+  if (mobileExpandedProjectId === card.dataset.project) {
+    return;
+  }
+
+  mobileProjectRestoreScrollTop = mobileProjectList.scrollTop;
+  mobileExpandedProjectId = card.dataset.project || "";
+  window.clearTimeout(mobileProjectTransitionTimer);
+  archiveApp.classList.remove("is-mobile-project-collapsing");
+  archiveApp.classList.add("is-mobile-project-expanded", "is-mobile-project-transitioning", "is-mobile-project-expanding");
+
+  mobileProjectCards.forEach((projectCard) => {
+    const isExpandedCard = projectCard === card;
+
+    setMobileProjectCardExpandedState(projectCard, isExpandedCard);
+    projectCard.toggleAttribute("aria-hidden", !isExpandedCard);
+    projectCard.classList.toggle("is-mobile-centered", isExpandedCard);
+  });
+
+  mobileProjectList.scrollTo({ top: 0, behavior: "auto" });
+  mobileProjectTransitionTimer = window.setTimeout(() => {
+    archiveApp.classList.remove("is-mobile-project-transitioning", "is-mobile-project-expanding");
+  }, 760);
+}
+
+function collapseMobileProjectCard({ restoreScroll = true } = {}) {
+  if (!mobileExpandedProjectId || !mobileProjectList || !archiveApp) {
+    return;
+  }
+
+  window.clearTimeout(mobileProjectTransitionTimer);
+  archiveApp.classList.remove("is-mobile-project-expanding");
+  archiveApp.classList.add("is-mobile-project-transitioning", "is-mobile-project-collapsing");
+  mobileExpandedProjectId = "";
+  archiveApp.classList.remove("is-mobile-project-expanded");
+
+  mobileProjectCards.forEach((card) => {
+    setMobileProjectCardExpandedState(card, false);
+    card.removeAttribute("aria-hidden");
+  });
+
+  window.requestAnimationFrame(() => {
+    if (restoreScroll) {
+      mobileProjectList.scrollTo({ top: mobileProjectRestoreScrollTop, behavior: "auto" });
+    }
+
+    queueMobileCenteredProjectCardSync();
+  });
+
+  mobileProjectTransitionTimer = window.setTimeout(() => {
+    archiveApp.classList.remove("is-mobile-project-transitioning", "is-mobile-project-collapsing");
+  }, 620);
 }
 
 function triggerPrimaryNavRoll(button) {
@@ -2088,13 +2202,58 @@ indexItems.forEach((item) => {
   });
 });
 
+mobileProjectCards.forEach((card) => {
+  const header = getMobileProjectHeader(card);
+  const arrow = getMobileProjectArrow(card);
+
+  header?.addEventListener("click", () => {
+    if (mobileExpandedProjectId === card.dataset.project) {
+      return;
+    }
+
+    expandMobileProjectCard(card);
+  });
+
+  header?.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+
+    if (mobileExpandedProjectId === card.dataset.project) {
+      return;
+    }
+
+    expandMobileProjectCard(card);
+  });
+
+  arrow?.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (mobileExpandedProjectId === card.dataset.project) {
+      collapseMobileProjectCard();
+      return;
+    }
+
+    expandMobileProjectCard(card);
+  });
+});
+
 detailScroll?.addEventListener("scroll", requestActiveUpdate, { passive: true });
 mobileProjectList?.addEventListener("scroll", queueMobileCenteredProjectCardSync, { passive: true });
 document.addEventListener("pointermove", syncArchiveFrameCursorFromPointer, { passive: true });
 window.addEventListener("resize", refreshMeasurements);
 window.addEventListener("resize", syncAboutSheetScale);
 window.addEventListener("resize", syncAboutWorkTileArrows);
-window.addEventListener("resize", queueMobileCenteredProjectCardSync);
+window.addEventListener("resize", () => {
+  if (!window.matchMedia("(max-width: 700px)").matches) {
+    collapseMobileProjectCard({ restoreScroll: false });
+  }
+
+  queueMobileCenteredProjectCardSync();
+});
 window.addEventListener("load", refreshMeasurements);
 window.addEventListener("load", syncAboutSheetScale);
 window.addEventListener("load", syncAboutWorkTileArrows);
@@ -2122,6 +2281,7 @@ async function showHomeIntroFromNav() {
   };
 
   await syncExpandedProject("");
+  collapseMobileProjectCard({ restoreScroll: false });
 
   if (isAboutViewActive) {
     startHomeReturn();
@@ -2144,6 +2304,7 @@ async function showProjectsFromNav() {
   setMobileNavView("projects");
   setProjectDirectoryExpanded();
   await syncExpandedProject("");
+  collapseMobileProjectCard();
 
   if (isAboutViewActive) {
     setAboutViewActive(false, { deferHide: true });
@@ -2157,6 +2318,7 @@ async function showProjectsFromNav() {
 async function showAboutFromNav() {
   setMobileNavView("about");
   await syncExpandedProject("");
+  collapseMobileProjectCard({ restoreScroll: false });
   finishHomeIntro();
 
   if (detailScroll) {
