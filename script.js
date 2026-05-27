@@ -265,8 +265,50 @@ function buildProjectPanels() {
 
 buildProjectPanels();
 
+function buildMobileProjectList() {
+  const archiveDetail = document.querySelector(".archive-detail");
+
+  if (!archiveDetail || archiveDetail.querySelector(".mobile-project-list")) {
+    return;
+  }
+
+  const list = createElementWithClass("div", "mobile-project-list");
+
+  list.setAttribute("aria-label", "移动端项目列表");
+
+  orderedArchiveProjects.forEach((project, projectIndex) => {
+    const displayNumber = project.displayNumber || String(projectIndex + 1).padStart(2, "0");
+    const card = createElementWithClass("article", "mobile-project-card");
+    const header = createElementWithClass("div", "mobile-project-card-header");
+    const number = createElementWithClass("p", "mobile-project-number", `${displayNumber}.`);
+    const title = createElementWithClass("h2", "mobile-project-title", getProjectCardTitle(project));
+    const arrow = createElementWithClass("span", "mobile-project-arrow");
+    const media = createElementWithClass("div", "mobile-project-media");
+    const image = document.createElement("img");
+
+    card.dataset.project = project.id;
+    card.classList.toggle("is-featured", projectIndex === 0);
+    arrow.setAttribute("aria-hidden", "true");
+    image.src = project.coverImage || project.images?.[0] || "";
+    image.alt = project.title;
+    image.loading = projectIndex < 2 ? "eager" : "lazy";
+    image.decoding = "async";
+
+    header.append(number, title, arrow);
+    media.append(image);
+    card.append(header, media);
+    list.append(card);
+  });
+
+  archiveDetail.append(list);
+}
+
+buildMobileProjectList();
+
 const projectPanels = Array.from(document.querySelectorAll(".project-panel"));
 const indexItems = Array.from(document.querySelectorAll(".index-item"));
+const mobileProjectList = document.querySelector(".mobile-project-list");
+const mobileProjectCards = Array.from(document.querySelectorAll(".mobile-project-card"));
 const currentProject = document.getElementById("current-project");
 const debugToggle = document.getElementById("debug-toggle");
 const labelToggle = document.getElementById("label-toggle");
@@ -513,6 +555,55 @@ let projectEmbedScrollCursor = null;
 let projectEmbedScrollCursorX = window.innerWidth / 2;
 let projectEmbedScrollCursorY = window.innerHeight / 2;
 let projectEmbedScrollCursorLayer = null;
+
+function setMobileNavView(viewName) {
+  if (!homeTransitionStage) {
+    return;
+  }
+
+  homeTransitionStage.dataset.mobileView = viewName;
+}
+
+function syncMobileCenteredProjectCard() {
+  if (!mobileProjectList || mobileProjectCards.length === 0 || !window.matchMedia("(max-width: 700px)").matches) {
+    mobileProjectCards.forEach((card) => card.classList.remove("is-mobile-centered"));
+    return;
+  }
+
+  const viewportCenter = window.innerHeight / 2;
+  let closestCard = null;
+  let closestDistance = Number.POSITIVE_INFINITY;
+
+  mobileProjectCards.forEach((card) => {
+    const rect = card.getBoundingClientRect();
+
+    if (rect.bottom <= 0 || rect.top >= window.innerHeight) {
+      return;
+    }
+
+    if (rect.top <= viewportCenter && rect.bottom >= viewportCenter) {
+      closestCard = card;
+      closestDistance = 0;
+      return;
+    }
+
+    const cardCenter = rect.top + rect.height / 2;
+    const distance = Math.abs(cardCenter - viewportCenter);
+
+    if (closestDistance !== 0 && distance < closestDistance) {
+      closestDistance = distance;
+      closestCard = card;
+    }
+  });
+
+  mobileProjectCards.forEach((card) => {
+    card.classList.toggle("is-mobile-centered", card === closestCard);
+  });
+}
+
+function queueMobileCenteredProjectCardSync() {
+  window.requestAnimationFrame(syncMobileCenteredProjectCard);
+}
 
 function triggerPrimaryNavRoll(button) {
   if (!button) {
@@ -1007,6 +1098,8 @@ function finishHomeIntro({ immediate = false } = {}) {
   clearHomeIntroFlowTimers();
   homeIntro.classList.add("is-exiting");
   homeTransitionStage?.classList.add("is-index-visible");
+  setMobileNavView("projects");
+  queueMobileCenteredProjectCardSync();
 
   scheduleHomeIntroTimer(
     () => {
@@ -1081,6 +1174,7 @@ function playHomeIntro({ autoExit = true, immediate = false } = {}) {
   );
   homeIntro.classList.add("is-intro-ready");
   homeTransitionStage?.classList.remove("is-index-visible");
+  setMobileNavView("home");
 
   if (archiveApp) {
     archiveApp.inert = true;
@@ -1211,6 +1305,7 @@ function setAboutViewActive(active, { deferHide = false, targetView = "projects"
   aboutButton?.setAttribute("aria-pressed", String(active));
 
   if (active) {
+    setMobileNavView("about");
     aboutView?.removeAttribute("hidden");
     aboutView?.removeAttribute("inert");
     homeTransitionStage?.classList.remove("is-about-leaving");
@@ -1223,6 +1318,7 @@ function setAboutViewActive(active, { deferHide = false, targetView = "projects"
       syncAboutWorkTileArrows();
     });
   } else {
+    setMobileNavView(targetView === "home" ? "home" : "projects");
     if (deferHide) {
       homeTransitionStage?.classList.add("is-about-leaving");
     }
@@ -1993,13 +2089,16 @@ indexItems.forEach((item) => {
 });
 
 detailScroll?.addEventListener("scroll", requestActiveUpdate, { passive: true });
+mobileProjectList?.addEventListener("scroll", queueMobileCenteredProjectCardSync, { passive: true });
 document.addEventListener("pointermove", syncArchiveFrameCursorFromPointer, { passive: true });
 window.addEventListener("resize", refreshMeasurements);
 window.addEventListener("resize", syncAboutSheetScale);
 window.addEventListener("resize", syncAboutWorkTileArrows);
+window.addEventListener("resize", queueMobileCenteredProjectCardSync);
 window.addEventListener("load", refreshMeasurements);
 window.addEventListener("load", syncAboutSheetScale);
 window.addEventListener("load", syncAboutWorkTileArrows);
+window.addEventListener("load", queueMobileCenteredProjectCardSync);
 window.addEventListener("blur", () => {
   hideArchiveFrameCursor();
   hideProjectEmbedScrollCursor();
@@ -2018,6 +2117,7 @@ async function showHomeIntroFromNav() {
     listNavigationTargetId = "";
     syncSelectedProject(firstProjectId);
     syncVisibleProject(firstProjectId);
+    setMobileNavView("home");
     playHomeIntro({ autoExit: false });
   };
 
@@ -2041,6 +2141,7 @@ async function showHomeIntroFromNav() {
 }
 
 async function showProjectsFromNav() {
+  setMobileNavView("projects");
   setProjectDirectoryExpanded();
   await syncExpandedProject("");
 
@@ -2049,10 +2150,12 @@ async function showProjectsFromNav() {
   }
 
   finishHomeIntro();
+  queueMobileCenteredProjectCardSync();
   requestActiveUpdate();
 }
 
 async function showAboutFromNav() {
+  setMobileNavView("about");
   await syncExpandedProject("");
   finishHomeIntro();
 
