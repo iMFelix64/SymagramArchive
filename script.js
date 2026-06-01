@@ -357,6 +357,10 @@ const ABOUT_WORK_ARROW_WHITE_CLASS = "about-work-tile--arrow-white";
 let mobileExpandedProjectId = "";
 let mobileProjectRestoreScrollTop = 0;
 let mobileProjectTransitionTimer = 0;
+let mobileProjectActiveAnimation = null;
+const MOBILE_PROJECT_EXPAND_DURATION = 920;
+const MOBILE_PROJECT_COLLAPSE_DURATION = 780;
+const MOBILE_PROJECT_MOTION_EASING = "cubic-bezier(0.19, 1, 0.22, 1)";
 
 function getNumericCssValue(element, propertyName, fallback = 0) {
   const value = Number.parseFloat(window.getComputedStyle(element).getPropertyValue(propertyName));
@@ -661,6 +665,58 @@ function setMobileProjectCardExpandedState(card, expanded) {
   arrow?.setAttribute("aria-label", actionLabel);
 }
 
+function runMobileProjectFlip(card, firstRect, duration) {
+  if (!card || !firstRect) {
+    return null;
+  }
+
+  const lastRect = card.getBoundingClientRect();
+  const deltaX = firstRect.left - lastRect.left;
+  const deltaY = firstRect.top - lastRect.top;
+
+  mobileProjectActiveAnimation?.cancel();
+
+  if (Math.abs(deltaX) < 0.5 && Math.abs(deltaY) < 0.5) {
+    mobileProjectActiveAnimation = null;
+    return null;
+  }
+
+  card.classList.add("is-mobile-motion-target");
+
+  const animation = card.animate(
+    [
+      { transform: `translate3d(${deltaX}px, ${deltaY}px, 0)` },
+      { transform: "translate3d(0, 0, 0)" },
+    ],
+    {
+      duration,
+      easing: MOBILE_PROJECT_MOTION_EASING,
+      fill: "both",
+    },
+  );
+
+  mobileProjectActiveAnimation = animation;
+
+  const clearAnimation = () => {
+    if (mobileProjectActiveAnimation === animation) {
+      mobileProjectActiveAnimation = null;
+      card.classList.remove("is-mobile-motion-target");
+    }
+
+    animation.cancel();
+  };
+
+  animation.addEventListener("finish", clearAnimation, { once: true });
+  animation.addEventListener("cancel", () => {
+    if (mobileProjectActiveAnimation === animation) {
+      mobileProjectActiveAnimation = null;
+      card.classList.remove("is-mobile-motion-target");
+    }
+  }, { once: true });
+
+  return animation;
+}
+
 function expandMobileProjectCard(card) {
   if (!card || !mobileProjectList || !archiveApp || !window.matchMedia("(max-width: 700px)").matches) {
     return;
@@ -669,6 +725,8 @@ function expandMobileProjectCard(card) {
   if (mobileExpandedProjectId === card.dataset.project) {
     return;
   }
+
+  const firstRect = card.getBoundingClientRect();
 
   mobileProjectRestoreScrollTop = mobileProjectList.scrollTop;
   mobileExpandedProjectId = card.dataset.project || "";
@@ -685,9 +743,10 @@ function expandMobileProjectCard(card) {
   });
 
   mobileProjectList.scrollTo({ top: 0, behavior: "auto" });
+  runMobileProjectFlip(card, firstRect, MOBILE_PROJECT_EXPAND_DURATION);
   mobileProjectTransitionTimer = window.setTimeout(() => {
     archiveApp.classList.remove("is-mobile-project-transitioning", "is-mobile-project-expanding");
-  }, 760);
+  }, MOBILE_PROJECT_EXPAND_DURATION);
 }
 
 function collapseMobileProjectCard({ restoreScroll = true } = {}) {
@@ -695,9 +754,14 @@ function collapseMobileProjectCard({ restoreScroll = true } = {}) {
     return;
   }
 
+  const expandedCard = mobileProjectCards.find((card) => card.dataset.project === mobileExpandedProjectId);
+  const firstRect = getMobileProjectHeader(expandedCard)?.getBoundingClientRect() || expandedCard?.getBoundingClientRect();
+  const targetScrollTop = mobileProjectRestoreScrollTop;
+
   window.clearTimeout(mobileProjectTransitionTimer);
   archiveApp.classList.remove("is-mobile-project-expanding");
   archiveApp.classList.add("is-mobile-project-transitioning", "is-mobile-project-collapsing");
+  expandedCard?.classList.add("is-mobile-collapse-target");
   mobileExpandedProjectId = "";
   archiveApp.classList.remove("is-mobile-project-expanded");
 
@@ -706,17 +770,19 @@ function collapseMobileProjectCard({ restoreScroll = true } = {}) {
     card.removeAttribute("aria-hidden");
   });
 
-  window.requestAnimationFrame(() => {
-    if (restoreScroll) {
-      mobileProjectList.scrollTo({ top: mobileProjectRestoreScrollTop, behavior: "auto" });
-    }
+  if (restoreScroll) {
+    mobileProjectList.scrollTo({ top: targetScrollTop, behavior: "auto" });
+  } else {
+    mobileProjectList.scrollTo({ top: mobileProjectRestoreScrollTop, behavior: "auto" });
+  }
 
-    queueMobileCenteredProjectCardSync();
-  });
+  runMobileProjectFlip(expandedCard, firstRect, MOBILE_PROJECT_COLLAPSE_DURATION);
+  queueMobileCenteredProjectCardSync();
 
   mobileProjectTransitionTimer = window.setTimeout(() => {
     archiveApp.classList.remove("is-mobile-project-transitioning", "is-mobile-project-collapsing");
-  }, 620);
+    expandedCard?.classList.remove("is-mobile-collapse-target");
+  }, MOBILE_PROJECT_COLLAPSE_DURATION);
 }
 
 function triggerPrimaryNavRoll(button) {
