@@ -3657,7 +3657,6 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
   .about-experience-panel {
     box-sizing: border-box;
     padding-inline: 10px;
-    border: 1px solid #000;
   }
 
   .about-panel-title,
