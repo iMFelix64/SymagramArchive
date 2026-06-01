@@ -1751,7 +1751,6 @@ body {
 
 .about-work-grid {
   display: grid;
-  width: 100%;
   gap: 10px;
 }
 
@@ -1770,13 +1769,17 @@ body {
   --about-work-arrow-height: 25.455px;
   position: relative;
   display: block;
-  width: 100%;
   margin: 0;
-  aspect-ratio: 370 / 115;
-  height: auto;
+  height: 115px;
   min-height: 0;
   background: #c2c2c2;
   overflow: hidden;
+}
+
+.about-work-tile picture {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .about-work-tile img {
@@ -1805,6 +1808,20 @@ body {
 
 .about-work-tile--arrow-white::after {
   filter: invert(1);
+}
+
+@media (min-width: 1181px) {
+  .about-work-grid--three .about-work-tile,
+  .about-work-grid--three span {
+    aspect-ratio: 342 / 230;
+    height: auto;
+  }
+
+  .about-work-grid--two .about-work-tile,
+  .about-work-grid--two span {
+    aspect-ratio: 522 / 230;
+    height: auto;
+  }
 }
 
 @media (max-width: 1500px) {
@@ -1846,7 +1863,7 @@ body {
 
   .about-work-tile,
   .about-work-grid span {
-    height: auto;
+    height: 86px;
   }
 }
 
@@ -3858,7 +3875,9 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
 
   .about-work-tile,
   .about-work-grid span {
+    aspect-ratio: 370 / 115;
     height: auto;
+    width: 100%;
   }
 }
 
