@@ -606,7 +606,7 @@ body.is-project-embed-scroll-cursor-active .project-embed-scroll-cursor-arrow-sh
   font-size: clamp(3rem, 4.975vw, 5.97rem);
   line-height: 0.783;
   font-weight: 700;
-  letter-spacing: -0.021em;
+  letter-spacing: -0.003675em;
   text-transform: uppercase;
   user-select: none;
 }
@@ -699,7 +699,7 @@ body.is-project-embed-scroll-cursor-active .project-embed-scroll-cursor-arrow-sh
   width: var(--letter-width, auto);
   min-width: 0;
   height: 0.82em;
-  margin-right: 0.35px;
+  margin-right: 0.06125px;
   border: 0;
   color: var(--ink);
   font: inherit;
@@ -1751,6 +1751,7 @@ body {
 
 .about-work-grid {
   display: grid;
+  width: 100%;
   gap: 10px;
 }
 
@@ -1769,8 +1770,10 @@ body {
   --about-work-arrow-height: 25.455px;
   position: relative;
   display: block;
+  width: 100%;
   margin: 0;
-  height: 115px;
+  aspect-ratio: 370 / 115;
+  height: auto;
   min-height: 0;
   background: #c2c2c2;
   overflow: hidden;
@@ -1779,6 +1782,7 @@ body {
 .about-work-tile img {
   display: block;
   width: 100%;
+  max-width: 100%;
   height: 100%;
   object-fit: cover;
 }
@@ -1842,7 +1846,7 @@ body {
 
   .about-work-tile,
   .about-work-grid span {
-    height: 86px;
+    height: auto;
   }
 }
 
@@ -3540,7 +3544,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
   }
 
   .mobile-project-card[data-project="01"] .mobile-project-media img {
-    object-position: 68% center;
+    object-position: center;
   }
 
   .mobile-project-card[data-project="02"] .mobile-project-media img {
@@ -3648,6 +3652,14 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     margin: 0 0 22px;
   }
 
+  .about-profile-panel,
+  .about-core-panel .about-compact-section,
+  .about-experience-panel {
+    box-sizing: border-box;
+    padding-inline: 10px;
+    border: 1px solid #000;
+  }
+
   .about-panel-title,
   .about-profile-name {
     font-size: 25px;
@@ -3660,6 +3672,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     grid-template-columns: 127px minmax(0, 1fr);
     column-gap: 15px;
     align-items: start;
+    padding-bottom: 15px;
   }
 
   .about-profile-panel .about-panel-title,
@@ -3734,17 +3747,23 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     height: auto;
   }
 
+  .about-core-panel .about-compact-section:nth-child(1),
+  .about-core-panel .about-compact-section:nth-child(2),
+  .about-core-panel .about-compact-section:nth-child(3) {
+    height: auto;
+  }
+
   .about-core-panel {
     display: block;
-    margin-bottom: 34px;
+    margin-bottom: 0;
   }
 
   .about-compact-section {
-    margin-bottom: 5px;
+    margin-bottom: 22px;
   }
 
   .about-core-panel .about-compact-section:nth-child(3) {
-    margin-bottom: 0;
+    margin-bottom: 22px;
   }
 
   .about-title-row-inline > span,
@@ -3810,7 +3829,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     column-gap: max(0px, calc((100% - 153.876px) / 3));
     row-gap: 15px;
     height: auto;
-    padding: 15px 0 0;
+    padding: 15px 0;
   }
 
   .about-tool-list li,
@@ -3821,7 +3840,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
 
   .about-experience-list {
     gap: 26px;
-    padding: 12px 0 0;
+    padding: 12px 0 15px;
   }
 
   .about-experience-item {
@@ -3840,7 +3859,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
 
   .about-work-tile,
   .about-work-grid span {
-    height: 115px;
+    height: auto;
   }
 }
 

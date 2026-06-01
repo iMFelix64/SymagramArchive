@@ -368,6 +368,11 @@ function getNumericCssValue(element, propertyName, fallback = 0) {
 }
 
 function syncAboutWorkTileArrow(tile) {
+  if (tile.dataset.arrowTone === "white") {
+    tile.classList.add(ABOUT_WORK_ARROW_WHITE_CLASS);
+    return;
+  }
+
   const image = tile.querySelector("img");
   const tileWidth = Math.round(tile.clientWidth);
   const tileHeight = Math.round(tile.clientHeight);
