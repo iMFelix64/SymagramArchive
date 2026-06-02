@@ -10,8 +10,19 @@ const floatAssets = [
   "./Assets/Home/截屏2026-04-30 11.28.34 1.png",
   "./Assets/Home/截屏2026-04-30 11.29.14 1.png",
   "./Assets/Home/截屏2026-04-30 11.29.33 1.png",
-  "./Assets/Home/截屏2026-04-30 11.31.59 1.png",
-  "./Assets/Home/截屏2026-04-30 11.32.21 1.png",
+  "./Assets/Home/截屏2026-06-02 10.03.47 1.png",
+  "./Assets/Home/截屏2026-06-02 10.05.15 1.png",
+];
+const floatProjectIds = [
+  "02",
+  "02",
+  "03",
+  "04",
+  "05",
+  "01",
+  "01",
+  "05",
+  "07",
 ];
 const floatAnchors = [
   [7, 10],
@@ -56,6 +67,14 @@ function randomGlyph() {
   return glyphs[Math.floor(Math.random() * glyphs.length)];
 }
 
+function openProjectFromFloat(projectId) {
+  if (!projectId) {
+    return;
+  }
+
+  window.location.href = `./index.html?project=${encodeURIComponent(projectId)}&v=20260602-home-links-1`;
+}
+
 function startScramble(letter) {
   if (scrambleTimers.has(letter)) {
     return;
@@ -93,11 +112,16 @@ function buildFloatLayer() {
   floatLayer.className = "home-float-layer";
   floatLayer.setAttribute("aria-hidden", "true");
 
-  floatAssets.forEach((assetPath) => {
+  floatAssets.forEach((assetPath, assetIndex) => {
     const item = document.createElement("div");
     const image = document.createElement("img");
+    const projectId = floatProjectIds[assetIndex];
 
     item.className = "home-float-item";
+    item.dataset.project = projectId || "";
+    item.setAttribute("role", "button");
+    item.setAttribute("tabindex", "0");
+    item.setAttribute("aria-label", projectId ? `打开项目 ${projectId}` : "打开项目");
     image.className = "home-float-image";
     image.src = assetPath;
     image.alt = "";
@@ -109,6 +133,20 @@ function buildFloatLayer() {
     });
     item.addEventListener("mouseleave", () => {
       homeStage.classList.remove("is-cursor-image-hover");
+    });
+    item.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      openProjectFromFloat(projectId);
+    });
+    item.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      openProjectFromFloat(projectId);
     });
 
     item.append(image);

@@ -312,10 +312,10 @@ function buildMobileProjectList() {
 
     card.dataset.project = project.id;
     card.classList.toggle("is-featured", projectIndex === 0);
-    header.setAttribute("role", "button");
-    header.setAttribute("tabindex", "0");
-    header.setAttribute("aria-expanded", "false");
-    header.setAttribute("aria-label", `展开项目：${project.title.replace(/\s+/g, " ")}`);
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+    card.setAttribute("aria-expanded", "false");
+    card.setAttribute("aria-label", `展开项目：${project.title.replace(/\s+/g, " ")}`);
     arrow.type = "button";
     arrow.setAttribute("aria-label", `展开项目：${project.title.replace(/\s+/g, " ")}`);
     image.src = project.coverImage || project.images?.[0] || "";
@@ -553,8 +553,19 @@ const HOME_FLOAT_ASSETS = [
   "./Assets/Home/截屏2026-04-30 11.28.34 1.png",
   "./Assets/Home/截屏2026-04-30 11.29.14 1.png",
   "./Assets/Home/截屏2026-04-30 11.29.33 1.png",
-  "./Assets/Home/截屏2026-04-30 11.31.59 1.png",
-  "./Assets/Home/截屏2026-04-30 11.32.21 1.png",
+  "./Assets/Home/截屏2026-06-02 10.03.47 1.png",
+  "./Assets/Home/截屏2026-06-02 10.05.15 1.png",
+];
+const HOME_FLOAT_PROJECT_IDS = [
+  "02",
+  "02",
+  "03",
+  "04",
+  "05",
+  "01",
+  "01",
+  "05",
+  "07",
 ];
 const HOME_FLOAT_ANCHORS = [
   [7, 10],
@@ -656,7 +667,6 @@ function getMobileProjectArrow(card) {
 }
 
 function setMobileProjectCardExpandedState(card, expanded) {
-  const header = getMobileProjectHeader(card);
   const arrow = getMobileProjectArrow(card);
   const projectTitle = orderedArchiveProjects
     .find((project) => project.id === card?.dataset.project)
@@ -665,8 +675,8 @@ function setMobileProjectCardExpandedState(card, expanded) {
   const actionLabel = expanded ? "返回项目列表" : `展开项目：${projectTitle || ""}`;
 
   card?.classList.toggle("is-mobile-expanded", expanded);
-  header?.setAttribute("aria-expanded", String(expanded));
-  header?.setAttribute("aria-label", actionLabel);
+  card?.setAttribute("aria-expanded", String(expanded));
+  card?.setAttribute("aria-label", actionLabel);
   arrow?.setAttribute("aria-label", actionLabel);
 }
 
@@ -889,11 +899,19 @@ function buildHomeFloatLayer() {
   homeFloatLayer.className = "home-float-layer";
   homeFloatLayer.setAttribute("aria-hidden", "true");
 
-  HOME_FLOAT_ASSETS.forEach((assetPath) => {
+  HOME_FLOAT_ASSETS.forEach((assetPath, assetIndex) => {
     const item = document.createElement("div");
     const image = document.createElement("img");
+    const projectId = HOME_FLOAT_PROJECT_IDS[assetIndex];
+    const projectTitle = orderedArchiveProjects
+      .find((project) => project.id === projectId)
+      ?.title.replace(/\s+/g, " ");
 
     item.className = "home-float-item";
+    item.dataset.project = projectId || "";
+    item.setAttribute("role", "button");
+    item.setAttribute("tabindex", "0");
+    item.setAttribute("aria-label", projectTitle ? `打开项目：${projectTitle}` : "打开项目");
     image.className = "home-float-image";
     image.src = assetPath;
     image.alt = "";
@@ -905,6 +923,20 @@ function buildHomeFloatLayer() {
     });
     item.addEventListener("mouseleave", () => {
       homeIntro.classList.remove("is-cursor-image-hover");
+    });
+    item.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      navigateToProjectFromHome(projectId);
+    });
+    item.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      navigateToProjectFromHome(projectId);
     });
 
     item.append(image);
@@ -1447,6 +1479,46 @@ homeIntro?.addEventListener("click", () => {
 
   finishHomeIntro();
 });
+
+async function navigateToProjectFromHome(projectId) {
+  if (!projectId || !panelByProject.has(projectId)) {
+    return;
+  }
+
+  const targetPanel = panelByProject.get(projectId);
+  const targetMobileCard = mobileProjectCards.find((card) => card.dataset.project === projectId);
+  const isMobileProjectLayout = window.matchMedia("(max-width: 700px)").matches;
+
+  finishHomeIntro({ immediate: true });
+  setAboutViewActive(false);
+  setMobileNavView("projects");
+  listNavigationTargetId = "";
+  syncSelectedProject(projectId);
+  syncVisibleProject(projectId);
+
+  if (isMobileProjectLayout) {
+    await syncExpandedProject("");
+    collapseMobileProjectCard({ restoreScroll: false });
+    window.requestAnimationFrame(() => {
+      if (targetMobileCard) {
+        expandMobileProjectCard(targetMobileCard);
+      }
+    });
+    return;
+  }
+
+  collapseMobileProjectCard({ restoreScroll: false });
+  await syncExpandedProject("");
+
+  if (selectRollingProject(projectId)) {
+    return;
+  }
+
+  if (targetPanel && detailScroll) {
+    refreshMeasurements();
+    await animateDetailScrollToPanel(targetPanel);
+  }
+}
 
 function syncSelectedProject(selectedId) {
   if (selectedProjectId === selectedId) {
@@ -2274,10 +2346,9 @@ indexItems.forEach((item) => {
 });
 
 mobileProjectCards.forEach((card) => {
-  const header = getMobileProjectHeader(card);
   const arrow = getMobileProjectArrow(card);
 
-  header?.addEventListener("click", () => {
+  card.addEventListener("click", () => {
     if (mobileExpandedProjectId === card.dataset.project) {
       return;
     }
@@ -2285,8 +2356,12 @@ mobileProjectCards.forEach((card) => {
     expandMobileProjectCard(card);
   });
 
-  header?.addEventListener("keydown", (event) => {
+  card.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    if (event.target.closest(".mobile-project-arrow")) {
       return;
     }
 
@@ -2542,6 +2617,19 @@ projectEmbedPanelFrames.forEach((panelFrame) => {
   });
 });
 
+document.querySelectorAll(".about-work-link[data-project]").forEach((link) => {
+  link.addEventListener("click", (event) => {
+    const projectId = link.dataset.project;
+
+    if (!projectId) {
+      return;
+    }
+
+    event.preventDefault();
+    navigateToProjectFromHome(projectId);
+  });
+});
+
 projectEmbedWheelLayers.forEach((wheelLayer) => {
   wheelLayer.addEventListener("pointerenter", showProjectEmbedScrollCursor);
   wheelLayer.addEventListener("pointermove", moveProjectEmbedScrollCursor);
@@ -2580,3 +2668,11 @@ refreshMeasurements();
 syncDebugToggle();
 syncLabelToggle();
 bindRollingFrameDebugControls();
+
+const initialProjectParam = new URLSearchParams(window.location.search).get("project");
+
+if (initialProjectParam && panelByProject.has(initialProjectParam)) {
+  window.requestAnimationFrame(() => {
+    navigateToProjectFromHome(initialProjectParam);
+  });
+}
