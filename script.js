@@ -354,11 +354,14 @@ const homeButton = document.getElementById("index-home-button");
 const aboutButton = document.getElementById("index-about-button");
 const projectGroup = document.getElementById("index-project-group");
 const ABOUT_WORK_ARROW_WHITE_CLASS = "about-work-tile--arrow-white";
+const ABOUT_WORK_HOVER_ANIMATION_CLASS = "is-desktop-hover-animating";
+const ABOUT_WORK_HOVER_ANIMATION_MS = 560;
 let mobileExpandedProjectId = "";
 let mobileProjectRestoreScrollTop = 0;
 let mobileProjectTransitionTimer = 0;
 let mobileProjectActiveAnimation = null;
 let mobileAboutWorkHighlightFrame = 0;
+const aboutWorkHoverAnimationTimers = new WeakMap();
 const MOBILE_PROJECT_EXPAND_DURATION = 920;
 const MOBILE_PROJECT_COLLAPSE_DURATION = 780;
 const MOBILE_PROJECT_MOTION_EASING = "cubic-bezier(0.19, 1, 0.22, 1)";
@@ -437,6 +440,29 @@ function syncAboutWorkTileArrows() {
 
     image.addEventListener("load", () => syncAboutWorkTileArrow(tile), { once: true });
   });
+}
+
+function playDesktopAboutWorkHoverAnimation(tile) {
+  if (window.matchMedia("(max-width: 700px)").matches) {
+    return;
+  }
+
+  const existingTimer = aboutWorkHoverAnimationTimers.get(tile);
+
+  if (existingTimer) {
+    window.clearTimeout(existingTimer);
+  }
+
+  tile.classList.remove(ABOUT_WORK_HOVER_ANIMATION_CLASS);
+  void tile.offsetWidth;
+  tile.classList.add(ABOUT_WORK_HOVER_ANIMATION_CLASS);
+
+  const timer = window.setTimeout(() => {
+    tile.classList.remove(ABOUT_WORK_HOVER_ANIMATION_CLASS);
+    aboutWorkHoverAnimationTimers.delete(tile);
+  }, ABOUT_WORK_HOVER_ANIMATION_MS);
+
+  aboutWorkHoverAnimationTimers.set(tile, timer);
 }
 
 function syncAboutSheetScale() {
@@ -2689,6 +2715,10 @@ document.querySelectorAll(".about-work-link[data-project]").forEach((link) => {
     event.preventDefault();
     navigateToProjectFromHome(projectId);
   });
+});
+
+aboutWorkTiles.forEach((tile) => {
+  tile.addEventListener("pointerenter", () => playDesktopAboutWorkHoverAnimation(tile));
 });
 
 projectEmbedWheelLayers.forEach((wheelLayer) => {
