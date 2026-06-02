@@ -356,6 +356,7 @@ const projectGroup = document.getElementById("index-project-group");
 const ABOUT_WORK_ARROW_WHITE_CLASS = "about-work-tile--arrow-white";
 const ABOUT_WORK_HOVER_ANIMATION_CLASS = "is-desktop-hover-animating";
 const ABOUT_WORK_HOVER_ANIMATION_MS = 560;
+const ABOUT_PROJECT_MOBILE_EXIT_DELAY = 220;
 let mobileExpandedProjectId = "";
 let mobileProjectRestoreScrollTop = 0;
 let mobileProjectTransitionTimer = 0;
@@ -1569,9 +1570,14 @@ async function navigateToProjectFromHome(projectId) {
   const targetPanel = panelByProject.get(projectId);
   const targetMobileCard = mobileProjectCards.find((card) => card.dataset.project === projectId);
   const isMobileProjectLayout = window.matchMedia("(max-width: 700px)").matches;
+  const shouldDeferAboutExit = isAboutViewActive;
+  const releaseAboutView = () => {
+    if (shouldDeferAboutExit && isAboutViewActive) {
+      setAboutViewActive(false, { deferHide: true });
+    }
+  };
 
   finishHomeIntro({ immediate: true });
-  setAboutViewActive(false);
   setMobileNavView("projects");
   listNavigationTargetId = "";
   syncSelectedProject(projectId);
@@ -1584,6 +1590,8 @@ async function navigateToProjectFromHome(projectId) {
       if (targetMobileCard) {
         expandMobileProjectCard(targetMobileCard);
       }
+
+      window.setTimeout(releaseAboutView, ABOUT_PROJECT_MOBILE_EXIT_DELAY);
     });
     return;
   }
@@ -1592,6 +1600,7 @@ async function navigateToProjectFromHome(projectId) {
   await syncExpandedProject("");
 
   if (selectRollingProject(projectId)) {
+    releaseAboutView();
     return;
   }
 
@@ -1599,6 +1608,8 @@ async function navigateToProjectFromHome(projectId) {
     refreshMeasurements();
     await animateDetailScrollToPanel(targetPanel);
   }
+
+  releaseAboutView();
 }
 
 function syncSelectedProject(selectedId) {
