@@ -358,6 +358,7 @@ let mobileExpandedProjectId = "";
 let mobileProjectRestoreScrollTop = 0;
 let mobileProjectTransitionTimer = 0;
 let mobileProjectActiveAnimation = null;
+let mobileAboutWorkHighlightFrame = 0;
 const MOBILE_PROJECT_EXPAND_DURATION = 920;
 const MOBILE_PROJECT_COLLAPSE_DURATION = 780;
 const MOBILE_PROJECT_MOTION_EASING = "cubic-bezier(0.19, 1, 0.22, 1)";
@@ -535,6 +536,7 @@ const projectEmbedFrames = Array.from(document.querySelectorAll(".panel-project-
 const projectEmbedWheelLayers = Array.from(document.querySelectorAll(".panel-project-embed-wheel-layer"));
 const aboutView = document.getElementById("about-view");
 const aboutSheet = document.querySelector(".about-sheet");
+const aboutWorkTiles = Array.from(document.querySelectorAll(".about-work-tile"));
 const archiveDetail = document.querySelector(".archive-detail");
 const panelByProject = new Map(projectPanels.map((panel) => [panel.dataset.project, panel]));
 const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, item]));
@@ -656,6 +658,59 @@ function syncMobileCenteredProjectCard() {
 
 function queueMobileCenteredProjectCardSync() {
   window.requestAnimationFrame(syncMobileCenteredProjectCard);
+}
+
+function syncMobileAboutWorkTileHighlight() {
+  const isMobile = window.matchMedia("(max-width: 700px)").matches;
+
+  if (!aboutSheet || aboutWorkTiles.length === 0 || !isMobile || !isAboutViewActive) {
+    aboutWorkTiles.forEach((tile) => tile.classList.remove("is-mobile-scroll-highlighted"));
+    return;
+  }
+
+  const sheetRect = aboutSheet.getBoundingClientRect();
+  const visibleTop = Math.max(0, sheetRect.top);
+  const visibleBottom = Math.min(window.innerHeight, sheetRect.bottom);
+  const viewportCenter = visibleTop + (visibleBottom - visibleTop) / 2;
+  let closestTile = null;
+  let closestDistance = Number.POSITIVE_INFINITY;
+
+  aboutWorkTiles.forEach((tile) => {
+    const rect = tile.getBoundingClientRect();
+
+    if (rect.bottom <= visibleTop || rect.top >= visibleBottom) {
+      return;
+    }
+
+    if (rect.top <= viewportCenter && rect.bottom >= viewportCenter) {
+      closestTile = tile;
+      closestDistance = 0;
+      return;
+    }
+
+    const tileCenter = rect.top + rect.height / 2;
+    const distance = Math.abs(tileCenter - viewportCenter);
+
+    if (closestDistance !== 0 && distance < closestDistance) {
+      closestDistance = distance;
+      closestTile = tile;
+    }
+  });
+
+  aboutWorkTiles.forEach((tile) => {
+    tile.classList.toggle("is-mobile-scroll-highlighted", tile === closestTile);
+  });
+}
+
+function queueMobileAboutWorkTileHighlightSync() {
+  if (mobileAboutWorkHighlightFrame) {
+    return;
+  }
+
+  mobileAboutWorkHighlightFrame = window.requestAnimationFrame(() => {
+    mobileAboutWorkHighlightFrame = 0;
+    syncMobileAboutWorkTileHighlight();
+  });
 }
 
 function getMobileProjectHeader(card) {
@@ -1573,6 +1628,7 @@ function setAboutViewActive(active, { deferHide = false, targetView = "projects"
     window.requestAnimationFrame(() => {
       syncAboutSheetScale();
       syncAboutWorkTileArrows();
+      queueMobileAboutWorkTileHighlightSync();
     });
   } else {
     setMobileNavView(targetView === "home" ? "home" : "projects");
@@ -1584,6 +1640,8 @@ function setAboutViewActive(active, { deferHide = false, targetView = "projects"
     if (archiveApp) {
       archiveApp.inert = false;
     }
+
+    aboutWorkTiles.forEach((tile) => tile.classList.remove("is-mobile-scroll-highlighted"));
 
     if (deferHide) {
       window.setTimeout(() => {
@@ -2389,10 +2447,12 @@ mobileProjectCards.forEach((card) => {
 
 detailScroll?.addEventListener("scroll", requestActiveUpdate, { passive: true });
 mobileProjectList?.addEventListener("scroll", queueMobileCenteredProjectCardSync, { passive: true });
+aboutSheet?.addEventListener("scroll", queueMobileAboutWorkTileHighlightSync, { passive: true });
 document.addEventListener("pointermove", syncArchiveFrameCursorFromPointer, { passive: true });
 window.addEventListener("resize", refreshMeasurements);
 window.addEventListener("resize", syncAboutSheetScale);
 window.addEventListener("resize", syncAboutWorkTileArrows);
+window.addEventListener("resize", queueMobileAboutWorkTileHighlightSync);
 window.addEventListener("resize", () => {
   if (!window.matchMedia("(max-width: 700px)").matches) {
     collapseMobileProjectCard({ restoreScroll: false });
@@ -2404,6 +2464,7 @@ window.addEventListener("load", refreshMeasurements);
 window.addEventListener("load", syncAboutSheetScale);
 window.addEventListener("load", syncAboutWorkTileArrows);
 window.addEventListener("load", queueMobileCenteredProjectCardSync);
+window.addEventListener("load", queueMobileAboutWorkTileHighlightSync);
 window.addEventListener("blur", () => {
   hideArchiveFrameCursor();
   hideProjectEmbedScrollCursor();
