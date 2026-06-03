@@ -2786,8 +2786,19 @@ async function showHomeIntroFromNav() {
 }
 
 async function showProjectsFromNav() {
+  const isAlreadyShowingProjects = !isAboutViewActive && homeTransitionStage?.classList.contains("is-index-visible");
+
   setMobileNavView("projects");
   setProjectDirectoryExpanded();
+
+  if (isAlreadyShowingProjects) {
+    await syncExpandedProject("");
+    collapseMobileProjectCard();
+    queueMobileCenteredProjectCardSync();
+    requestActiveUpdate();
+    return;
+  }
+
   await syncExpandedProject("");
   collapseMobileProjectCard();
 
