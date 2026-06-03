@@ -578,7 +578,7 @@ function prepareProjectDirectoryEnter({ force = false } = {}) {
 
   projectGroup.style.setProperty("--project-directory-rule-delay", `${PROJECT_DIRECTORY_LIST_DELAY_MS}ms`);
   enterItems.forEach((item, index) => {
-    item.style.setProperty("--project-directory-enter-delay", `${PROJECT_DIRECTORY_LIST_DELAY_MS + index * 28}ms`);
+    item.style.setProperty("--project-directory-enter-delay", `${PROJECT_DIRECTORY_LIST_DELAY_MS + index * 60}ms`);
   });
   projectPanels.forEach((panel, index) => {
     panel.style.setProperty("--project-panel-enter-delay", `${index * 28}ms`);
@@ -613,7 +613,7 @@ function startProjectDirectoryEnter() {
   const panelEnterItems = getProjectPanelEnterItems();
 
   enterItems.forEach((item, index) => {
-    const delay = PROJECT_DIRECTORY_LIST_DELAY_MS + index * 28;
+    const delay = PROJECT_DIRECTORY_LIST_DELAY_MS + index * 60;
 
     item.style.transition = `opacity 660ms cubic-bezier(0.16, 1, 0.32, 1) ${delay}ms, transform 660ms cubic-bezier(0.16, 1, 0.32, 1) ${delay}ms`;
   });
