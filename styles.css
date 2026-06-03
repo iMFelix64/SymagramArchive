@@ -4022,16 +4022,6 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     animation: none;
   }
 
-  .about-work-tile:hover::after {
-    opacity: 1;
-    transform: rotate(-45deg);
-  }
-
-  .about-work-tile:hover .about-work-link::after {
-    opacity: 0;
-    transform: translate(-50%, 50%) rotate(-45deg);
-  }
-
   .about-work-tile.is-mobile-scroll-highlighted {
     transform: scale(1.025);
     filter: brightness(1.03) saturate(1.03);
