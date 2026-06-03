@@ -813,6 +813,8 @@ body {
   width: 1px;
   background: rgba(18, 18, 18, 0.95);
   pointer-events: none;
+  transform: scaleY(1);
+  transform-origin: top center;
 }
 
 .archive-index::-webkit-scrollbar {
@@ -1021,6 +1023,16 @@ body {
 .index-group.is-project-directory-pre-enter .index-item {
   opacity: 0;
   transform: translate3d(-42px, 0, 0);
+}
+
+.archive-app:has(.index-group.is-project-directory-pre-enter) .archive-index::after {
+  opacity: 0;
+  transform: scaleY(0);
+}
+
+.archive-app:has(.index-group.is-project-directory-entering) .archive-index::after {
+  animation: projectDirectoryVerticalRuleEnter 720ms cubic-bezier(0.16, 1, 0.32, 1) both;
+  animation-delay: 300ms;
 }
 
 .index-group.is-project-directory-entering .index-panel-title,
@@ -1236,6 +1248,22 @@ body {
   100% {
     opacity: 1;
     transform: scaleX(1);
+  }
+}
+
+@keyframes projectDirectoryVerticalRuleEnter {
+  0% {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
   }
 }
 
@@ -4195,6 +4223,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
   .index-group.is-project-directory-entering .index-panel-title,
   .index-group.is-project-directory-entering .index-segment-title,
   .index-group.is-project-directory-entering .index-item,
+  .archive-app:has(.index-group.is-project-directory-entering) .archive-index::after,
   .index-group.is-project-directory-entering .index-list::before,
   .index-group.is-project-directory-entering .index-list::after,
   .archive-detail.is-project-panels-entering .archive-rolling-panel,

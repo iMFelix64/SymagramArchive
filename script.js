@@ -760,6 +760,7 @@ const itemByProject = new Map(indexItems.map((item) => [item.dataset.project, it
 const PANEL_RESET_ANIMATION_MS = 420;
 const HOME_RETURN_SCROLL_MS = 760;
 const HOME_RETURN_OVERLAP_MS = 180;
+const HOME_PROJECT_RESET_DELAY_MS = HOME_RETURN_SCROLL_MS;
 const NAV_ROLL_COOLDOWN_MS = 1000;
 const PARAMETERS_OPEN_STORAGE_KEY = "rolling-parameters-open-v1";
 const ABOUT_DESIGN_CONTENT_HEIGHT = 772.2574462890625;
@@ -819,6 +820,8 @@ let homeCursorX = window.innerWidth / 2;
 let homeCursorY = window.innerHeight / 2;
 let isHomeCursorImageHover = false;
 let homeCursorTurnTimer = null;
+let homeProjectResetTimer = 0;
+let isHomeReturnInProgress = false;
 let archiveFrameCursor = null;
 let archiveFrameCursorX = window.innerWidth / 2;
 let archiveFrameCursorY = window.innerHeight / 2;
@@ -1584,6 +1587,7 @@ function finishHomeIntro({ immediate = false, playProjectDirectory = true } = {}
     return;
   }
 
+  clearScheduledHomeProjectReset();
   clearHomeIntroFlowTimers();
   homeIntro.classList.add("is-exiting");
   setMobileNavView("projects");
@@ -1610,6 +1614,39 @@ function finishHomeIntro({ immediate = false, playProjectDirectory = true } = {}
     },
     immediate ? 0 : 760,
   );
+}
+
+function clearScheduledHomeProjectReset() {
+  window.clearTimeout(homeProjectResetTimer);
+  homeProjectResetTimer = 0;
+  isHomeReturnInProgress = false;
+}
+
+function resetProjectStateBehindHome(projectId) {
+  if (!projectId || !panelByProject.has(projectId)) {
+    return;
+  }
+
+  listNavigationTargetId = "";
+  syncSelectedProject(projectId);
+  syncVisibleProject(projectId);
+  selectRollingProject(projectId);
+}
+
+function scheduleProjectStateResetBehindHome(projectId) {
+  clearScheduledHomeProjectReset();
+  isHomeReturnInProgress = true;
+
+  homeProjectResetTimer = window.setTimeout(() => {
+    homeProjectResetTimer = 0;
+    isHomeReturnInProgress = false;
+
+    if (homeTransitionStage?.classList.contains("is-index-visible") || isAboutViewActive) {
+      return;
+    }
+
+    resetProjectStateBehindHome(projectId);
+  }, HOME_PROJECT_RESET_DELAY_MS);
 }
 
 function prepareHomeIntro() {
@@ -2205,7 +2242,7 @@ function getRollingFrameActiveProjectId() {
 }
 
 function updateActiveProject() {
-  if (isAboutViewActive || !detailScroll || projectPanels.length === 0) {
+  if (isHomeReturnInProgress || isAboutViewActive || !detailScroll || projectPanels.length === 0) {
     return;
   }
 
@@ -2715,6 +2752,7 @@ window.addEventListener("blur", () => {
 async function showHomeIntroFromNav() {
   const firstProjectId = projectPanels[0]?.dataset.project || "01";
   let hasStartedHome = false;
+  isHomeReturnInProgress = true;
 
   const startHomeReturn = () => {
     if (hasStartedHome) {
@@ -2722,11 +2760,9 @@ async function showHomeIntroFromNav() {
     }
 
     hasStartedHome = true;
-    listNavigationTargetId = "";
-    syncSelectedProject(firstProjectId);
-    syncVisibleProject(firstProjectId);
     setMobileNavView("home");
     playHomeIntro({ autoExit: false });
+    scheduleProjectStateResetBehindHome(firstProjectId);
   };
 
   await syncExpandedProject("");
