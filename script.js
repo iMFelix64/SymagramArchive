@@ -357,11 +357,25 @@ const ABOUT_WORK_ARROW_WHITE_CLASS = "about-work-tile--arrow-white";
 const ABOUT_WORK_HOVER_ANIMATION_CLASS = "is-desktop-hover-animating";
 const ABOUT_WORK_HOVER_ANIMATION_MS = 560;
 const ABOUT_PROJECT_MOBILE_EXIT_DELAY = 220;
+const PROJECT_DIRECTORY_PRE_ENTER_CLASS = "is-project-directory-pre-enter";
+const PROJECT_DIRECTORY_ENTERING_CLASS = "is-project-directory-entering";
+const PROJECT_PANELS_PRE_ENTER_CLASS = "is-project-panels-pre-enter";
+const PROJECT_PANELS_ENTERING_CLASS = "is-project-panels-entering";
+const PROJECT_DIRECTORY_ENTER_MS = 1800;
+const PROJECT_ENTER_START_DELAY_MS = 380;
+const PROJECT_DIRECTORY_LIST_DELAY_MS = 50;
+const ABOUT_PANELS_PRE_ENTER_CLASS = "is-about-panels-pre-enter";
+const ABOUT_PANELS_ENTERING_CLASS = "is-about-panels-entering";
+const ABOUT_PANELS_ENTER_START_DELAY_MS = 200;
+const ABOUT_PANELS_ENTER_MS = 1500;
 let mobileExpandedProjectId = "";
 let mobileProjectRestoreScrollTop = 0;
 let mobileProjectTransitionTimer = 0;
 let mobileProjectActiveAnimation = null;
 let mobileAboutWorkHighlightFrame = 0;
+let projectDirectoryEnterTimer = 0;
+let projectDirectoryEnterElements = [];
+let aboutPanelsEnterTimer = 0;
 const aboutWorkHoverAnimationTimers = new WeakMap();
 const MOBILE_PROJECT_EXPAND_DURATION = 920;
 const MOBILE_PROJECT_COLLAPSE_DURATION = 780;
@@ -509,6 +523,182 @@ syncStaticProjectPanelNumbers();
 function setProjectDirectoryExpanded() {
   projectGroup?.classList.remove("is-collapsed");
   projectToggle?.setAttribute("aria-expanded", "true");
+}
+
+function clearProjectDirectoryEnter() {
+  window.clearTimeout(projectDirectoryEnterTimer);
+  projectDirectoryEnterTimer = 0;
+  projectDirectoryEnterElements.forEach((element) => {
+    element.style.removeProperty("opacity");
+    element.style.removeProperty("transform");
+    element.style.removeProperty("transition");
+    element.style.removeProperty("will-change");
+  });
+  projectDirectoryEnterElements = [];
+  projectGroup?.classList.remove(PROJECT_DIRECTORY_PRE_ENTER_CLASS);
+  projectGroup?.classList.remove(PROJECT_DIRECTORY_ENTERING_CLASS);
+  archiveDetail?.classList.remove(PROJECT_PANELS_PRE_ENTER_CLASS);
+  archiveDetail?.classList.remove(PROJECT_PANELS_ENTERING_CLASS);
+}
+
+function getProjectDirectoryEnterItems() {
+  if (!projectGroup) {
+    return [];
+  }
+
+  return [
+    projectGroup.querySelector(".index-panel-title"),
+    ...projectGroup.querySelectorAll(".index-segment-title, .index-item"),
+  ].filter(Boolean);
+}
+
+function getProjectPanelEnterItems() {
+  return [document.querySelector(".archive-rolling-panel") || detailScroll || archiveDetail].filter(Boolean);
+}
+
+function shouldSkipProjectDirectoryEnter(force = false) {
+  if (
+    !projectGroup ||
+    window.matchMedia("(max-width: 700px)").matches ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function prepareProjectDirectoryEnter({ force = false } = {}) {
+  if (shouldSkipProjectDirectoryEnter(force)) {
+    return false;
+  }
+
+  const enterItems = getProjectDirectoryEnterItems();
+  const panelEnterItems = getProjectPanelEnterItems();
+
+  projectGroup.style.setProperty("--project-directory-rule-delay", `${PROJECT_DIRECTORY_LIST_DELAY_MS}ms`);
+  enterItems.forEach((item, index) => {
+    item.style.setProperty("--project-directory-enter-delay", `${PROJECT_DIRECTORY_LIST_DELAY_MS + index * 28}ms`);
+  });
+  projectPanels.forEach((panel, index) => {
+    panel.style.setProperty("--project-panel-enter-delay", `${index * 28}ms`);
+  });
+
+  clearProjectDirectoryEnter();
+  projectDirectoryEnterElements = [...enterItems, ...panelEnterItems];
+  enterItems.forEach((item) => {
+    item.style.transition = "none";
+    item.style.opacity = "0";
+    item.style.transform = "translate3d(-42px, 0, 0)";
+    item.style.willChange = "opacity, transform";
+  });
+  panelEnterItems.forEach((panelContent) => {
+    panelContent.style.willChange = "opacity, transform";
+  });
+
+  projectGroup.classList.add(PROJECT_DIRECTORY_PRE_ENTER_CLASS);
+  archiveDetail?.classList.add(PROJECT_PANELS_PRE_ENTER_CLASS);
+  projectGroup.classList.remove(PROJECT_DIRECTORY_ENTERING_CLASS);
+  archiveDetail?.classList.remove(PROJECT_PANELS_ENTERING_CLASS);
+
+  return true;
+}
+
+function startProjectDirectoryEnter() {
+  if (!projectGroup || projectDirectoryEnterElements.length === 0) {
+    return;
+  }
+
+  const enterItems = getProjectDirectoryEnterItems();
+  const panelEnterItems = getProjectPanelEnterItems();
+
+  enterItems.forEach((item, index) => {
+    const delay = PROJECT_DIRECTORY_LIST_DELAY_MS + index * 28;
+
+    item.style.transition = `opacity 660ms cubic-bezier(0.16, 1, 0.32, 1) ${delay}ms, transform 660ms cubic-bezier(0.16, 1, 0.32, 1) ${delay}ms`;
+  });
+  projectDirectoryEnterElements.forEach((element) => {
+    void element.offsetWidth;
+  });
+
+  window.requestAnimationFrame(() => {
+    projectGroup.classList.add(PROJECT_DIRECTORY_ENTERING_CLASS);
+    archiveDetail?.classList.add(PROJECT_PANELS_ENTERING_CLASS);
+    rollingFrame?.contentWindow?.postMessage({ type: "rolling-enter-projects" }, "*");
+    enterItems.forEach((item) => {
+      item.style.opacity = "1";
+      item.style.transform = "translate3d(0, 0, 0)";
+    });
+  });
+
+  projectDirectoryEnterTimer = window.setTimeout(() => {
+    projectDirectoryEnterElements.forEach((element) => {
+      element.style.removeProperty("opacity");
+      element.style.removeProperty("transform");
+      element.style.removeProperty("transition");
+      element.style.removeProperty("will-change");
+    });
+    projectDirectoryEnterElements = [];
+    projectGroup.classList.remove(PROJECT_DIRECTORY_PRE_ENTER_CLASS);
+    projectGroup.classList.remove(PROJECT_DIRECTORY_ENTERING_CLASS);
+    archiveDetail?.classList.remove(PROJECT_PANELS_PRE_ENTER_CLASS);
+    archiveDetail?.classList.remove(PROJECT_PANELS_ENTERING_CLASS);
+    projectDirectoryEnterTimer = 0;
+  }, PROJECT_DIRECTORY_ENTER_MS);
+}
+
+function getAboutPanelEnterItems() {
+  if (!aboutView) {
+    return [];
+  }
+
+  return [
+    aboutView.querySelector(".about-profile-panel"),
+    aboutView.querySelector(".about-keyword-panel"),
+    ...aboutView.querySelectorAll(".about-core-panel .about-compact-section"),
+    aboutView.querySelector(".about-experience-panel"),
+  ].filter(Boolean);
+}
+
+function clearAboutPanelsEnter() {
+  window.clearTimeout(aboutPanelsEnterTimer);
+  aboutPanelsEnterTimer = 0;
+  aboutView?.classList.remove(ABOUT_PANELS_PRE_ENTER_CLASS, ABOUT_PANELS_ENTERING_CLASS);
+
+  getAboutPanelEnterItems().forEach((item) => {
+    item.style.removeProperty("--about-panel-enter-delay");
+  });
+}
+
+function prepareAboutPanelsEnter() {
+  if (
+    !aboutView ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    return false;
+  }
+
+  clearAboutPanelsEnter();
+  getAboutPanelEnterItems().forEach((item, index) => {
+    item.style.setProperty("--about-panel-enter-delay", `${index * 72}ms`);
+  });
+  aboutView.classList.add(ABOUT_PANELS_PRE_ENTER_CLASS);
+
+  return true;
+}
+
+function startAboutPanelsEnter() {
+  if (!aboutView?.classList.contains(ABOUT_PANELS_PRE_ENTER_CLASS)) {
+    return;
+  }
+
+  void aboutView.offsetWidth;
+  aboutView.classList.add(ABOUT_PANELS_ENTERING_CLASS);
+
+  aboutPanelsEnterTimer = window.setTimeout(() => {
+    aboutView.classList.remove(ABOUT_PANELS_PRE_ENTER_CLASS, ABOUT_PANELS_ENTERING_CLASS);
+    aboutPanelsEnterTimer = 0;
+  }, ABOUT_PANELS_ENTER_MS);
 }
 
 function syncRollingFrameProjectNumbers() {
@@ -1389,16 +1579,24 @@ function layoutHomeFloatItems() {
   revealHomeFloatItems();
 }
 
-function finishHomeIntro({ immediate = false } = {}) {
+function finishHomeIntro({ immediate = false, playProjectDirectory = true } = {}) {
   if (!homeIntro) {
     return;
   }
 
   clearHomeIntroFlowTimers();
   homeIntro.classList.add("is-exiting");
-  homeTransitionStage?.classList.add("is-index-visible");
   setMobileNavView("projects");
   queueMobileCenteredProjectCardSync();
+  const shouldPlayProjectDirectoryEnter = playProjectDirectory && prepareProjectDirectoryEnter();
+
+  homeTransitionStage?.classList.add("is-index-visible");
+
+  if (shouldPlayProjectDirectoryEnter) {
+    window.setTimeout(() => {
+      window.requestAnimationFrame(() => startProjectDirectoryEnter());
+    }, PROJECT_ENTER_START_DELAY_MS);
+  }
 
   scheduleHomeIntroTimer(
     () => {
@@ -1657,6 +1855,7 @@ function setAboutViewActive(active, { deferHide = false, targetView = "projects"
     setMobileNavView("about");
     aboutView?.removeAttribute("hidden");
     aboutView?.removeAttribute("inert");
+    const shouldPlayAboutPanelsEnter = prepareAboutPanelsEnter();
     homeTransitionStage?.classList.remove("is-about-leaving");
     homeTransitionStage?.classList.add("is-index-visible", "is-about-visible");
     if (archiveApp) {
@@ -1666,8 +1865,14 @@ function setAboutViewActive(active, { deferHide = false, targetView = "projects"
       syncAboutSheetScale();
       syncAboutWorkTileArrows();
       queueMobileAboutWorkTileHighlightSync();
+      if (shouldPlayAboutPanelsEnter) {
+        window.setTimeout(() => {
+          window.requestAnimationFrame(() => startAboutPanelsEnter());
+        }, ABOUT_PANELS_ENTER_START_DELAY_MS);
+      }
     });
   } else {
+    clearAboutPanelsEnter();
     setMobileNavView(targetView === "home" ? "home" : "projects");
     if (deferHide) {
       homeTransitionStage?.classList.add("is-about-leaving");
@@ -2563,7 +2768,7 @@ async function showAboutFromNav() {
   setMobileNavView("about");
   await syncExpandedProject("");
   collapseMobileProjectCard({ restoreScroll: false });
-  finishHomeIntro();
+  finishHomeIntro({ playProjectDirectory: false });
 
   if (detailScroll) {
     detailScroll.scrollTo({ top: 0, behavior: "auto" });

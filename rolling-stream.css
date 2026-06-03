@@ -556,6 +556,19 @@ img {
   width: var(--stream-width);
 }
 
+.rolling-app.is-projects-enter-pre .rolling-project-card,
+.rolling-app.is-projects-enter-pre .rolling-project-stream {
+  opacity: 0;
+  transform: translate3d(120px, 0, 0);
+}
+
+.rolling-app.is-projects-entering .rolling-project-card,
+.rolling-app.is-projects-entering .rolling-project-stream {
+  animation: rollingProjectBlockEnter 860ms cubic-bezier(0.16, 1, 0.32, 1) both;
+  animation-delay: var(--rolling-project-enter-delay, 0ms);
+  will-change: opacity, transform;
+}
+
 .rolling-project:last-child {
   border-bottom: 0;
 }
@@ -979,5 +992,17 @@ body.is-rolling-scroll-cursor-active .rolling-project.is-detail-expanded .rollin
 
   68% {
     translate: 0 -2px;
+  }
+}
+
+@keyframes rollingProjectBlockEnter {
+  0% {
+    opacity: 0;
+    transform: translate3d(120px, 0, 0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }

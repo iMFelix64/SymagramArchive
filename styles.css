@@ -1016,6 +1016,25 @@ body {
   margin: 0 0 24px;
 }
 
+.index-group.is-project-directory-pre-enter .index-panel-title,
+.index-group.is-project-directory-pre-enter .index-segment-title,
+.index-group.is-project-directory-pre-enter .index-item {
+  opacity: 0;
+  transform: translate3d(-42px, 0, 0);
+}
+
+.index-group.is-project-directory-entering .index-panel-title,
+.index-group.is-project-directory-entering .index-segment-title,
+.index-group.is-project-directory-entering .index-item {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 660ms cubic-bezier(0.16, 1, 0.32, 1),
+    transform 660ms cubic-bezier(0.16, 1, 0.32, 1);
+  transition-delay: var(--project-directory-enter-delay, 0ms);
+  will-change: opacity, transform;
+}
+
 .index-group-label {
   flex: 1;
 }
@@ -1052,6 +1071,40 @@ body {
     padding-top 240ms ease,
     padding-bottom 240ms ease;
   position: relative;
+}
+
+.index-list::before,
+.index-list::after {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  height: 0.5px;
+  background: var(--rule-strong);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.index-list::before {
+  top: 0;
+}
+
+.index-list::after {
+  bottom: 0;
+}
+
+.index-group.is-project-directory-entering .index-list {
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+}
+
+.index-group.is-project-directory-entering .index-list::before,
+.index-group.is-project-directory-entering .index-list::after {
+  animation: projectDirectoryRuleEnter 620ms cubic-bezier(0.16, 1, 0.32, 1) both;
+  animation-delay: var(--project-directory-rule-delay, 0ms);
 }
 
 .index-list::-webkit-scrollbar {
@@ -1168,6 +1221,48 @@ body {
 
 .index-item.is-active .index-item-dot {
   opacity: 1;
+}
+
+@keyframes projectDirectoryRuleEnter {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes projectPanelContentEnter {
+  0% {
+    opacity: 0;
+    transform: translate3d(140px, 0, 0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes aboutPanelExpandDown {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transform: translate3d(0, -14px, 0);
+  }
+
+  100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 .detail-views a {
@@ -1378,6 +1473,30 @@ body {
 
 .about-panel {
   min-width: 0;
+}
+
+.about-view.is-about-panels-pre-enter .about-profile-panel,
+.about-view.is-about-panels-pre-enter .about-keyword-panel,
+.about-view.is-about-panels-pre-enter .about-core-panel .about-compact-section,
+.about-view.is-about-panels-pre-enter .about-experience-panel,
+.about-view.is-about-panels-pre-enter .about-portrait {
+  opacity: 0;
+  clip-path: inset(0 0 100% 0);
+  transform: translate3d(0, -14px, 0);
+}
+
+.about-view.is-about-panels-entering .about-profile-panel,
+.about-view.is-about-panels-entering .about-keyword-panel,
+.about-view.is-about-panels-entering .about-core-panel .about-compact-section,
+.about-view.is-about-panels-entering .about-experience-panel,
+.about-view.is-about-panels-entering .about-portrait {
+  animation: aboutPanelExpandDown 780ms cubic-bezier(0.16, 1, 0.32, 1) both;
+  animation-delay: var(--about-panel-enter-delay, 0ms);
+  will-change: opacity, clip-path, transform;
+}
+
+.about-view.is-about-panels-entering .about-portrait {
+  animation-delay: calc(var(--about-panel-enter-delay, 0ms) + 110ms);
 }
 
 .about-panel-title {
@@ -2047,6 +2166,16 @@ body {
   align-items: stretch;
   min-height: 0;
   padding-bottom: var(--project-bottom-gap);
+}
+
+.archive-detail.is-project-panels-pre-enter .archive-rolling-panel {
+  opacity: 0;
+  transform: translate3d(140px, 0, 0);
+}
+
+.archive-detail.is-project-panels-entering .archive-rolling-panel {
+  animation: projectPanelContentEnter 920ms cubic-bezier(0.16, 1, 0.32, 1) both;
+  will-change: opacity, transform;
 }
 
 .archive-app.is-panel-expanded .project-panel {
@@ -4022,6 +4151,21 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     animation: none;
   }
 
+  .about-work-tile:hover .about-work-link::before {
+    opacity: 0;
+    transform: translateX(-118%);
+  }
+
+  .about-work-tile:hover::after {
+    opacity: 1;
+    transform: rotate(-45deg);
+  }
+
+  .about-work-tile:hover .about-work-link::after {
+    opacity: 0;
+    transform: translate(-50%, 50%) rotate(-45deg);
+  }
+
   .about-work-tile.is-mobile-scroll-highlighted {
     transform: scale(1.025);
     filter: brightness(1.03) saturate(1.03);
@@ -4045,6 +4189,21 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
 
 @media (prefers-reduced-motion: reduce) {
   .home-transition-stage {
+    transition: none;
+  }
+
+  .index-group.is-project-directory-entering .index-panel-title,
+  .index-group.is-project-directory-entering .index-segment-title,
+  .index-group.is-project-directory-entering .index-item,
+  .index-group.is-project-directory-entering .index-list::before,
+  .index-group.is-project-directory-entering .index-list::after,
+  .archive-detail.is-project-panels-entering .archive-rolling-panel,
+  .about-view.is-about-panels-entering .about-profile-panel,
+  .about-view.is-about-panels-entering .about-keyword-panel,
+  .about-view.is-about-panels-entering .about-core-panel .about-compact-section,
+  .about-view.is-about-panels-entering .about-experience-panel,
+  .about-view.is-about-panels-entering .about-portrait {
+    animation: none;
     transition: none;
   }
 }

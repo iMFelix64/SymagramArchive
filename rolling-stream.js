@@ -289,6 +289,10 @@ const projectsList = Array.from(document.querySelectorAll(".rolling-project"));
 const segmentGroups = Array.from(document.querySelectorAll(".rolling-segment-group"));
 const segmentLabels = Array.from(document.querySelectorAll(".rolling-segment-label"));
 const segmentDividers = Array.from(document.querySelectorAll(".rolling-segment-divider"));
+const ROLLING_PROJECTS_ENTER_PRE_CLASS = "is-projects-enter-pre";
+const ROLLING_PROJECTS_ENTERING_CLASS = "is-projects-entering";
+const ROLLING_PROJECTS_ENTER_MS = 1500;
+let rollingProjectsEnterTimer = 0;
 const segmentRanges = projectSegments
   .map((segment) => {
     const indexes = segment.projectIds
@@ -323,6 +327,50 @@ const projectStates = new Map(
     },
   ]),
 );
+
+function clearRollingProjectsEnter() {
+  window.clearTimeout(rollingProjectsEnterTimer);
+  rollingProjectsEnterTimer = 0;
+  rollingApp?.classList.remove(ROLLING_PROJECTS_ENTER_PRE_CLASS, ROLLING_PROJECTS_ENTERING_CLASS);
+
+  projectsList.forEach((project) => {
+    project.querySelectorAll(".rolling-project-card, .rolling-project-stream").forEach((element) => {
+      element.style.removeProperty("--rolling-project-enter-delay");
+    });
+  });
+}
+
+function playRollingProjectsEnter() {
+  if (
+    !rollingApp ||
+    projectsList.length === 0 ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    return;
+  }
+
+  clearRollingProjectsEnter();
+
+  projectsList.forEach((project, index) => {
+    const delay = index * 72;
+
+    project.querySelectorAll(".rolling-project-card, .rolling-project-stream").forEach((element) => {
+      element.style.setProperty("--rolling-project-enter-delay", `${delay}ms`);
+    });
+  });
+
+  rollingApp.classList.add(ROLLING_PROJECTS_ENTER_PRE_CLASS);
+  void rollingApp.offsetWidth;
+  window.requestAnimationFrame(() => {
+    rollingApp.classList.add(ROLLING_PROJECTS_ENTERING_CLASS);
+  });
+
+  rollingProjectsEnterTimer = window.setTimeout(() => {
+    rollingApp.classList.remove(ROLLING_PROJECTS_ENTER_PRE_CLASS, ROLLING_PROJECTS_ENTERING_CLASS);
+    rollingProjectsEnterTimer = 0;
+  }, ROLLING_PROJECTS_ENTER_MS);
+}
+
 let activeProjectIndex = 0;
 let settledProjectIndex = 0;
 let activeProjectSelectedAt = Number.NEGATIVE_INFINITY;
@@ -2020,7 +2068,16 @@ window.addEventListener("keydown", (event) => {
 window.addEventListener("message", (event) => {
   const message = event.data;
 
-  if (!message || message.type !== "rolling-select-project") {
+  if (!message) {
+    return;
+  }
+
+  if (message.type === "rolling-enter-projects") {
+    playRollingProjectsEnter();
+    return;
+  }
+
+  if (message.type !== "rolling-select-project") {
     return;
   }
 
