@@ -1,6 +1,6 @@
 :root {
   /* 页面基础颜色 */
-  --paper: #fbfbf9;
+  --paper: #F8F8F8;
   --ink: #121212;
   --muted: #474747;
   --rule-strong: rgba(0, 0, 0, 0.72);
@@ -79,7 +79,7 @@
   --panel-highlight-border: rgba(18, 18, 18, 0.12);
 
   /* 文字卡片高亮时的背景色 */
-  --panel-highlight-active: #ffe112;
+  --panel-highlight-active: #F8F826;
 
   /* 文字卡片上边距 */
   --panel-highlight-padding-top: 15px;
@@ -2101,10 +2101,10 @@ body {
 .about-work-grid span::before {
   content: "";
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 36px;
-  height: 36px;
+  top: -2px;
+  right: -2px;
+  width: 40px;
+  height: 40px;
   background: var(--panel-highlight-active);
   opacity: 0;
   transform: translate(30%, -30%);
@@ -3451,14 +3451,14 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     height: var(--mobile-viewport-height);
     min-height: var(--mobile-viewport-height);
     overflow: hidden;
-    background: #fff;
+    background: #F8F8F8;
   }
 
   .home-transition-stage {
     display: block;
     height: var(--mobile-viewport-height);
     min-height: var(--mobile-viewport-height);
-    background: #fff;
+    background: #F8F8F8;
     transform: none !important;
     transition: none;
   }
@@ -3683,7 +3683,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     height: var(--mobile-viewport-height);
     min-height: var(--mobile-viewport-height);
     padding: var(--mobile-content-top) 16px 0;
-    background: #fff;
+    background: #F8F8F8;
     overflow: hidden;
   }
 
@@ -3701,7 +3701,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     margin-left: 0;
     padding: 0;
     overflow: hidden;
-    background: #fff;
+    background: #F8F8F8;
   }
 
   .mobile-project-list {
@@ -3725,7 +3725,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     flex-direction: column;
     margin: 0 0 5px;
     max-height: 620px;
-    background: #fff;
+    background: #F8F8F8;
     cursor: pointer;
     overflow-anchor: none;
     opacity: 1;
@@ -3785,7 +3785,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     min-height: 52px;
     padding: 7px 0 7px 10px;
     border: 1px solid #dedede;
-    background: #fff;
+    background: #F8F8F8;
     cursor: inherit;
     overflow: hidden;
     transition:
@@ -3798,8 +3798,8 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
   }
 
   .mobile-project-card.is-mobile-centered .mobile-project-card-header {
-    border-color: #ffef11;
-    background: #ffef11;
+    border-color: #F8F826;
+    background: #F8F826;
   }
 
   .mobile-project-card.is-mobile-expanded .mobile-project-card-header {
@@ -3811,8 +3811,8 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     align-items: start;
     min-height: 84px;
     padding: 10px;
-    border-color: #ffef11;
-    background: #ffef11;
+    border-color: #F8F826;
+    background: #F8F826;
   }
 
   .mobile-project-number {
@@ -4037,7 +4037,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     min-height: var(--mobile-viewport-height);
     padding: var(--mobile-content-top) 16px 0;
     overflow: hidden;
-    background: #fff;
+    background: #F8F8F8;
   }
 
   .about-sheet {

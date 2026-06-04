@@ -1,10 +1,10 @@
 :root {
   color-scheme: light;
-  --rolling-bg: #fbfbf9;
+  --rolling-bg: #F8F8F8;
   --rolling-text: #121212;
   --rolling-muted: rgba(18, 18, 18, 0.66);
   --rolling-line: rgba(18, 18, 18, 0.72);
-  --rolling-accent: #ffe112;
+  --rolling-accent: #F8F826;
   --rolling-stage: linear-gradient(42deg, #e8e8e9 8%, #8a9cb0 58%, #0a0a0a 103%);
   --rolling-page-width: min(1200px, calc(100vw - 48px));
   --rolling-card-number-width: 132px;
