@@ -135,6 +135,7 @@ const MAX_WHEEL_SENSITIVITY = 1;
 const DEFAULT_SELECTED_DELAY_MS = 0;
 const MIN_SELECTED_DELAY_MS = 0;
 const MAX_SELECTED_DELAY_MS = 100;
+const ACTIVE_IMAGE_SWEEP_MS = 520;
 const DEFAULT_RETURN_SCROLL_DURATION_MS = 520;
 const MIN_RETURN_SCROLL_DURATION_MS = 0;
 const MAX_RETURN_SCROLL_DURATION_MS = 1600;
@@ -161,6 +162,7 @@ const DETAIL_SIDE_GAP = 10;
 const DETAIL_FRAME_VIEWPORT_OFFSET = 82;
 const DETAIL_MEDIA_BOTTOM_GAP = 15;
 const INDEX_SLIDE_FOLLOW = 0.09;
+const CARD_HIGHLIGHT_PROGRESS_DELAY = 0.16;
 const SEGMENT_STICKY_TOP = 0;
 const SEGMENT_DIVIDER_TOP_GAP = 15;
 const SEGMENT_DIVIDER_BOTTOM_GAP = 15;
@@ -374,6 +376,7 @@ function playRollingProjectsEnter() {
 let activeProjectIndex = 0;
 let settledProjectIndex = 0;
 let activeProjectSelectedAt = Number.NEGATIVE_INFINITY;
+let activeProjectHighlightStartedAt = Number.NEGATIVE_INFINITY;
 let expandedProjectIndex = -1;
 let coverflowWheelProgress = 0;
 let lastCoverflowWheelTime = 0;
@@ -1458,6 +1461,11 @@ function paintProject(project, target, index) {
   const detailProgress = easeInOutCubic(state.detailProgress);
   const mediaExpandProgress = detailProgress;
   const indexSlideProgress = steepenProgress(state.indexSlide);
+  const cardHighlightProgress = clamp(
+    (indexSlideProgress - CARD_HIGHLIGHT_PROGRESS_DELAY) / (1 - CARD_HIGHLIGHT_PROGRESS_DELAY),
+    0,
+    1,
+  );
   const normalExpandedHeight = getResolvedExpandedHeight(false);
   const detailExpandedHeight = getResolvedExpandedHeight(true);
   const normalHeight = lerp(CARD_COLLAPSED_HEIGHT, normalExpandedHeight, visualProgress);
@@ -1508,6 +1516,7 @@ function paintProject(project, target, index) {
   project.style.setProperty("--image-lift", `${state.lift.toFixed(2)}px`);
   project.style.setProperty("--glow", state.glow.toFixed(4));
   project.style.setProperty("--index-shift", `${indexShift.toFixed(2)}px`);
+  project.style.setProperty("--card-highlight-progress", cardHighlightProgress.toFixed(4));
   project.style.zIndex = String(100 - Math.round(Math.abs(index - activeProjectIndex) * 10));
   project.classList.toggle("is-index-sliding", state.indexSlide > 0.001);
   project.classList.toggle("is-card-expanded", state.indexSlide > 0.985);
@@ -1539,9 +1548,12 @@ function syncActiveProjectClass() {
   projectsList.forEach((project, index) => {
     const isActive = index === activeProjectIndex;
     const isDetailExpanded = index === expandedProjectIndex;
-    const isColorReady = isActive && now - activeProjectSelectedAt >= selectedTransitionDelayMs;
+    const highlightElapsed = now - activeProjectHighlightStartedAt;
+    const isImageSweeping = isActive && highlightElapsed >= 0 && highlightElapsed < ACTIVE_IMAGE_SWEEP_MS;
+    const isColorReady = isActive && (projectStates.get(project)?.indexSlide || 0) > 0.998;
 
     project.classList.toggle("is-active", isActive);
+    project.classList.toggle("is-image-sweeping", isImageSweeping);
     project.classList.toggle("is-color-ready", isColorReady);
     project.classList.toggle("is-detail-expanded", isDetailExpanded);
     project.classList.toggle("is-detail-hidden", isDetailMode && !isDetailExpanded);
@@ -1590,6 +1602,7 @@ function selectCoverflowProject(nextIndex, selectedAt = performance.now()) {
 
   activeProjectIndex = clampedIndex;
   activeProjectSelectedAt = selectedAt;
+  activeProjectHighlightStartedAt = selectedAt;
   notifyParentActiveProject();
 }
 

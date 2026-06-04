@@ -600,18 +600,50 @@ img {
   width: 100%;
 }
 
-.rolling-project.is-active.is-color-ready .rolling-project-card {
+.rolling-project-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   background: var(--rolling-accent);
+  opacity: 0;
+  pointer-events: none;
+  transform: scaleX(var(--card-highlight-progress, 0));
+  transform-origin: right center;
+}
+
+.rolling-project-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.rolling-project.is-active.is-color-ready .rolling-project-card {
+  background: transparent;
 }
 
 .rolling-project.is-frame-cursor-hover .rolling-project-card {
   background: var(--rolling-accent);
 }
 
+.rolling-project.is-active:not(.is-color-ready) .rolling-project-card,
+.rolling-project.is-active:not(.is-color-ready).is-frame-cursor-hover .rolling-project-card {
+  background: transparent;
+}
+
+.rolling-project.is-active .rolling-project-card::before {
+  opacity: 1;
+}
+
 .rolling-project.is-detail-expanded .rolling-project-card {
   background: transparent;
   grid-column: 2;
   cursor: pointer;
+}
+
+.rolling-project.is-detail-expanded .rolling-project-card::before {
+  animation: none;
+  opacity: 0;
+  transform: scaleX(0);
 }
 
 .rolling-project.is-active.is-color-ready.is-detail-expanded .rolling-project-card {
@@ -750,12 +782,31 @@ img {
   outline-offset: 3px;
 }
 
+.rolling-image-media::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  left: 0;
+  z-index: 3;
+  width: 118%;
+  background: var(--rolling-accent);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-118%);
+}
+
+.rolling-project.is-active.is-image-sweeping .rolling-image-media::before {
+  animation: rollingImageHighlightSweep 520ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
 .rolling-image-media::after {
   box-shadow: 0 24px 58px rgba(0, 0, 0, calc(var(--glow) * 0.16));
   content: "";
   inset: 0;
   pointer-events: none;
   position: absolute;
+  z-index: 2;
 }
 
 .rolling-image-media img {
@@ -768,6 +819,28 @@ img {
   transform: translate3d(0, var(--image-lift), 0) scale(var(--image-scale));
   transform-origin: center center;
   width: 100%;
+}
+
+@keyframes rollingImageHighlightSweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-118%);
+  }
+
+  12%,
+  78% {
+    opacity: 1;
+  }
+
+  42% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(118%);
+  }
 }
 
 .rolling-image-embed-frame {
