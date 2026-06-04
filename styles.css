@@ -357,9 +357,14 @@ body.debug-labels [data-debug-label]:hover {
   left: var(--float-left);
   top: var(--float-top);
   width: var(--float-width);
+  z-index: 1;
   animation: homeFloatDrift var(--float-duration) ease-in-out var(--float-delay) infinite alternate;
   cursor: inherit;
   will-change: transform;
+}
+
+.home-float-item:hover {
+  z-index: 10;
 }
 
 .home-float-image {
@@ -2092,6 +2097,32 @@ body {
   object-fit: cover;
 }
 
+.about-work-tile::before,
+.about-work-grid span::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  background: var(--panel-highlight-active);
+  opacity: 0;
+  transform: translate(30%, -30%);
+  z-index: 2;
+  pointer-events: none;
+  transition:
+    opacity 360ms cubic-bezier(0.19, 1, 0.22, 1) 480ms,
+    transform 360ms cubic-bezier(0.22, 1, 0.36, 1) 480ms;
+}
+
+.about-work-tile:hover::before,
+.about-work-tile:has(.about-work-link:focus-visible)::before,
+.about-work-tile.is-desktop-hover-animating::before,
+.about-work-tile.is-mobile-scroll-highlighted::before {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
 .about-work-tile::after,
 .about-work-grid span::after {
   content: "";
@@ -2126,6 +2157,7 @@ body {
 .about-work-tile.is-mobile-scroll-highlighted .about-work-link::after {
   opacity: 1;
   transform: translate(0, 0) rotate(-45deg);
+  filter: none;
 }
 
 .about-work-tile--arrow-white::after,

@@ -67,9 +67,14 @@ body {
   left: var(--float-left);
   top: var(--float-top);
   width: var(--float-width);
+  z-index: 1;
   animation: homeFloatDrift var(--float-duration) ease-in-out var(--float-delay) infinite alternate;
   cursor: inherit;
   will-change: transform;
+}
+
+.home-float-item:hover {
+  z-index: 10;
 }
 
 .home-float-image {
