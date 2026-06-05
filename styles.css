@@ -4298,6 +4298,9 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
   .about-work-tile:hover .about-work-link::before,
   .about-work-tile:active .about-work-link::before,
   .about-work-link:focus-visible::before,
+  .about-work-tile:hover::before,
+  .about-work-tile:active::before,
+  .about-work-tile:has(.about-work-link:focus-visible)::before,
   .about-work-tile:hover::after,
   .about-work-tile:active::after,
   .about-work-tile:has(.about-work-link:focus-visible)::after,
@@ -4314,6 +4317,13 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
   .about-work-link:focus-visible::before {
     opacity: 0;
     transform: translateX(-118%);
+  }
+
+  .about-work-tile:hover::before,
+  .about-work-tile:active::before,
+  .about-work-tile:has(.about-work-link:focus-visible)::before {
+    opacity: 0;
+    transform: translate(30%, -30%);
   }
 
   .about-work-tile:hover::after,
@@ -4334,6 +4344,11 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
     transform: scale(1.025);
     filter: brightness(1.03) saturate(1.03);
     z-index: 2;
+  }
+
+  .about-work-tile.is-mobile-scroll-highlighted::before {
+    opacity: 1;
+    transform: translate(0, 0);
   }
 
   .about-work-tile.is-mobile-scroll-highlighted .about-work-link::before {
