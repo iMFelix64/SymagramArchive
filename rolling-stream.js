@@ -120,6 +120,7 @@ const WHEEL_SENSITIVITY_STORAGE_KEY = "rolling-coverflow-wheel-sensitivity-v2";
 const DELAY_STORAGE_KEY = "rolling-coverflow-delay-ms-v3";
 const RETURN_SCROLL_DURATION_STORAGE_KEY = "rolling-return-scroll-duration-ms-v2";
 const PARAMETERS_OPEN_STORAGE_KEY = "rolling-parameters-open-v1";
+const ROLLING_DETAIL_HISTORY_KEY = "symagramRollingDetail";
 const FOCUS_BAND_HEIGHT_RATIO = 0.12;
 const DEFAULT_FOCUS_BAND_TOP_RATIO = 0.44;
 const COVERFLOW_WHEEL_THRESHOLD = 60;
@@ -170,6 +171,10 @@ const SEGMENT_BOUNDARY_GAP = Math.max(
   0,
   SEGMENT_DIVIDER_TOP_GAP + SEGMENT_DIVIDER_BOTTOM_GAP + PROJECT_ROW_BOTTOM_PADDING - EXPANDED_PROJECT_GAP,
 );
+const ROLLING_DETAIL_BACK_GESTURE_MIN_X = 90;
+const ROLLING_DETAIL_BACK_GESTURE_MIN_EVENT_X = 12;
+const ROLLING_DETAIL_BACK_GESTURE_MAX_Y_RATIO = 0.72;
+const ROLLING_DETAIL_BACK_GESTURE_WINDOW_MS = 260;
 let focusBandTopRatio = DEFAULT_FOCUS_BAND_TOP_RATIO;
 let focusBandDragOffset = 0;
 let cardExpandedHeight = DEFAULT_CARD_EXPANDED_HEIGHT;
@@ -191,6 +196,8 @@ let rollingScrollCursor = null;
 let rollingScrollCursorX = window.innerWidth / 2;
 let rollingScrollCursorY = window.innerHeight / 2;
 let rollingScrollCursorLayer = null;
+let rollingDetailBackGestureDeltaX = 0;
+let rollingDetailBackGestureLastAt = 0;
 
 function buildProjects() {
   const segmentRailMarkup = `
@@ -1654,6 +1661,82 @@ function notifyParentActiveProject() {
   );
 }
 
+function getRollingHistoryStateObject() {
+  return history.state && typeof history.state === "object" && !Array.isArray(history.state)
+    ? history.state
+    : {};
+}
+
+function getRollingDetailHistoryState() {
+  return getRollingHistoryStateObject()[ROLLING_DETAIL_HISTORY_KEY] || null;
+}
+
+function replaceRollingDetailHistoryState(nextDetailState) {
+  try {
+    history.replaceState(
+      {
+        ...getRollingHistoryStateObject(),
+        [ROLLING_DETAIL_HISTORY_KEY]: nextDetailState,
+      },
+      "",
+      window.location.href,
+    );
+  } catch {
+    // Direct open/close still works if the History API is unavailable.
+  }
+}
+
+function pushRollingDetailHistoryState(projectId) {
+  if (!projectId) {
+    return;
+  }
+
+  const currentDetailState = getRollingDetailHistoryState();
+
+  if (currentDetailState?.view === "detail" && currentDetailState.projectId === projectId) {
+    return;
+  }
+
+  if (!currentDetailState) {
+    replaceRollingDetailHistoryState({ view: "stream" });
+  }
+
+  try {
+    history.pushState(
+      {
+        ...getRollingHistoryStateObject(),
+        [ROLLING_DETAIL_HISTORY_KEY]: {
+          view: "detail",
+          projectId,
+        },
+      },
+      "",
+      window.location.href,
+    );
+  } catch {
+    // Direct open/close still works if the History API is unavailable.
+  }
+}
+
+function syncRollingDetailFromHistory() {
+  const detailState = getRollingDetailHistoryState();
+
+  if (detailState?.view === "detail") {
+    const projectIndex = projectsList.findIndex((project) => (
+      project.dataset.project === String(detailState.projectId || "")
+    ));
+
+    if (projectIndex >= 0 && projectIndex !== expandedProjectIndex) {
+      openProjectDetail(projectIndex, { pushHistory: false });
+    }
+    return;
+  }
+
+  if (expandedProjectIndex >= 0) {
+    closeProjectDetail({ updateHistory: false });
+  }
+}
+
 function animateElementScrollToTop(element, durationMs, frameWindow = window) {
   if (!element) {
     return;
@@ -1769,7 +1852,7 @@ function prepareProjectReturnScroll(index) {
   returnScrollProjectIndex = index;
 }
 
-function openProjectDetail(index) {
+function openProjectDetail(index, { pushHistory = true } = {}) {
   const nextIndex = clamp(index, 0, projectsList.length - 1);
 
   hideRollingFrameCursor();
@@ -1781,10 +1864,19 @@ function openProjectDetail(index) {
   activeProjectSelectedAt = performance.now() - selectedTransitionDelayMs;
   coverflowWheelProgress = 0;
   notifyParentDetailState();
+
+  if (pushHistory) {
+    pushRollingDetailHistoryState(projectsList[nextIndex]?.dataset.project || "");
+  }
 }
 
-function closeProjectDetail() {
+function closeProjectDetail({ updateHistory = true } = {}) {
   if (expandedProjectIndex < 0) {
+    return;
+  }
+
+  if (updateHistory && getRollingDetailHistoryState()?.view === "detail") {
+    history.back();
     return;
   }
 
@@ -1801,6 +1893,61 @@ function closeProjectDetail() {
   activeProjectSelectedAt = performance.now();
   coverflowWheelProgress = 0;
   notifyParentDetailState();
+
+  if (updateHistory) {
+    replaceRollingDetailHistoryState({ view: "stream" });
+  }
+}
+
+function resetRollingDetailBackGesture() {
+  rollingDetailBackGestureDeltaX = 0;
+  rollingDetailBackGestureLastAt = 0;
+}
+
+function isRollingDetailBackGestureWheel(event) {
+  if (expandedProjectIndex < 0) {
+    return false;
+  }
+
+  const deltaX = Number(event.deltaX) || 0;
+  const deltaY = Number(event.deltaY) || 0;
+  const absX = Math.abs(deltaX);
+  const absY = Math.abs(deltaY);
+
+  return (
+    deltaX < 0 &&
+    absX >= ROLLING_DETAIL_BACK_GESTURE_MIN_EVENT_X &&
+    absY <= absX * ROLLING_DETAIL_BACK_GESTURE_MAX_Y_RATIO
+  );
+}
+
+function handleRollingDetailBackGesture(event) {
+  if (!isRollingDetailBackGestureWheel(event)) {
+    resetRollingDetailBackGesture();
+    return;
+  }
+
+  const now = window.performance.now();
+
+  if (now - rollingDetailBackGestureLastAt > ROLLING_DETAIL_BACK_GESTURE_WINDOW_MS) {
+    rollingDetailBackGestureDeltaX = 0;
+  }
+
+  rollingDetailBackGestureLastAt = now;
+  rollingDetailBackGestureDeltaX += event.deltaX;
+
+  if (Math.abs(rollingDetailBackGestureDeltaX) < ROLLING_DETAIL_BACK_GESTURE_MIN_X) {
+    return;
+  }
+
+  resetRollingDetailBackGesture();
+
+  if (event.cancelable) {
+    event.preventDefault();
+  }
+
+  event.stopPropagation();
+  closeProjectDetail();
 }
 
 function syncCoverflowWheelProgress() {
@@ -2162,6 +2309,10 @@ loadReturnScrollDuration();
 syncReturnScrollControl();
 loadParametersOpen();
 syncParametersToggle();
+
+replaceRollingDetailHistoryState({ view: "stream" });
+window.addEventListener("popstate", syncRollingDetailFromHistory);
+window.addEventListener("wheel", handleRollingDetailBackGesture, { passive: false, capture: true });
 
 window.addEventListener("wheel", handleCoverflowWheel, { passive: false });
 projectsRoot.addEventListener("wheel", handleCoverflowWheel, { passive: false });

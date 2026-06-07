@@ -126,7 +126,7 @@ window.TDG_ARCHIVE = {
       "tagline": "Child equipments",
       "description": "专为2-6岁儿童打造的二合一陪伴型滑板车。创新的翻转式隐形坐鞍设计，加宽避震车轮与全车零锐角包裹，在不同成长阶段为孩子的户外探索提供最稳固、精准的安全保障。",
       "placeholder": false,
-      "visible": false,
+      "visible": true,
       "imageFolder": "./Assets/Project Vault/26P-A DotGO",
       "coverImage": "./Assets/Project Vault/26P-A DotGO/DotGO - 01.jpg",
       "images": [
