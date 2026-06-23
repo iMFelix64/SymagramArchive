@@ -1,19 +1,5 @@
 const archiveData = window.TDG_ARCHIVE || { groups: [], projects: [] };
 
-function createProjectEmbedSrc(projectId, { priority = "auto" } = {}) {
-  const params = new URLSearchParams({
-    project: projectId,
-    embed: "1",
-    v: "20260623-click-load-rest-fff946",
-  });
-
-  if (priority === "high") {
-    params.set("priority", "high");
-  }
-
-  return `./projects/project-panel-mark-1/?${params.toString()}`;
-}
-
 const projectCatalog = (archiveData.projects || [])
   .filter((project) => project && project.visible !== false)
   .map((project) => {
@@ -239,14 +225,6 @@ function buildProjects() {
     .map((project, projectIndex) => {
       const leadImage = project.images[0] || project.coverImage || "";
       const shouldLoadImmediately = projectIndex === 0;
-      const embedSrc = createProjectEmbedSrc(project.id, {
-        priority: shouldLoadImmediately ? "high" : "auto",
-      });
-      const embedSrcAttribute = shouldLoadImmediately
-        ? `src="${embedSrc}"`
-        : `data-src="${embedSrc}"`;
-      const embedFetchPriority = shouldLoadImmediately ? "high" : "low";
-      const embedLoading = shouldLoadImmediately ? "eager" : "lazy";
       const cardTitle = formatSingleLineText(getProjectCardTitle(project));
       const detailTitle = formatMultilineText(getProjectDetailTitle(project));
       const mediaMarkup = project.placeholder
@@ -257,14 +235,19 @@ function buildProjects() {
         `
         : leadImage
           ? `
-          <figure class="rolling-image-media rolling-image-media--embed" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
-            <iframe
-              class="rolling-image-embed-frame"
-              ${embedSrcAttribute}
-              title="${project.title} 项目页面"
-              loading="${embedLoading}"
-              fetchpriority="${embedFetchPriority}"
-            ></iframe>
+          <figure class="rolling-image-media rolling-image-media--gallery" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
+            <div class="rolling-project-gallery" data-rolling-gallery>
+              <figure class="rolling-project-gallery-frame">
+                <img
+                  class="rolling-gallery-image rolling-gallery-image--hero"
+                  src="${escapeHtml(leadImage)}"
+                  alt="${escapeHtml(project.title)}项目主图 01"
+                  loading="${shouldLoadImmediately ? "eager" : "lazy"}"
+                  decoding="async"
+                  fetchpriority="${shouldLoadImmediately ? "high" : "low"}"
+                />
+              </figure>
+            </div>
             <div class="rolling-image-wheel-layer" aria-hidden="true"></div>
           </figure>
         `
@@ -320,10 +303,9 @@ const segmentDividers = Array.from(document.querySelectorAll(".rolling-segment-d
 const ROLLING_PROJECTS_ENTER_PRE_CLASS = "is-projects-enter-pre";
 const ROLLING_PROJECTS_ENTERING_CLASS = "is-projects-entering";
 const ROLLING_PROJECTS_ENTER_MS = 1500;
-const ROLLING_EMBED_WARM_RADIUS = 1;
 let rollingProjectsEnterTimer = 0;
-let rollingEmbedWarmTimer = 0;
 let rollingAnimationFrame = 0;
+let rollingGalleryImageObserver = null;
 const segmentRanges = projectSegments
   .map((segment) => {
     const indexes = segment.projectIds
@@ -359,64 +341,99 @@ const projectStates = new Map(
   ]),
 );
 
-function loadRollingProjectEmbed(index, priority = "auto") {
-  const frame = projectsList[index]?.querySelector(".rolling-image-embed-frame");
-  const src = frame?.dataset.src;
+function loadDeferredRollingGalleryImage(image) {
+  const src = image?.dataset.src;
 
-  if (!frame || frame.hasAttribute("src") || !src) {
+  if (!src) {
+    return;
+  }
+
+  image.src = src;
+  image.removeAttribute("data-src");
+  rollingGalleryImageObserver?.unobserve(image);
+}
+
+function getRollingGalleryImageObserver() {
+  if (!("IntersectionObserver" in window)) {
+    return null;
+  }
+
+  if (!rollingGalleryImageObserver) {
+    rollingGalleryImageObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            loadDeferredRollingGalleryImage(entry.target);
+          }
+        });
+      },
+      {
+        root: null,
+        rootMargin: "420px 0px",
+      },
+    );
+  }
+
+  return rollingGalleryImageObserver;
+}
+
+function observeDeferredRollingGalleryImages(scope) {
+  const images = Array.from(scope?.querySelectorAll("img[data-src]") || []);
+  const observer = getRollingGalleryImageObserver();
+
+  if (!observer) {
+    images.forEach(loadDeferredRollingGalleryImage);
+    return;
+  }
+
+  images.forEach((image) => observer.observe(image));
+}
+
+function createRollingGalleryFrame(project, src, index) {
+  const frame = document.createElement("figure");
+  const image = document.createElement("img");
+  const imageNumber = String(index + 1).padStart(2, "0");
+
+  frame.className = "rolling-project-gallery-frame";
+  image.className = "rolling-gallery-image";
+  image.dataset.src = src;
+  image.alt = `${project.title}项目图片 ${imageNumber}`;
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.fetchPriority = "low";
+  frame.append(image);
+  return frame;
+}
+
+function loadRollingProjectMedia(index) {
+  const projectElement = projectsList[index];
+  const gallery = projectElement?.querySelector("[data-rolling-gallery]");
+  const project = projectById.get(projectElement?.dataset.project || "");
+
+  if (!gallery || !project || gallery.dataset.mediaLoaded === "true") {
     return false;
   }
 
-  frame.fetchPriority = priority === "high" ? "high" : "low";
-  frame.loading = priority === "high" ? "eager" : "lazy";
-  frame.src = src;
+  const images = project.images?.length
+    ? project.images
+    : [project.coverImage].filter(Boolean);
+  const frames = images
+    .slice(1)
+    .map((src, imageIndex) => createRollingGalleryFrame(project, src, imageIndex + 1));
+
+  if (!frames.length) {
+    gallery.dataset.mediaLoaded = "true";
+    return false;
+  }
+
+  gallery.append(...frames);
+  gallery.dataset.mediaLoaded = "true";
+  observeDeferredRollingGalleryImages(gallery);
   return true;
 }
 
-function loadRollingProjectEmbedsAround(centerIndex, radius = 0, priority = "auto") {
-  const start = Math.max(0, centerIndex - radius);
-  const end = Math.min(projectsList.length - 1, centerIndex + radius);
-
-  for (let index = start; index <= end; index += 1) {
-    loadRollingProjectEmbed(index, index === centerIndex ? priority : "auto");
-  }
-}
-
 function requestRollingProjectRestMedia(index) {
-  const frame = projectsList[index]?.querySelector(".rolling-image-embed-frame");
-
-  if (!frame) {
-    return;
-  }
-
-  const sendRequest = () => {
-    try {
-      frame.contentWindow?.projectViewport?.loadRestMedia?.();
-      frame.contentWindow?.postMessage(
-        {
-          type: "project-load-rest-media",
-        },
-        window.location.origin,
-      );
-    } catch (error) {
-      // The project embed is same-origin here; this keeps expansion resilient if it is not ready yet.
-    }
-  };
-
-  if (frame.contentWindow?.document?.readyState === "complete") {
-    sendRequest();
-    return;
-  }
-
-  frame.addEventListener("load", sendRequest, { once: true });
-  sendRequest();
-}
-
-function scheduleRollingEmbedWarmup(centerIndex = activeProjectIndex) {
-  window.clearTimeout(rollingEmbedWarmTimer);
-  rollingEmbedWarmTimer = window.setTimeout(() => {
-    loadRollingProjectEmbedsAround(centerIndex, ROLLING_EMBED_WARM_RADIUS);
-  }, 900);
+  loadRollingProjectMedia(index);
 }
 
 function clearRollingProjectsEnter() {
@@ -1036,46 +1053,31 @@ function syncRollingScrollCursorPosition() {
   rollingScrollCursor.style.setProperty("--cursor-y", `${rollingScrollCursorY}px`);
 }
 
-function getRollingEmbedScrollState(wheelLayer) {
+function getRollingGalleryScrollState(wheelLayer) {
   const project = wheelLayer?.closest(".rolling-project");
-  const embedFrame = project?.querySelector(".rolling-image-embed-frame");
+  const gallery = project?.querySelector("[data-rolling-gallery]");
 
-  try {
-    const viewportState = embedFrame?.contentWindow?.projectViewport?.getScrollState?.();
-
-    if (viewportState) {
-      return viewportState;
-    }
-
-    const projectPage = embedFrame?.contentDocument?.querySelector(".project-page");
-
-    if (!projectPage) {
-      return {
-        isAtBottom: true,
-        isReady: false,
-      };
-    }
-
-    const maxScrollTop = Math.max(0, projectPage.scrollHeight - projectPage.clientHeight);
-
-    return {
-      isAtBottom: projectPage.scrollTop >= maxScrollTop - 2,
-      isReady: true,
-      maxScrollTop,
-      scrollTop: projectPage.scrollTop,
-    };
-  } catch (error) {
+  if (!gallery) {
     return {
       isAtBottom: true,
       isReady: false,
     };
   }
+
+  const maxScrollTop = Math.max(0, gallery.scrollHeight - gallery.clientHeight);
+
+  return {
+    isAtBottom: gallery.scrollTop >= maxScrollTop - 2,
+    isReady: true,
+    maxScrollTop,
+    scrollTop: gallery.scrollTop,
+  };
 }
 
 function refreshRollingScrollCursor(wheelLayer = rollingScrollCursorLayer) {
   if (
     !wheelLayer?.closest(".rolling-project.is-detail-expanded") ||
-    getRollingEmbedScrollState(wheelLayer).isAtBottom
+    getRollingGalleryScrollState(wheelLayer).isAtBottom
   ) {
     hideRollingScrollCursor();
     return;
@@ -1106,25 +1108,16 @@ function hideRollingScrollCursor() {
   rollingScrollCursorLayer = null;
 }
 
-function postScrollToRollingEmbeddedProject(project, deltaY) {
-  const embedFrame = project?.querySelector(".rolling-image-embed-frame");
+function scrollRollingProjectGallery(project, deltaY) {
+  const gallery = project?.querySelector("[data-rolling-gallery]");
 
-  if (!embedFrame?.contentWindow) {
+  if (!gallery) {
     return false;
   }
 
-  try {
-    embedFrame.contentWindow.postMessage(
-      {
-        type: "project-scroll-by",
-        deltaY,
-      },
-      "*",
-    );
-    return true;
-  } catch (error) {
-    return false;
-  }
+  gallery.scrollTop += Number(deltaY) || 0;
+  observeDeferredRollingGalleryImages(gallery);
+  return true;
 }
 
 function loadFocusBandTopRatio() {
@@ -1686,15 +1679,12 @@ function selectCoverflowProject(nextIndex, selectedAt = performance.now()) {
 
   if (clampedIndex === activeProjectIndex) {
     activeProjectSelectedAt = selectedAt;
-    loadRollingProjectEmbedsAround(clampedIndex, ROLLING_EMBED_WARM_RADIUS, "high");
     return;
   }
 
   activeProjectIndex = clampedIndex;
   activeProjectSelectedAt = selectedAt;
   activeProjectHighlightStartedAt = selectedAt;
-  loadRollingProjectEmbedsAround(activeProjectIndex, ROLLING_EMBED_WARM_RADIUS, "high");
-  scheduleRollingEmbedWarmup(activeProjectIndex);
   notifyParentActiveProject();
 }
 
@@ -1857,76 +1847,15 @@ function animateElementScrollToTop(element, durationMs, frameWindow = window) {
   requestFrame(tick);
 }
 
-function animateWindowScrollToTop(frameWindow, durationMs) {
-  if (!frameWindow) {
-    return;
-  }
-
-  const frameDocument = frameWindow.document;
-  const startTop =
-    frameWindow.scrollY ||
-    frameDocument?.documentElement?.scrollTop ||
-    frameDocument?.body?.scrollTop ||
-    0;
-  const startLeft =
-    frameWindow.scrollX ||
-    frameDocument?.documentElement?.scrollLeft ||
-    frameDocument?.body?.scrollLeft ||
-    0;
-  const duration = Math.max(0, durationMs);
-
-  if (duration === 0 || (startTop === 0 && startLeft === 0)) {
-    frameWindow.scrollTo(0, 0);
-    return;
-  }
-
-  const requestFrame =
-    frameWindow.requestAnimationFrame?.bind(frameWindow) ||
-    window.requestAnimationFrame.bind(window);
-  const startTime = frameWindow.performance?.now?.() ?? performance.now();
-
-  const tick = (currentTime) => {
-    const elapsed = currentTime - startTime;
-    const progress = clamp(elapsed / duration, 0, 1);
-    const easedProgress = easeInOutCubic(progress);
-
-    frameWindow.scrollTo(
-      lerp(startLeft, 0, easedProgress),
-      lerp(startTop, 0, easedProgress),
-    );
-
-    if (progress < 1) {
-      requestFrame(tick);
-    }
-  };
-
-  requestFrame(tick);
-}
-
 function resetProjectMediaScroll(index) {
   const project = projectsList[index];
-  loadRollingProjectEmbed(index);
-  const frame = project?.querySelector(".rolling-image-embed-frame");
+  const gallery = project?.querySelector("[data-rolling-gallery]");
 
-  if (!frame?.contentWindow) {
+  if (!gallery) {
     return;
   }
 
-  try {
-    const frameDocument = frame.contentDocument;
-    const scrollRoot = frameDocument?.querySelector(".project-page");
-
-    if (scrollRoot) {
-      animateElementScrollToTop(scrollRoot, returnScrollDurationMs, frame.contentWindow);
-      return;
-    }
-
-    animateWindowScrollToTop(frame.contentWindow, returnScrollDurationMs);
-    animateElementScrollToTop(frameDocument?.documentElement, returnScrollDurationMs, frame.contentWindow);
-    animateElementScrollToTop(frameDocument?.body, returnScrollDurationMs, frame.contentWindow);
-  } catch (error) {
-    // The embed is same-origin in this project; keep close behavior intact if that ever changes.
-  }
+  animateElementScrollToTop(gallery, returnScrollDurationMs);
 }
 
 function prepareProjectReturnScroll(index) {
@@ -1943,7 +1872,6 @@ function openProjectDetail(index, { pushHistory = true } = {}) {
 
   hideRollingFrameCursor();
   hideRollingScrollCursor();
-  loadRollingProjectEmbed(nextIndex, "high");
   requestRollingProjectRestMedia(nextIndex);
   returnScrollProjectIndex = -1;
   activeProjectIndex = nextIndex;
@@ -2290,7 +2218,7 @@ projectsRoot.addEventListener(
       return;
     }
 
-    const didPost = postScrollToRollingEmbeddedProject(project, event.deltaY);
+    const didPost = scrollRollingProjectGallery(project, event.deltaY);
 
     if (!didPost) {
       return;
@@ -2433,8 +2361,6 @@ syncCoverflowCenter();
 syncSegmentRail();
 syncActiveProjectClass();
 primeProjectStates();
-loadRollingProjectEmbedsAround(activeProjectIndex, 0, "high");
-scheduleRollingEmbedWarmup(activeProjectIndex);
 notifyParentActiveProject();
 notifyParentDetailState();
 startRollingAnimation();
