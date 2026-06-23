@@ -109,7 +109,7 @@ function createProjectEmbedSrc(projectId, { priority = "auto" } = {}) {
   const params = new URLSearchParams({
     project: projectId,
     embed: "1",
-    v: "20260623-loading-priority-4",
+    v: "20260623-click-load-rest-fff946",
   });
 
   if (priority === "high") {
@@ -294,9 +294,9 @@ function createMobileProjectDetailGallery(project, projectIndex) {
     const frame = createElementWithClass("figure", "mobile-project-detail-frame");
     const image = document.createElement("img");
 
-    image.src = imageSrc;
+    image.dataset.src = imageSrc;
     image.alt = `${project.title} ${String(imageIndex + 2).padStart(2, "0")}`;
-    image.loading = projectIndex === 0 && imageIndex < 2 ? "eager" : "lazy";
+    image.loading = "lazy";
     image.decoding = "async";
     frame.append(image);
     gallery.append(frame);
@@ -864,6 +864,43 @@ function ensureProjectPanelEmbedLoaded(panel, priority = "auto") {
   return true;
 }
 
+function requestProjectPanelRestMedia(panel) {
+  const embedFrame = panel?.querySelector(".panel-project-embed-frame");
+
+  if (!embedFrame) {
+    return;
+  }
+
+  const sendRequest = () => {
+    try {
+      embedFrame.contentWindow?.projectViewport?.loadRestMedia?.();
+      embedFrame.contentWindow?.postMessage(
+        {
+          type: "project-load-rest-media",
+        },
+        window.location.origin,
+      );
+    } catch (error) {
+      // The embed is same-origin; this keeps expansion resilient while it finishes loading.
+    }
+  };
+
+  if (embedFrame.contentWindow?.document?.readyState === "complete") {
+    sendRequest();
+    return;
+  }
+
+  embedFrame.addEventListener("load", sendRequest, { once: true });
+  sendRequest();
+}
+
+function hydrateMobileProjectGallery(card) {
+  card?.querySelectorAll(".mobile-project-detail-gallery img[data-src]").forEach((image) => {
+    image.src = image.dataset.src;
+    image.removeAttribute("data-src");
+  });
+}
+
 function setMobileNavView(viewName) {
   if (!homeTransitionStage) {
     return;
@@ -1063,6 +1100,10 @@ function expandMobileProjectCard(card) {
     setMobileProjectCardExpandedState(projectCard, isExpandedCard);
     projectCard.toggleAttribute("aria-hidden", !isExpandedCard);
     projectCard.classList.toggle("is-mobile-centered", isExpandedCard);
+
+    if (isExpandedCard) {
+      hydrateMobileProjectGallery(projectCard);
+    }
   });
 
   mobileProjectList.scrollTo({ top: 0, behavior: "auto" });
@@ -2251,6 +2292,7 @@ async function syncExpandedProject(projectId = "") {
   if (expandedProjectId) {
     const nextPanel = panelByProject.get(expandedProjectId);
     ensureProjectPanelEmbedLoaded(nextPanel, "high");
+    requestProjectPanelRestMedia(nextPanel);
     cancelDeferredPanelCopy(nextPanel);
     nextPanel?.classList.add("is-expanded");
     nextPanel?.querySelector(".panel-expand-toggle")?.setAttribute("aria-expanded", "true");

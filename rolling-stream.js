@@ -4,7 +4,7 @@ function createProjectEmbedSrc(projectId, { priority = "auto" } = {}) {
   const params = new URLSearchParams({
     project: projectId,
     embed: "1",
-    v: "20260623-loading-priority-4",
+    v: "20260623-click-load-rest-fff946",
   });
 
   if (priority === "high") {
@@ -380,6 +380,36 @@ function loadRollingProjectEmbedsAround(centerIndex, radius = 0, priority = "aut
   for (let index = start; index <= end; index += 1) {
     loadRollingProjectEmbed(index, index === centerIndex ? priority : "auto");
   }
+}
+
+function requestRollingProjectRestMedia(index) {
+  const frame = projectsList[index]?.querySelector(".rolling-image-embed-frame");
+
+  if (!frame) {
+    return;
+  }
+
+  const sendRequest = () => {
+    try {
+      frame.contentWindow?.projectViewport?.loadRestMedia?.();
+      frame.contentWindow?.postMessage(
+        {
+          type: "project-load-rest-media",
+        },
+        window.location.origin,
+      );
+    } catch (error) {
+      // The project embed is same-origin here; this keeps expansion resilient if it is not ready yet.
+    }
+  };
+
+  if (frame.contentWindow?.document?.readyState === "complete") {
+    sendRequest();
+    return;
+  }
+
+  frame.addEventListener("load", sendRequest, { once: true });
+  sendRequest();
 }
 
 function scheduleRollingEmbedWarmup(centerIndex = activeProjectIndex) {
@@ -1914,6 +1944,7 @@ function openProjectDetail(index, { pushHistory = true } = {}) {
   hideRollingFrameCursor();
   hideRollingScrollCursor();
   loadRollingProjectEmbed(nextIndex, "high");
+  requestRollingProjectRestMedia(nextIndex);
   returnScrollProjectIndex = -1;
   activeProjectIndex = nextIndex;
   settledProjectIndex = nextIndex;

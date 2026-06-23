@@ -9,6 +9,9 @@ const PROJECT_RESET_ANIMATION_MS = 420;
 const DEFERRED_IMAGE_ROOT_MARGIN = "120px 0px";
 const shouldPrioritizeHeroImage = projectSearchParams.get("priority") === "high";
 let deferredImageObserver = null;
+let deferredProjectMediaLoaded = false;
+let pendingProjectImages = [];
+let pendingProject = null;
 
 function getProjectIdFromSearch() {
   const params = new URLSearchParams(window.location.search);
@@ -108,6 +111,26 @@ function hydrateDeferredProjectImages() {
   }
 
   images.forEach((image) => observer.observe(image));
+}
+
+function appendDeferredProjectMedia() {
+  if (deferredProjectMediaLoaded || !pendingProject || !projectStream) {
+    return false;
+  }
+
+  deferredProjectMediaLoaded = true;
+
+  const imageNodes = pendingProjectImages
+    .slice(1)
+    .map((src, index) => createProjectImage(pendingProject, src, index + 1));
+
+  if (!imageNodes.length) {
+    return false;
+  }
+
+  projectStream.append(...imageNodes);
+  hydrateDeferredProjectImages();
+  return true;
 }
 
 function createProjectImage(project, src, index) {
@@ -268,6 +291,9 @@ function renderProjectStream() {
   }
 
   const images = getProjectImages(project);
+  deferredProjectMediaLoaded = false;
+  pendingProject = null;
+  pendingProjectImages = [];
 
   document.title = `Project ${project.id} / ${project.title}`;
   projectPage?.setAttribute("aria-label", `${project.title}项目页面`);
@@ -285,22 +311,19 @@ function renderProjectStream() {
 
   projectPage?.classList.remove("project-page--article");
 
-  const imageNodes = images.map((src, index) => {
-    const image = createProjectImage(project, src, index);
+  if (!images.length) {
+    projectStream.replaceChildren();
+    return;
+  }
 
-    if (index !== 0) {
-      return image;
-    }
+  const heroImage = createProjectImage(project, images[0], 0);
+  const hero = document.createElement("figure");
 
-    const hero = document.createElement("figure");
-
-    hero.className = "project-hero";
-    hero.append(image);
-    return hero;
-  });
-
-  projectStream.replaceChildren(...imageNodes);
-  hydrateDeferredProjectImages();
+  pendingProject = project;
+  pendingProjectImages = images;
+  hero.className = "project-hero";
+  hero.append(heroImage);
+  projectStream.replaceChildren(hero);
 }
 
 function syncViewportHeight() {
@@ -377,9 +400,17 @@ window.projectViewport = {
   animateToTop(duration = PROJECT_RESET_ANIMATION_MS) {
     return animateProjectToTop(duration);
   },
+  loadRestMedia() {
+    return appendDeferredProjectMedia();
+  },
 };
 
 window.addEventListener("message", (event) => {
+  if (event.data?.type === "project-load-rest-media") {
+    appendDeferredProjectMedia();
+    return;
+  }
+
   if (event.data?.type === "project-scroll-to-top") {
     if (event.data.behavior === "smooth") {
       animateProjectToTop(Number(event.data.duration) || PROJECT_RESET_ANIMATION_MS);
@@ -402,5 +433,6 @@ window.addEventListener("message", (event) => {
 
 renderProjectStream();
 document.body.classList.toggle("is-embedded", isEmbedded);
+projectPage?.addEventListener("click", appendDeferredProjectMedia, { once: true });
 window.addEventListener("resize", syncViewportHeight);
 syncViewportHeight();
