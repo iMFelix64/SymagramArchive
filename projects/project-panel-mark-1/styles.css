@@ -72,6 +72,10 @@ body.is-shell-driven .project-stream {
   background: var(--project-panel);
 }
 
+.project-image[data-src] {
+  aspect-ratio: 3 / 2;
+}
+
 body.is-embedded {
   background: var(--project-paper);
 }
@@ -181,6 +185,10 @@ body.is-embedded .project-hero .project-image {
   display: block;
   height: auto;
   width: 100%;
+}
+
+.project-article-image[data-src] {
+  aspect-ratio: 4 / 3;
 }
 
 .project-article-cover .project-article-image {

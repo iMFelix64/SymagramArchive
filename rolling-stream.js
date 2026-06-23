@@ -1,7 +1,17 @@
 const archiveData = window.TDG_ARCHIVE || { groups: [], projects: [] };
 
-function createProjectEmbedSrc(projectId) {
-  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1&v=20260526-card-title-1`;
+function createProjectEmbedSrc(projectId, { priority = "auto" } = {}) {
+  const params = new URLSearchParams({
+    project: projectId,
+    embed: "1",
+    v: "20260623-loading-priority-4",
+  });
+
+  if (priority === "high") {
+    params.set("priority", "high");
+  }
+
+  return `./projects/project-panel-mark-1/?${params.toString()}`;
 }
 
 const projectCatalog = (archiveData.projects || [])
@@ -127,7 +137,7 @@ const COVERFLOW_WHEEL_THRESHOLD = 60;
 const COVERFLOW_WHEEL_DELTA_LIMIT = 220;
 const COVERFLOW_IDLE_DECAY_DELAY_MS = 220;
 const COVERFLOW_TUG_DECAY = 0.92;
-const DEFAULT_FOLLOW = 0.045;
+const DEFAULT_FOLLOW = 0.075;
 const MIN_FOLLOW = 0.035;
 const MAX_FOLLOW = 0.12;
 const DEFAULT_WHEEL_SENSITIVITY = 0.6;
@@ -226,9 +236,17 @@ function buildProjects() {
     .join("");
 
   const projectsMarkup = projects
-    .map((project) => {
+    .map((project, projectIndex) => {
       const leadImage = project.images[0] || project.coverImage || "";
-      const embedSrc = createProjectEmbedSrc(project.id);
+      const shouldLoadImmediately = projectIndex === 0;
+      const embedSrc = createProjectEmbedSrc(project.id, {
+        priority: shouldLoadImmediately ? "high" : "auto",
+      });
+      const embedSrcAttribute = shouldLoadImmediately
+        ? `src="${embedSrc}"`
+        : `data-src="${embedSrc}"`;
+      const embedFetchPriority = shouldLoadImmediately ? "high" : "low";
+      const embedLoading = shouldLoadImmediately ? "eager" : "lazy";
       const cardTitle = formatSingleLineText(getProjectCardTitle(project));
       const detailTitle = formatMultilineText(getProjectDetailTitle(project));
       const mediaMarkup = project.placeholder
@@ -242,9 +260,10 @@ function buildProjects() {
           <figure class="rolling-image-media rolling-image-media--embed" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
             <iframe
               class="rolling-image-embed-frame"
-              src="${embedSrc}"
+              ${embedSrcAttribute}
               title="${project.title} 项目页面"
-              loading="eager"
+              loading="${embedLoading}"
+              fetchpriority="${embedFetchPriority}"
             ></iframe>
             <div class="rolling-image-wheel-layer" aria-hidden="true"></div>
           </figure>
@@ -301,7 +320,10 @@ const segmentDividers = Array.from(document.querySelectorAll(".rolling-segment-d
 const ROLLING_PROJECTS_ENTER_PRE_CLASS = "is-projects-enter-pre";
 const ROLLING_PROJECTS_ENTERING_CLASS = "is-projects-entering";
 const ROLLING_PROJECTS_ENTER_MS = 1500;
+const ROLLING_EMBED_WARM_RADIUS = 1;
 let rollingProjectsEnterTimer = 0;
+let rollingEmbedWarmTimer = 0;
+let rollingAnimationFrame = 0;
 const segmentRanges = projectSegments
   .map((segment) => {
     const indexes = segment.projectIds
@@ -336,6 +358,36 @@ const projectStates = new Map(
     },
   ]),
 );
+
+function loadRollingProjectEmbed(index, priority = "auto") {
+  const frame = projectsList[index]?.querySelector(".rolling-image-embed-frame");
+  const src = frame?.dataset.src;
+
+  if (!frame || frame.hasAttribute("src") || !src) {
+    return false;
+  }
+
+  frame.fetchPriority = priority === "high" ? "high" : "low";
+  frame.loading = priority === "high" ? "eager" : "lazy";
+  frame.src = src;
+  return true;
+}
+
+function loadRollingProjectEmbedsAround(centerIndex, radius = 0, priority = "auto") {
+  const start = Math.max(0, centerIndex - radius);
+  const end = Math.min(projectsList.length - 1, centerIndex + radius);
+
+  for (let index = start; index <= end; index += 1) {
+    loadRollingProjectEmbed(index, index === centerIndex ? priority : "auto");
+  }
+}
+
+function scheduleRollingEmbedWarmup(centerIndex = activeProjectIndex) {
+  window.clearTimeout(rollingEmbedWarmTimer);
+  rollingEmbedWarmTimer = window.setTimeout(() => {
+    loadRollingProjectEmbedsAround(centerIndex, ROLLING_EMBED_WARM_RADIUS);
+  }, 900);
+}
 
 function clearRollingProjectsEnter() {
   window.clearTimeout(rollingProjectsEnterTimer);
@@ -1604,12 +1656,15 @@ function selectCoverflowProject(nextIndex, selectedAt = performance.now()) {
 
   if (clampedIndex === activeProjectIndex) {
     activeProjectSelectedAt = selectedAt;
+    loadRollingProjectEmbedsAround(clampedIndex, ROLLING_EMBED_WARM_RADIUS, "high");
     return;
   }
 
   activeProjectIndex = clampedIndex;
   activeProjectSelectedAt = selectedAt;
   activeProjectHighlightStartedAt = selectedAt;
+  loadRollingProjectEmbedsAround(activeProjectIndex, ROLLING_EMBED_WARM_RADIUS, "high");
+  scheduleRollingEmbedWarmup(activeProjectIndex);
   notifyParentActiveProject();
 }
 
@@ -1820,6 +1875,7 @@ function animateWindowScrollToTop(frameWindow, durationMs) {
 
 function resetProjectMediaScroll(index) {
   const project = projectsList[index];
+  loadRollingProjectEmbed(index);
   const frame = project?.querySelector(".rolling-image-embed-frame");
 
   if (!frame?.contentWindow) {
@@ -1857,6 +1913,7 @@ function openProjectDetail(index, { pushHistory = true } = {}) {
 
   hideRollingFrameCursor();
   hideRollingScrollCursor();
+  loadRollingProjectEmbed(nextIndex, "high");
   returnScrollProjectIndex = -1;
   activeProjectIndex = nextIndex;
   settledProjectIndex = nextIndex;
@@ -1965,6 +2022,12 @@ function syncCoverflowWheelProgress() {
 }
 
 function animateProjects() {
+  rollingAnimationFrame = 0;
+
+  if (document.hidden || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+
   syncSettleTransition();
   syncCoverflowCenter();
   syncCoverflowWheelProgress();
@@ -1986,7 +2049,15 @@ function animateProjects() {
   });
 
   syncSegmentRail();
-  requestAnimationFrame(animateProjects);
+  rollingAnimationFrame = requestAnimationFrame(animateProjects);
+}
+
+function startRollingAnimation() {
+  if (rollingAnimationFrame || document.hidden || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+
+  rollingAnimationFrame = requestAnimationFrame(animateProjects);
 }
 
 debugToggle?.addEventListener("click", () => {
@@ -2312,6 +2383,7 @@ syncParametersToggle();
 
 replaceRollingDetailHistoryState({ view: "stream" });
 window.addEventListener("popstate", syncRollingDetailFromHistory);
+document.addEventListener("visibilitychange", startRollingAnimation);
 window.addEventListener("wheel", handleRollingDetailBackGesture, { passive: false, capture: true });
 
 window.addEventListener("wheel", handleCoverflowWheel, { passive: false });
@@ -2330,6 +2402,8 @@ syncCoverflowCenter();
 syncSegmentRail();
 syncActiveProjectClass();
 primeProjectStates();
+loadRollingProjectEmbedsAround(activeProjectIndex, 0, "high");
+scheduleRollingEmbedWarmup(activeProjectIndex);
 notifyParentActiveProject();
 notifyParentDetailState();
-animateProjects();
+startRollingAnimation();

@@ -2,9 +2,13 @@ const root = document.documentElement;
 const projectPage = document.querySelector(".project-page");
 const projectStream = document.querySelector("[data-project-stream]");
 const archiveData = window.TDG_ARCHIVE || { groups: [], projects: [] };
+const projectSearchParams = new URLSearchParams(window.location.search);
 const isEmbedded =
-  window.self !== window.top || new URLSearchParams(window.location.search).get("embed") === "1";
+  window.self !== window.top || projectSearchParams.get("embed") === "1";
 const PROJECT_RESET_ANIMATION_MS = 420;
+const DEFERRED_IMAGE_ROOT_MARGIN = "120px 0px";
+const shouldPrioritizeHeroImage = projectSearchParams.get("priority") === "high";
+let deferredImageObserver = null;
 
 function getProjectIdFromSearch() {
   const params = new URLSearchParams(window.location.search);
@@ -58,16 +62,73 @@ function resolveArchivePath(path) {
   return new URL(encodeArchivePath(path), getArchiveRootUrl()).href;
 }
 
+function loadDeferredProjectImage(image) {
+  const src = image?.dataset.src;
+
+  if (!src) {
+    return;
+  }
+
+  image.src = src;
+  image.removeAttribute("data-src");
+  deferredImageObserver?.unobserve(image);
+}
+
+function getDeferredImageObserver() {
+  if (!("IntersectionObserver" in window)) {
+    return null;
+  }
+
+  if (!deferredImageObserver) {
+    deferredImageObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            loadDeferredProjectImage(entry.target);
+          }
+        });
+      },
+      {
+        root: projectPage || null,
+        rootMargin: DEFERRED_IMAGE_ROOT_MARGIN,
+      },
+    );
+  }
+
+  return deferredImageObserver;
+}
+
+function hydrateDeferredProjectImages() {
+  const images = Array.from(projectStream?.querySelectorAll("img[data-src]") || []);
+  const observer = getDeferredImageObserver();
+
+  if (!observer) {
+    images.forEach(loadDeferredProjectImage);
+    return;
+  }
+
+  images.forEach((image) => observer.observe(image));
+}
+
 function createProjectImage(project, src, index) {
   const image = document.createElement("img");
+  const resolvedSrc = resolveArchivePath(src);
   const imageNumber = String(index + 1).padStart(2, "0");
 
   image.className = "project-image";
-  image.src = resolveArchivePath(src);
   image.alt = index === 0
     ? `${project.title}项目主图 ${imageNumber}`
     : `${project.title}项目图片 ${imageNumber}`;
   image.loading = index === 0 ? "eager" : "lazy";
+  image.decoding = "async";
+
+  if (index === 0) {
+    image.src = resolvedSrc;
+    image.fetchPriority = shouldPrioritizeHeroImage ? "high" : "auto";
+  } else {
+    image.dataset.src = resolvedSrc;
+    image.fetchPriority = "low";
+  }
 
   return image;
 }
@@ -85,12 +146,20 @@ function createProjectArticleFigure(project, entry, className = "project-article
   const figure = document.createElement("figure");
   const image = document.createElement("img");
   const source = typeof entry === "string" ? entry : entry.src;
+  const isCover = className.includes("cover");
 
   figure.className = className;
   image.className = "project-article-image";
-  image.src = resolveArchivePath(source);
   image.alt = typeof entry === "string" ? `${project.title}文章插图` : entry.alt || `${project.title}文章插图`;
-  image.loading = className.includes("cover") ? "eager" : "lazy";
+  image.loading = isCover ? "eager" : "lazy";
+  image.decoding = "async";
+  image.fetchPriority = isCover && shouldPrioritizeHeroImage ? "high" : "low";
+
+  if (isCover) {
+    image.src = resolveArchivePath(source);
+  } else {
+    image.dataset.src = resolveArchivePath(source);
+  }
 
   figure.append(image);
 
@@ -188,6 +257,7 @@ function renderProjectArticle(project) {
 
   shell.append(hero, body);
   projectStream.replaceChildren(shell);
+  hydrateDeferredProjectImages();
 }
 
 function renderProjectStream() {
@@ -230,6 +300,7 @@ function renderProjectStream() {
   });
 
   projectStream.replaceChildren(...imageNodes);
+  hydrateDeferredProjectImages();
 }
 
 function syncViewportHeight() {

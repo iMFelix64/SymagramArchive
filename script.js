@@ -105,8 +105,18 @@ function getProjectCardTitle(project) {
   return getProjectDisplayValue(project, "title").replace(/\s+/g, " ").trim();
 }
 
-function createProjectEmbedSrc(projectId) {
-  return `./projects/project-panel-mark-1/?project=${encodeURIComponent(projectId)}&embed=1&v=20260526-card-title-1`;
+function createProjectEmbedSrc(projectId, { priority = "auto" } = {}) {
+  const params = new URLSearchParams({
+    project: projectId,
+    embed: "1",
+    v: "20260623-loading-priority-4",
+  });
+
+  if (priority === "high") {
+    params.set("priority", "high");
+  }
+
+  return `./projects/project-panel-mark-1/?${params.toString()}`;
 }
 
 function createElementWithClass(tagName, className, textContent = "") {
@@ -121,10 +131,13 @@ function createElementWithClass(tagName, className, textContent = "") {
   return element;
 }
 
-function createProjectEmbed(project) {
+function createProjectEmbed(project, projectIndex = 0) {
   const embed = createElementWithClass("div", "panel-project-embed");
   const wheelLayer = createElementWithClass("div", "panel-project-embed-wheel-layer");
-  const embedSrc = createProjectEmbedSrc(project.id);
+  const shouldLoadImmediately = projectIndex === 0;
+  const embedSrc = createProjectEmbedSrc(project.id, {
+    priority: shouldLoadImmediately ? "high" : "auto",
+  });
 
   embed.setAttribute("aria-label", `${project.title}独立项目容器`);
   embed.dataset.debugLabel = "div.panel-project-embed";
@@ -134,9 +147,15 @@ function createProjectEmbed(project) {
     const frame = document.createElement("iframe");
 
     frame.className = "panel-project-embed-frame";
-    frame.src = embedSrc;
     frame.title = `${project.title}项目页面`;
-    frame.loading = "eager";
+    frame.loading = shouldLoadImmediately ? "eager" : "lazy";
+    frame.fetchPriority = shouldLoadImmediately ? "high" : "low";
+    frame.dataset.src = embedSrc;
+
+    if (shouldLoadImmediately) {
+      frame.src = embedSrc;
+    }
+
     embed.append(frame, wheelLayer);
     return embed;
   }
@@ -216,7 +235,7 @@ function createProjectPanel(project, projectIndex) {
   panelCopy.append(title, description);
   highlightCard.append(bandNumber, panelCopy, arrow);
   numberColumn.append(highlightCard);
-  frameScroll.append(createProjectEmbed(project));
+  frameScroll.append(createProjectEmbed(project, projectIndex));
   panelFrame.append(frameScroll);
   frameShell.append(panelFrame);
   sideCopy.append(
@@ -831,6 +850,20 @@ let projectEmbedScrollCursorX = window.innerWidth / 2;
 let projectEmbedScrollCursorY = window.innerHeight / 2;
 let projectEmbedScrollCursorLayer = null;
 
+function ensureProjectPanelEmbedLoaded(panel, priority = "auto") {
+  const embedFrame = panel?.querySelector(".panel-project-embed-frame");
+  const src = embedFrame?.dataset.src;
+
+  if (!embedFrame || embedFrame.hasAttribute("src") || !src) {
+    return false;
+  }
+
+  embedFrame.fetchPriority = priority === "high" ? "high" : "low";
+  embedFrame.loading = priority === "high" ? "eager" : "lazy";
+  embedFrame.src = src;
+  return true;
+}
+
 function setMobileNavView(viewName) {
   if (!homeTransitionStage) {
     return;
@@ -1190,8 +1223,9 @@ function buildHomeFloatLayer() {
     image.className = "home-float-image";
     image.src = assetPath;
     image.alt = "";
-    image.loading = "eager";
+    image.loading = "lazy";
     image.decoding = "async";
+    image.fetchPriority = "low";
 
     item.addEventListener("mouseenter", () => {
       homeIntro.classList.add("is-cursor-image-hover");
@@ -2216,6 +2250,7 @@ async function syncExpandedProject(projectId = "") {
 
   if (expandedProjectId) {
     const nextPanel = panelByProject.get(expandedProjectId);
+    ensureProjectPanelEmbedLoaded(nextPanel, "high");
     cancelDeferredPanelCopy(nextPanel);
     nextPanel?.classList.add("is-expanded");
     nextPanel?.querySelector(".panel-expand-toggle")?.setAttribute("aria-expanded", "true");

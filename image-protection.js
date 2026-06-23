@@ -107,6 +107,19 @@
     });
   });
 
-  protectImages();
-  observer.observe(document.documentElement, { childList: true, subtree: true });
+  function startObserver() {
+    const observeTarget = document.documentElement || document.body;
+
+    protectImages();
+
+    if (observeTarget) {
+      observer.observe(observeTarget, { childList: true, subtree: true });
+    }
+  }
+
+  if (document.documentElement || document.body) {
+    startObserver();
+  } else {
+    document.addEventListener("DOMContentLoaded", startObserver, { once: true });
+  }
 })();

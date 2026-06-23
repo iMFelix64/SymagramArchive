@@ -125,8 +125,9 @@ function buildFloatLayer() {
     image.className = "home-float-image";
     image.src = assetPath;
     image.alt = "";
-    image.loading = "eager";
+    image.loading = "lazy";
     image.decoding = "async";
+    image.fetchPriority = "low";
 
     item.addEventListener("mouseenter", () => {
       homeStage.classList.add("is-cursor-image-hover");
