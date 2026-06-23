@@ -225,6 +225,9 @@ function buildProjects() {
     .map((project, projectIndex) => {
       const leadImage = project.images[0] || project.coverImage || "";
       const shouldLoadImmediately = projectIndex === 0;
+      const leadImageAttribute = shouldLoadImmediately
+        ? `src="${escapeHtml(leadImage)}"`
+        : `data-src="${escapeHtml(leadImage)}"`;
       const cardTitle = formatSingleLineText(getProjectCardTitle(project));
       const detailTitle = formatMultilineText(getProjectDetailTitle(project));
       const mediaMarkup = project.placeholder
@@ -240,7 +243,7 @@ function buildProjects() {
               <figure class="rolling-project-gallery-frame">
                 <img
                   class="rolling-gallery-image rolling-gallery-image--hero"
-                  src="${escapeHtml(leadImage)}"
+                  ${leadImageAttribute}
                   alt="${escapeHtml(project.title)}项目主图 01"
                   loading="${shouldLoadImmediately ? "eager" : "lazy"}"
                   decoding="async"
@@ -405,6 +408,17 @@ function createRollingGalleryFrame(project, src, index) {
   return frame;
 }
 
+function loadRollingProjectHero(index) {
+  const heroImage = projectsList[index]?.querySelector(".rolling-gallery-image--hero[data-src]");
+
+  if (!heroImage) {
+    return false;
+  }
+
+  loadDeferredRollingGalleryImage(heroImage);
+  return true;
+}
+
 function loadRollingProjectMedia(index) {
   const projectElement = projectsList[index];
   const gallery = projectElement?.querySelector("[data-rolling-gallery]");
@@ -413,6 +427,8 @@ function loadRollingProjectMedia(index) {
   if (!gallery || !project || gallery.dataset.mediaLoaded === "true") {
     return false;
   }
+
+  loadRollingProjectHero(index);
 
   const images = project.images?.length
     ? project.images
@@ -1679,12 +1695,14 @@ function selectCoverflowProject(nextIndex, selectedAt = performance.now()) {
 
   if (clampedIndex === activeProjectIndex) {
     activeProjectSelectedAt = selectedAt;
+    loadRollingProjectHero(clampedIndex);
     return;
   }
 
   activeProjectIndex = clampedIndex;
   activeProjectSelectedAt = selectedAt;
   activeProjectHighlightStartedAt = selectedAt;
+  loadRollingProjectHero(activeProjectIndex);
   notifyParentActiveProject();
 }
 
