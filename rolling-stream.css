@@ -16,6 +16,7 @@
   --rolling-project-gap: 10px;
   --rolling-detail-gap: 10px;
   --rolling-detail-copy-width: 318px;
+  --rolling-template-panel-top-offset: 16px;
   --font-sans: "PingFang SC", "PingFang HK", "PingFang TC", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
@@ -322,14 +323,15 @@ img {
 }
 
 .is-panel-embed .rolling-projects {
-  height: 100vh;
-  min-height: 100vh;
+  height: calc(100vh - var(--rolling-template-panel-top-offset));
+  margin-top: var(--rolling-template-panel-top-offset);
+  min-height: calc(100vh - var(--rolling-template-panel-top-offset));
   overflow: hidden;
   padding-top: 0;
 }
 
 .is-panel-embed .rolling-segment-rail {
-  height: 100vh;
+  height: 100%;
 }
 
 .rolling-topbar {
@@ -865,6 +867,8 @@ img {
 
 .rolling-project-gallery .rolling-gallery-image[data-src] {
   aspect-ratio: 3 / 2;
+  color: transparent;
+  opacity: 0;
 }
 
 .rolling-app:not(.is-detail-expanded) .rolling-project-gallery {
