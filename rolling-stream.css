@@ -865,6 +865,8 @@ img {
 
 .rolling-project-gallery .rolling-gallery-image[data-src] {
   aspect-ratio: 3 / 2;
+  color: transparent;
+  opacity: 0;
 }
 
 .rolling-app:not(.is-detail-expanded) .rolling-project-gallery {

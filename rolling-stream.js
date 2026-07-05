@@ -309,6 +309,7 @@ const ROLLING_PROJECTS_ENTER_MS = 1500;
 let rollingProjectsEnterTimer = 0;
 let rollingAnimationFrame = 0;
 let rollingGalleryImageObserver = null;
+let rollingHeroWarmTimer = 0;
 const segmentRanges = projectSegments
   .map((segment) => {
     const indexes = segment.projectIds
@@ -417,6 +418,48 @@ function loadRollingProjectHero(index) {
 
   loadDeferredRollingGalleryImage(heroImage);
   return true;
+}
+
+function getHeroWarmupOrder(centerIndex = activeProjectIndex) {
+  return projectsList
+    .map((project, index) => ({
+      index,
+      distance: Math.abs(index - centerIndex),
+    }))
+    .sort((a, b) => a.distance - b.distance || a.index - b.index)
+    .map((entry) => entry.index);
+}
+
+function scheduleRollingHeroWarmup(centerIndex = activeProjectIndex) {
+  window.clearTimeout(rollingHeroWarmTimer);
+
+  const warmupOrder = getHeroWarmupOrder(centerIndex).filter((index) => (
+    projectsList[index]?.querySelector(".rolling-gallery-image--hero[data-src]")
+  ));
+
+  if (!warmupOrder.length) {
+    return;
+  }
+
+  const loadNextHero = () => {
+    const nextIndex = warmupOrder.shift();
+
+    if (nextIndex === undefined) {
+      return;
+    }
+
+    loadRollingProjectHero(nextIndex);
+
+    if (warmupOrder.length) {
+      rollingHeroWarmTimer = window.setTimeout(loadNextHero, 220);
+    }
+  };
+
+  const requestIdle = window.requestIdleCallback || ((callback) => window.setTimeout(callback, 600));
+
+  requestIdle(() => {
+    rollingHeroWarmTimer = window.setTimeout(loadNextHero, 240);
+  });
 }
 
 function loadRollingProjectMedia(index) {
@@ -1703,6 +1746,7 @@ function selectCoverflowProject(nextIndex, selectedAt = performance.now()) {
   activeProjectSelectedAt = selectedAt;
   activeProjectHighlightStartedAt = selectedAt;
   loadRollingProjectHero(activeProjectIndex);
+  scheduleRollingHeroWarmup(activeProjectIndex);
   notifyParentActiveProject();
 }
 
@@ -2381,4 +2425,5 @@ syncActiveProjectClass();
 primeProjectStates();
 notifyParentActiveProject();
 notifyParentDetailState();
+scheduleRollingHeroWarmup(activeProjectIndex);
 startRollingAnimation();

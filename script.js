@@ -109,7 +109,7 @@ function createProjectEmbedSrc(projectId, { priority = "auto" } = {}) {
   const params = new URLSearchParams({
     project: projectId,
     embed: "1",
-    v: "20260623-snappy-gallery-2",
+    v: "20260705-snappy-cover-warm-1",
   });
 
   if (priority === "high") {
