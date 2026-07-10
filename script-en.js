@@ -62,7 +62,7 @@ function buildIndexList() {
       item.className = "index-item";
       item.dataset.project = project.id;
       item.dataset.segment = group.id;
-      item.setAttribute("aria-label", `项目 ${project.displayNumber} ${project.title}`);
+      item.setAttribute("aria-label", `Project ${project.displayNumber} ${project.title}`);
       item.dataset.debugLabel = `li.index-item[${project.id}]`;
 
       number.className = "index-item-number";
@@ -109,14 +109,14 @@ function createProjectEmbedSrc(projectId, { priority = "auto" } = {}) {
   const params = new URLSearchParams({
     project: projectId,
     embed: "1",
-    v: "20260707-snappy-bilingual-1",
+    v: "20260707-snappy-english-branch-match-1",
   });
 
   if (priority === "high") {
     params.set("priority", "high");
   }
 
-  return `./projects/project-panel-mark-1/?${params.toString()}`;
+  return `./projects/project-panel-mark-1/index-en.html?${params.toString()}`;
 }
 
 function createElementWithClass(tagName, className, textContent = "") {
@@ -139,7 +139,7 @@ function createProjectEmbed(project, projectIndex = 0) {
     priority: shouldLoadImmediately ? "high" : "auto",
   });
 
-  embed.setAttribute("aria-label", `${project.title}独立项目容器`);
+  embed.setAttribute("aria-label", `${project.title} project container`);
   embed.dataset.debugLabel = "div.panel-project-embed";
   wheelLayer.setAttribute("aria-hidden", "true");
 
@@ -147,7 +147,7 @@ function createProjectEmbed(project, projectIndex = 0) {
     const frame = document.createElement("iframe");
 
     frame.className = "panel-project-embed-frame";
-    frame.title = `${project.title}项目页面`;
+    frame.title = `${project.title} project page`;
     frame.loading = shouldLoadImmediately ? "eager" : "lazy";
     frame.fetchPriority = shouldLoadImmediately ? "high" : "low";
     frame.dataset.src = embedSrc;
@@ -198,11 +198,11 @@ function createProjectPanel(project, projectIndex) {
   );
   const sideYear = createElementWithClass("p", "panel-side-copy-year", getProjectDisplayValue(project, "year", "TBD"));
   const directionSpec = createProjectSideSpec(
-    "方向",
+    "Direction",
     getProjectDisplayValue(project, "direction", getProjectDisplayValue(project, "tagline")),
   );
   const keywordSpec = createProjectSideSpec(
-    "关键词",
+    "Keywords",
     getProjectDisplayValue(project, "keywords", getProjectDisplayValue(project, "tagline")),
   );
 
@@ -288,7 +288,7 @@ function createMobileProjectDetailGallery(project, projectIndex) {
   const gallery = createElementWithClass("div", "mobile-project-detail-gallery");
   const detailImages = Array.isArray(project.images) ? project.images.slice(1) : [];
 
-  gallery.setAttribute("aria-label", `${project.title.replace(/\s+/g, " ")} 项目图片`);
+  gallery.setAttribute("aria-label", `${project.title.replace(/\s+/g, " ")} project images`);
 
   detailImages.forEach((imageSrc, imageIndex) => {
     const frame = createElementWithClass("figure", "mobile-project-detail-frame");
@@ -314,7 +314,7 @@ function buildMobileProjectList() {
 
   const list = createElementWithClass("div", "mobile-project-list");
 
-  list.setAttribute("aria-label", "移动端项目列表");
+  list.setAttribute("aria-label", "Mobile project list");
 
   orderedArchiveProjects.forEach((project, projectIndex) => {
     const displayNumber = project.displayNumber || String(projectIndex + 1).padStart(2, "0");
@@ -334,9 +334,9 @@ function buildMobileProjectList() {
     card.setAttribute("role", "button");
     card.setAttribute("tabindex", "0");
     card.setAttribute("aria-expanded", "false");
-    card.setAttribute("aria-label", `展开项目：${project.title.replace(/\s+/g, " ")}`);
+    card.setAttribute("aria-label", `Open project: ${project.title.replace(/\s+/g, " ")}`);
     arrow.type = "button";
-    arrow.setAttribute("aria-label", `展开项目：${project.title.replace(/\s+/g, " ")}`);
+    arrow.setAttribute("aria-label", `Open project: ${project.title.replace(/\s+/g, " ")}`);
     image.src = project.coverImage || project.images?.[0] || "";
     image.alt = project.title;
     image.loading = projectIndex < 2 ? "eager" : "lazy";
@@ -1019,7 +1019,7 @@ function setMobileProjectCardExpandedState(card, expanded) {
     .find((project) => project.id === card?.dataset.project)
     ?.title
     .replace(/\s+/g, " ");
-  const actionLabel = expanded ? "返回项目列表" : `展开项目：${projectTitle || ""}`;
+  const actionLabel = expanded ? "Back to project list" : `Open project: ${projectTitle || ""}`;
 
   card?.classList.toggle("is-mobile-expanded", expanded);
   card?.setAttribute("aria-expanded", String(expanded));
@@ -1262,7 +1262,7 @@ function buildHomeFloatLayer() {
     item.dataset.project = projectId || "";
     item.setAttribute("role", "button");
     item.setAttribute("tabindex", "0");
-    item.setAttribute("aria-label", projectTitle ? `打开项目：${projectTitle}` : "打开项目");
+    item.setAttribute("aria-label", projectTitle ? `Open project: ${projectTitle}` : "Open project");
     image.className = "home-float-image";
     image.src = assetPath;
     image.alt = "";

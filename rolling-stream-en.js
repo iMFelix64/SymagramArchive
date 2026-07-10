@@ -1,68 +1,4 @@
 const archiveData = window.TDG_ARCHIVE || { groups: [], projects: [] };
-const ROLLING_LOCALE_STORAGE_KEY = "rolling-locale-v1";
-const ROLLING_LOCALES = new Set(["zh", "en"]);
-const rollingLocaleText = {
-  zh: {
-    htmlLang: "zh-CN",
-    languageToggleLabel: "语言切换",
-    heroTitle: "产品",
-    heroIntro: "Project 01-04 的内容重新整理为一个独立的 rolling stream。图片随着滚动产生带弹性的缩放反馈，展开后按素材比例自然排布。",
-    openProject: "打开",
-    projectInfoSuffix: "项目信息",
-    mainImageSuffix: "项目主图",
-    galleryImageSuffix: "项目图片",
-    detailDirectionLabel: "方向",
-  },
-  en: {
-    htmlLang: "en",
-    languageToggleLabel: "Language switch",
-    heroTitle: "Products",
-    heroIntro: "Projects 01 to 04 are arranged as one rolling stream. Each image responds to scroll with soft scale feedback.",
-    openProject: "Open",
-    projectInfoSuffix: "project information",
-    mainImageSuffix: "main image",
-    galleryImageSuffix: "project image",
-    detailDirectionLabel: "Direction",
-  },
-};
-function normalizeRollingLocale(value) {
-  return ROLLING_LOCALES.has(String(value).toLowerCase())
-    ? String(value).toLowerCase()
-    : "zh";
-}
-
-function readStoredRollingLocale() {
-  try {
-    return window.localStorage.getItem(ROLLING_LOCALE_STORAGE_KEY);
-  } catch (error) {
-    return "";
-  }
-}
-
-function writeStoredRollingLocale(locale) {
-  try {
-    window.localStorage.setItem(ROLLING_LOCALE_STORAGE_KEY, locale);
-  } catch (error) {
-    // Ignore private browsing/storage restrictions; the toggle still works for this session.
-  }
-}
-
-function getInitialRollingLocale() {
-  const params = new URLSearchParams(window.location.search);
-
-  return normalizeRollingLocale(
-    params.get("lang") ||
-    document.documentElement.dataset.rollingLocale ||
-    readStoredRollingLocale() ||
-    "zh",
-  );
-}
-
-let rollingLocale = getInitialRollingLocale();
-
-function getRollingLocaleText() {
-  return rollingLocaleText[rollingLocale] || rollingLocaleText.zh;
-}
 
 const projectCatalog = (archiveData.projects || [])
   .filter((project) => project && project.visible !== false)
@@ -101,33 +37,16 @@ function getProjectDisplayValue(project, key, fallback = "") {
   return value === undefined || value === null || value === "" ? fallback : String(value);
 }
 
-function getLocalizedProjectDisplayValue(project, key, fallback = "") {
-  return getProjectDisplayValue(project, key, fallback);
-}
-
-function getSegmentDisplayTitle(segment) {
-  return segment.title;
-}
-
 function getProjectDetailTitle(project) {
-  return getLocalizedProjectDisplayValue(
+  return getProjectDisplayValue(
     project,
     "detailTitle",
-    getLocalizedProjectDisplayValue(project, "sideTitle", getLocalizedProjectDisplayValue(project, "title")),
+    getProjectDisplayValue(project, "sideTitle", project.title),
   );
 }
 
 function getProjectCardTitle(project) {
-  return getLocalizedProjectDisplayValue(project, "title").replace(/\s+/g, " ").trim();
-}
-
-function getProjectImageAlt(project, index, isMainImage = false) {
-  const copy = getRollingLocaleText();
-  const title = getLocalizedProjectDisplayValue(project, "title");
-  const imageNumber = String(index + 1).padStart(2, "0");
-  const suffix = isMainImage ? copy.mainImageSuffix : copy.galleryImageSuffix;
-
-  return `${title}${rollingLocale === "zh" ? "" : " "}${suffix} ${imageNumber}`;
+  return getProjectDisplayValue(project, "title").replace(/\s+/g, " ").trim();
 }
 
 function escapeHtml(value) {
@@ -277,7 +196,6 @@ let rollingDetailBackGestureDeltaX = 0;
 let rollingDetailBackGestureLastAt = 0;
 
 function buildProjects() {
-  const copy = getRollingLocaleText();
   const segmentRailMarkup = `
     <aside class="rolling-segment-rail" aria-label="project segments" data-debug-label="aside.rolling-segment-rail">
       ${projectSegments
@@ -285,7 +203,7 @@ function buildProjects() {
           (segment) => `
             <section class="rolling-segment-group" data-segment-group="${segment.id}" data-debug-label="section.rolling-segment-group[${segment.id}]">
               <p class="rolling-segment-label" data-segment="${segment.id}" data-debug-label="p.rolling-segment-label[${segment.id}]">
-                ${escapeHtml(getSegmentDisplayTitle(segment))}
+                ${segment.title}
               </p>
             </section>
           `,
@@ -314,19 +232,19 @@ function buildProjects() {
       const detailTitle = formatMultilineText(getProjectDetailTitle(project));
       const mediaMarkup = project.placeholder
         ? `
-          <figure class="rolling-image-media rolling-image-media--placeholder" role="button" tabindex="0" aria-label="${copy.openProject} ${escapeHtml(getLocalizedProjectDisplayValue(project, "title"))}" data-debug-label="figure.rolling-image-media[${project.id}]">
+          <figure class="rolling-image-media rolling-image-media--placeholder" role="button" tabindex="0" aria-label="Open ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
             <div class="rolling-image-placeholder-copy">PLACEHOLDER ${project.displayNumber}</div>
           </figure>
         `
         : leadImage
           ? `
-          <figure class="rolling-image-media rolling-image-media--gallery" role="button" tabindex="0" aria-label="${copy.openProject} ${escapeHtml(getLocalizedProjectDisplayValue(project, "title"))}" data-debug-label="figure.rolling-image-media[${project.id}]">
+          <figure class="rolling-image-media rolling-image-media--gallery" role="button" tabindex="0" aria-label="Open ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
             <div class="rolling-project-gallery" data-rolling-gallery>
               <figure class="rolling-project-gallery-frame">
                 <img
                   class="rolling-gallery-image rolling-gallery-image--hero"
                   ${leadImageAttribute}
-                  alt="${escapeHtml(getProjectImageAlt(project, 0, true))}"
+                  alt="${escapeHtml(project.title)} main image 01"
                   loading="${shouldLoadImmediately ? "eager" : "lazy"}"
                   decoding="async"
                   fetchpriority="${shouldLoadImmediately ? "high" : "low"}"
@@ -337,18 +255,18 @@ function buildProjects() {
           </figure>
         `
           : `
-          <figure class="rolling-image-media rolling-image-media--placeholder" role="button" tabindex="0" aria-label="${copy.openProject} ${escapeHtml(getLocalizedProjectDisplayValue(project, "title"))}" data-debug-label="figure.rolling-image-media[${project.id}]">
+          <figure class="rolling-image-media rolling-image-media--placeholder" role="button" tabindex="0" aria-label="Open ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
             <div class="rolling-image-placeholder-copy">PLACEHOLDER ${project.displayNumber}</div>
           </figure>
         `;
 
       return `
         <article class="rolling-project" data-project="${project.id}" data-segment="${project.segmentId}" data-debug-label="article.rolling-project[${project.id}]">
-          <aside class="rolling-project-card" aria-label="${escapeHtml(getLocalizedProjectDisplayValue(project, "title"))} ${copy.projectInfoSuffix}" data-debug-label="aside.rolling-project-card[${project.id}]">
+          <aside class="rolling-project-card" aria-label="${project.title} project information" data-debug-label="aside.rolling-project-card[${project.id}]">
             <p class="rolling-project-index">${project.displayNumber}.</p>
             <div class="rolling-project-copy">
               <h2 class="rolling-project-name">${cardTitle}</h2>
-              <p class="rolling-project-description">${escapeHtml(getLocalizedProjectDisplayValue(project, "description"))}</p>
+              <p class="rolling-project-description">${project.description}</p>
             </div>
             <div class="rolling-project-arrow" aria-hidden="true">→</div>
           </aside>
@@ -362,13 +280,13 @@ function buildProjects() {
           <aside class="rolling-detail-copy" aria-hidden="true" data-debug-label="aside.rolling-detail-copy[${project.id}]">
             <p class="rolling-detail-kicker">PROJECT ${project.displayNumber}</p>
             <h3 class="rolling-detail-title">${detailTitle}</h3>
-            <p class="rolling-detail-description">${escapeHtml(getLocalizedProjectDisplayValue(project, "description"))}</p>
+            <p class="rolling-detail-description">${project.description}</p>
             <span class="rolling-detail-rule" aria-hidden="true"></span>
             <p class="rolling-detail-year">${project.year}</p>
             <span class="rolling-detail-rule" aria-hidden="true"></span>
             <div class="rolling-detail-spec">
-              <p class="rolling-detail-label">${copy.detailDirectionLabel}</p>
-              <p class="rolling-detail-value">${escapeHtml(getLocalizedProjectDisplayValue(project, "tagline"))}</p>
+              <p class="rolling-detail-label">Direction</p>
+              <p class="rolling-detail-value">${project.tagline}</p>
             </div>
           </aside>
         </article>
@@ -385,113 +303,6 @@ const projectsList = Array.from(document.querySelectorAll(".rolling-project"));
 const segmentGroups = Array.from(document.querySelectorAll(".rolling-segment-group"));
 const segmentLabels = Array.from(document.querySelectorAll(".rolling-segment-label"));
 const segmentDividers = Array.from(document.querySelectorAll(".rolling-segment-divider"));
-
-function syncRollingLocaleControls() {
-  const copy = getRollingLocaleText();
-
-  document.documentElement.lang = copy.htmlLang;
-}
-
-function syncRollingLocaleStaticText() {
-  const copy = getRollingLocaleText();
-  const title = document.querySelector(".rolling-title");
-  const intro = document.querySelector(".rolling-intro");
-
-  if (title) {
-    title.textContent = copy.heroTitle;
-  }
-
-  if (intro) {
-    intro.textContent = copy.heroIntro;
-  }
-}
-
-function syncRollingLocaleProjectText() {
-  const copy = getRollingLocaleText();
-
-  segmentLabels.forEach((label) => {
-    const segment = segmentById.get(label.dataset.segment || "");
-
-    if (segment) {
-      label.textContent = getSegmentDisplayTitle(segment);
-    }
-  });
-
-  projectsList.forEach((projectElement) => {
-    const project = projectById.get(projectElement.dataset.project || "");
-
-    if (!project) {
-      return;
-    }
-
-    const localizedTitle = getLocalizedProjectDisplayValue(project, "title");
-
-    projectElement.querySelector(".rolling-project-card")?.setAttribute(
-      "aria-label",
-      `${localizedTitle} ${copy.projectInfoSuffix}`,
-    );
-    projectElement.querySelector(".rolling-image-media")?.setAttribute(
-      "aria-label",
-      `${copy.openProject} ${localizedTitle}`,
-    );
-
-    const name = projectElement.querySelector(".rolling-project-name");
-    const description = projectElement.querySelector(".rolling-project-description");
-    const detailTitle = projectElement.querySelector(".rolling-detail-title");
-    const detailDescription = projectElement.querySelector(".rolling-detail-description");
-    const detailLabel = projectElement.querySelector(".rolling-detail-label");
-    const detailValue = projectElement.querySelector(".rolling-detail-value");
-
-    if (name) {
-      name.textContent = getProjectCardTitle(project);
-    }
-
-    if (description) {
-      description.textContent = getLocalizedProjectDisplayValue(project, "description");
-    }
-
-    if (detailTitle) {
-      detailTitle.textContent = getProjectDetailTitle(project);
-    }
-
-    if (detailDescription) {
-      detailDescription.textContent = getLocalizedProjectDisplayValue(project, "description");
-    }
-
-    if (detailLabel) {
-      detailLabel.textContent = copy.detailDirectionLabel;
-    }
-
-    if (detailValue) {
-      detailValue.textContent = getLocalizedProjectDisplayValue(project, "tagline");
-    }
-
-    projectElement.querySelectorAll(".rolling-gallery-image").forEach((image, imageIndex) => {
-      image.alt = getProjectImageAlt(project, imageIndex, imageIndex === 0);
-    });
-  });
-}
-
-function syncRollingLocaleText() {
-  syncRollingLocaleControls();
-  syncRollingLocaleStaticText();
-  syncRollingLocaleProjectText();
-}
-
-function setRollingLocale(nextLocale, { persist = true } = {}) {
-  const normalizedLocale = normalizeRollingLocale(nextLocale);
-
-  rollingLocale = normalizedLocale;
-
-  if (persist) {
-    writeStoredRollingLocale(normalizedLocale);
-  }
-
-  syncRollingLocaleText();
-}
-
-syncRollingLocaleText();
-
 const ROLLING_PROJECTS_ENTER_PRE_CLASS = "is-projects-enter-pre";
 const ROLLING_PROJECTS_ENTERING_CLASS = "is-projects-entering";
 const ROLLING_PROJECTS_ENTER_MS = 1500;
@@ -585,11 +396,12 @@ function observeDeferredRollingGalleryImages(scope) {
 function createRollingGalleryFrame(project, src, index) {
   const frame = document.createElement("figure");
   const image = document.createElement("img");
+  const imageNumber = String(index + 1).padStart(2, "0");
 
   frame.className = "rolling-project-gallery-frame";
   image.className = "rolling-gallery-image";
   image.dataset.src = src;
-  image.alt = getProjectImageAlt(project, index);
+  image.alt = `${project.title} project image ${imageNumber}`;
   image.loading = "lazy";
   image.decoding = "async";
   image.fetchPriority = "low";
@@ -1426,11 +1238,26 @@ function getCoverflowCenterY() {
 }
 
 function getSegmentColumnWidth() {
-  const value = Number.parseFloat(
-    window.getComputedStyle(projectsRoot).getPropertyValue("--rolling-segment-column"),
-  );
+  const rootWidth = projectsRoot.getBoundingClientRect().width || window.innerWidth;
+
+  if (isPanelEmbed) {
+    return clamp(rootWidth * 0.27, 190, 250);
+  }
+
+  const computedStyle = window.getComputedStyle(projectsRoot);
+  const value = Number.parseFloat(computedStyle.getPropertyValue("--rolling-segment-column"));
 
   return Number.isFinite(value) ? value : 0;
+}
+
+function getNormalExpandedCardWidth() {
+  const rootWidth = projectsRoot.getBoundingClientRect().width || window.innerWidth;
+
+  if (isPanelEmbed) {
+    return clamp(rootWidth * 0.38, 286, CARD_EXPANDED_WIDTH);
+  }
+
+  return CARD_EXPANDED_WIDTH;
 }
 
 function getActiveSegmentRange(position = activeProjectIndex) {
@@ -1628,7 +1455,7 @@ function getProjectCurrentSurfaceHeight(index, target) {
 function getAvailableStreamWidth(isDetailExpanded = false) {
   const rootWidth = projectsRoot.getBoundingClientRect().width || window.innerWidth;
   const segmentWidth = isDetailExpanded ? 0 : getSegmentColumnWidth();
-  const cardWidth = isDetailExpanded ? detailCardWidth : CARD_EXPANDED_WIDTH;
+  const cardWidth = isDetailExpanded ? detailCardWidth : getNormalExpandedCardWidth();
   const detailWidth = isDetailExpanded ? DETAIL_SIDE_WIDTH + DETAIL_SIDE_GAP : 0;
   const reservedWidth = segmentWidth + cardWidth + PROJECT_COLUMN_GAP + detailWidth;
 
@@ -1800,8 +1627,13 @@ function paintProject(project, target, index) {
   const normalHeight = lerp(CARD_COLLAPSED_HEIGHT, normalExpandedHeight, visualProgress);
   const height = Math.round(lerp(normalHeight, detailExpandedHeight, mediaExpandProgress));
   const cardHeight = Math.round(lerp(normalHeight, detailCardHeight, mediaExpandProgress));
-  const normalCardWidth = lerp(CARD_COLLAPSED_WIDTH, CARD_EXPANDED_WIDTH, visualProgress);
+  const normalCardWidth = lerp(CARD_COLLAPSED_WIDTH, getNormalExpandedCardWidth(), visualProgress);
   const cardWidth = lerp(normalCardWidth, detailCardWidth, mediaExpandProgress);
+  const descriptionLineClamp = clamp(
+    Math.floor((cardHeight - 15 - 22.5 - 14 - 10 - 52) / 18),
+    1,
+    8,
+  );
   const indexShift = (cardWidth - CARD_COLLAPSED_WIDTH) * (1 - indexSlideProgress);
   const rootWidth = projectsRoot.getBoundingClientRect().width || window.innerWidth;
   const segmentWidth = getSegmentColumnWidth();
@@ -1835,6 +1667,7 @@ function paintProject(project, target, index) {
   project.style.setProperty("--surface-height", `${height}px`);
   project.style.setProperty("--card-height", `${cardHeight}px`);
   project.style.setProperty("--card-width", `${cardWidth.toFixed(2)}px`);
+  project.style.setProperty("--description-line-clamp", String(descriptionLineClamp));
   project.style.setProperty("--stream-width", `${targetStreamWidth.toFixed(2)}px`);
   project.style.setProperty("--layout-spacer-width", `${layoutSpacerWidth.toFixed(2)}px`);
   project.style.setProperty("--detail-gap-width", `${detailGapWidth.toFixed(2)}px`);
@@ -2367,8 +2200,6 @@ parametersToggle?.addEventListener("click", () => {
 
 window.setRollingParametersOpen = setParametersOpen;
 window.getRollingParametersOpen = getParametersOpen;
-window.setRollingLocale = setRollingLocale;
-window.getRollingLocale = () => rollingLocale;
 
 focusBandHandle?.addEventListener("pointerdown", (event) => {
   focusBandDragOffset = event.clientY - window.innerHeight * focusBandTopRatio;
