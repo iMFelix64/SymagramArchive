@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SymagramArchive Admin</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <style>
+      @import url("https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700;800&display=swap");
+
       :root {
         --bg: #f4f3ee;
         --ink: #141414;
@@ -30,7 +32,7 @@
           var(--bg);
         background-size: 28px 28px;
         color: var(--ink);
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         margin: 0;
       }
 
@@ -480,7 +482,7 @@
       <header class="admin-header">
         <div>
           <p class="admin-kicker">SymagramArchive / Archive Data Manager</p>
-          <h1 class="admin-title">Archive 管理台</h1>
+          <h1 class="admin-title">Archive Admin</h1>
         </div>
         <div class="admin-actions">
           <button id="add-group-button" type="button">Add Group</button>
@@ -492,11 +494,11 @@
       </header>
 
       <section class="admin-main">
-        <section class="admin-panel" aria-label="分组与项目排序">
+        <section class="admin-panel" aria-label="Groups and project order">
           <header class="panel-header">
             <div>
               <h2 class="panel-title">Groups & Order</h2>
-              <p class="panel-note">分组可上下移动，项目可拖入不同分组，也可用 Up / Down 微调。</p>
+              <p class="panel-note">Move groups up or down. Drag projects between groups or adjust them with Up and Down.</p>
             </div>
           </header>
           <div class="panel-body">
@@ -505,21 +507,21 @@
           </div>
         </section>
 
-        <section class="admin-panel" aria-label="项目文字内容">
+        <section class="admin-panel" aria-label="Project text content">
           <header class="panel-header">
             <div>
               <h2 class="panel-title">Project Text</h2>
-              <p class="panel-note">编辑单个项目的标题、描述和侧边栏文字；编号 ID 保持稳定。</p>
+              <p class="panel-note">Edit each project title, description, and side copy. Keep the ID stable.</p>
             </div>
           </header>
           <div class="panel-body" id="project-editor"></div>
         </section>
 
-        <section class="admin-panel media-panel" aria-label="项目图片与来源">
+        <section class="admin-panel media-panel" aria-label="Project images and sources">
           <header class="panel-header">
             <div>
               <h2 class="panel-title">Images & Sources</h2>
-              <p class="panel-note">调整图片顺序、封面、文件路径和来源备注。第一张会默认作为详情页主图。</p>
+              <p class="panel-note">Adjust image order, cover, file paths, and source notes. The first image is the default detail hero.</p>
             </div>
           </header>
           <div class="panel-body">
@@ -532,7 +534,7 @@
       </section>
     </main>
 
-    <script src="./archive-data.js?v=20260526-title-wrap-1"></script>
+    <script src="./archive-data.js?v=20260705-english-1"></script>
     <script>
       const sourceData = window.TDG_ARCHIVE || { groups: [], projects: [] };
       let draftData = cloneArchiveData(sourceData);
@@ -572,7 +574,7 @@
         if (orphanIds.length) {
           groups.push({
             id: createUniqueGroupId(groups, "ungrouped"),
-            title: "未分组",
+            title: "Ungrouped",
             projectIds: orphanIds,
           });
         }
@@ -712,7 +714,7 @@
       }
 
       function addGroup() {
-        const title = window.prompt("输入新分组名称", "新分组");
+        const title = window.prompt("Enter a new group name", "New Group");
 
         if (title === null || !title.trim()) {
           return;
@@ -734,7 +736,7 @@
         }
 
         if (group.projectIds.length) {
-          const shouldContinue = window.confirm(`删除分组「${group.title}」并删除其中 ${group.projectIds.length} 个项目？`);
+          const shouldContinue = window.confirm(`Delete group "${group.title}" and its ${group.projectIds.length} projects?`);
 
           if (!shouldContinue) {
             return;
@@ -758,7 +760,7 @@
         if (!targetGroup) {
           draftData.groups.push({
             id: createUniqueGroupId(draftData.groups, "product"),
-            title: "产品",
+            title: "Products",
             projectIds: [],
           });
           targetGroup = draftData.groups[draftData.groups.length - 1];
@@ -768,11 +770,11 @@
         const project = {
           id: projectId,
           archiveCode: "",
-          title: "新项目",
+          title: "New Project",
           year: "TBD",
           category: "",
           tagline: "Project / Direction",
-          description: "这里填写项目介绍。",
+          description: "Add the project description here.",
           visible: true,
           placeholder: true,
           imageFolder: "",
@@ -794,7 +796,7 @@
           return;
         }
 
-        const shouldDelete = window.confirm(`删除项目「${project.title}」？`);
+        const shouldDelete = window.confirm(`Delete project "${project.title}"?`);
 
         if (!shouldDelete) {
           return;
@@ -1259,7 +1261,7 @@
         const project = getProject();
 
         if (!project) {
-          projectEditor.replaceChildren(createEmptyNote("还没有项目。先创建分组和项目。"));
+          projectEditor.replaceChildren(createEmptyNote("No projects yet. Create a group and a project first."));
           return;
         }
 
@@ -1318,7 +1320,7 @@
         );
 
         grid.append(
-          createEmptyNote(`当前排序 ${getDisplayNumber(project.id)} / 所在分组 ${getProjectGroup(project.id)?.title || "未分组"}`),
+          createEmptyNote(`Current order ${getDisplayNumber(project.id)} / Group ${getProjectGroup(project.id)?.title || "Ungrouped"}`),
           createSectionRule("Identity"),
           rowOne,
           rowTwo,
@@ -1367,7 +1369,7 @@
         const newProject = {
           ...JSON.parse(JSON.stringify(sourceProject)),
           id: newId,
-          title: `${sourceProject.title || "项目"} Copy`,
+          title: `${sourceProject.title || "Project"} Copy`,
         };
         const sourceIndex = group.projectIds.indexOf(projectId);
 
@@ -1381,7 +1383,7 @@
         const project = getProject();
 
         if (!project) {
-          mediaEditor.replaceChildren(createEmptyNote("选择一个项目后管理图片。"));
+          mediaEditor.replaceChildren(createEmptyNote("Select a project to manage images."));
           return;
         }
 
@@ -1455,7 +1457,7 @@
             imageList.append(createImageRow(project, path, index));
           });
         } else {
-          imageList.append(createEmptyNote("还没有图片。填写文件夹后刷新，或手动添加路径。"));
+          imageList.append(createEmptyNote("No images yet. Add a folder and refresh, or add paths by hand."));
         }
 
         shell.append(
@@ -1493,7 +1495,7 @@
         });
 
         sourceInput.value = project.imageSources?.[path] || "";
-        sourceInput.placeholder = "来源备注，例如 render / photo / Behance reference";
+        sourceInput.placeholder = "Source note, for example render / photo / Behance reference";
         sourceInput.setAttribute("aria-label", `Image ${index + 1} source`);
         sourceInput.addEventListener("input", () => {
           setImageSource(project, path, sourceInput.value);

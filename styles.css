@@ -1,5 +1,7 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700;800&display=swap");
+
 :root {
-  /* 页面基础颜色 */
+  /* Base page colors */
   --paper: #F8F8F8;
   --ink: #121212;
   --muted: #474747;
@@ -7,137 +9,134 @@
   --rule-soft: rgba(0, 0, 0, 0.3);
   --accent: #fa2b1f;
   --placeholder: #5b5b5b;
-  --font-sans: "PingFang SC", "PingFang HK", "PingFang TC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-sans: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* 左侧目录栏宽度 */
+  /* Left index column width */
   --index-column-width: 350px;
 
-  /* 顶部导航栏高度 */
+  /* Top navigation height */
   --archive-top-nav-height: 72px;
 
-  /* 项目展开时左侧目录栏宽度 */
+  /* Left index width when a project is expanded */
   --index-column-width-expanded: 220px;
 
-  /* 左侧项目高亮块的左缩进 */
+  /* Left inset for the project highlight block */
   --index-highlight-indent: 44px;
 
-  /* 项目数字相对高亮块再额外右移的距离 */
+  /* Extra right shift for project numbers inside the highlight block */
   --index-item-text-extra-indent: 10px;
 
-  /* 高亮小圆点距离右边界的额外缩进，值越大，小圆点越往左 */
+  /* Extra inset from the right edge for the highlight dot */
   --index-item-dot-offset: 7px;
 
-  /* 项目数字栏宽度 */
+  /* Project number column width */
   --project-number-width: 132px;
 
-  /* 项目展开后左侧黄色卡片宽度 */
+  /* Yellow card width after project expansion */
   --panel-expanded-card-width: 150px;
 
-  /* 项目展开后左侧黄色卡片高度 */
+  /* Yellow card height after project expansion */
   --panel-expanded-card-height: 150px;
 
-  /* 项目展开后右侧说明栏固定宽度 */
+  /* Fixed width of the right copy column after expansion */
   --panel-expanded-side-width: 318px;
 
-  /* 展开后 frame 与右侧说明栏之间的固定间距 */
+  /* Fixed gap between the frame and right copy column after expansion */
   --panel-expanded-side-gap: 10px;
 
-  /* 文字说明区域宽度，值越大，文字区越宽，右侧 frame 会相应变窄 */
+  /* Copy area width */
   --panel-copy-width: 260px;
 
-  /* 项目顶部留白，上下分割线与内容的呼吸感主要由它控制 */
+  /* Top space for each project */
   --hero-top-space: 15px;
 
-  /* 右侧滚动区域 sticky 元素距离视口顶部的实际位置：外框 + toolbar + 15px 留白 */
+  /* Sticky top position for the right scroll area */
   --detail-sticky-top: calc(1px + 24px + 20px + 12px + 1px + var(--hero-top-space));
 
-  /* 数字与文字卡片之间的水平间距 */
+  /* Horizontal gap between the number and text card */
   --hero-number-text-gap: 0px;
 
-  /* 文字卡片与右侧 frame 之间的水平间距 */
+  /* Horizontal gap between the text card and right frame */
   --hero-text-frame-gap: 10px;
 
-  /* frame 顶部白色遮罩条的高度 */
+  /* Height of the white mask above the frame */
   --frame-top-box-height: 15px;
 
-  /* frame 的基础高度，跟随浏览器可视高度自适应 */
+  /* Base frame height */
   --panel-frame-min-height: calc(100dvh - 82px);
 
-  /* 项目展开后 frame 的可视高度，同样跟随浏览器可视高度自适应 */
+  /* Visible frame height after expansion */
   --panel-expanded-frame-height: calc(100dvh - 82px);
 
-  /* 展开后主图和后续附加内容之间的间距 */
+  /* Gap between the main image and extra content after expansion */
   --panel-frame-gallery-gap: 36px;
 
-  /* 项目 01 独立图片流容器宽度 */
+  /* Width for the Project 01 standalone image stream */
   --project-01-flow-width: 920px;
 
-  /* 主图的统一导出比例，当前项目 01 是 1350 x 900，也就是 3:2 */
+  /* Shared hero image export ratio */
   --project-frame-aspect-ratio: 3 / 2;
 
-  /* 文字高亮卡片描边颜色 */
+  /* Highlight card border color */
   --panel-highlight-border: rgba(18, 18, 18, 0.12);
 
-  /* 文字卡片高亮时的背景色 */
+  /* Highlight card active background */
   --panel-highlight-active: #FFF946;
 
-  /* 文字卡片上边距 */
+  /* Highlight card top padding */
   --panel-highlight-padding-top: 15px;
 
-  /* 文字卡片右边距 */
+  /* Highlight card right padding */
   --panel-highlight-padding-right: 10px;
 
-  /* 文字卡片下边距 */
+  /* Highlight card bottom padding */
   --panel-highlight-padding-bottom: 10px;
 
-  /* 文字卡片左边距 */
+  /* Highlight card left padding */
   --panel-highlight-padding-left: 9px;
 
-  /* 文字高亮卡片的最小高度 */
+  /* Highlight card minimum height */
   --panel-highlight-min-height: 208px;
 
-  /* overview 里 frame shell 按 3:2 比例从高亮卡片高度推导出的最小宽度 */
+  /* Minimum frame shell width derived from the highlight card height */
   --panel-frame-shell-min-width: 312px;
 
-  /* 右下角箭头图标尺寸 */
+  /* Arrow icon size */
   --panel-highlight-arrow-size: 40px;
 
-  /* 箭头距离卡片右下角的距离 */
+  /* Arrow inset from the lower right corner */
   --panel-highlight-arrow-inset: 10px;
 
-  /* 给箭头预留的底部空间，值越大，箭头和上面文字距离越远 */
+  /* Bottom space reserved for the arrow */
   --panel-highlight-arrow-reserve: 52px;
 
-  /* 项目卡片展开/收起的统一动效 */
+  /* Shared expand and collapse motion */
   --panel-expand-motion: 300ms ease;
 
-  /* 项目主布局切换的动效，用于卡片和 frame 同步变形 */
+  /* Main layout transition motion */
   --panel-layout-motion: 420ms cubic-bezier(0.22, 1, 0.36, 1);
 
-  /* 卡片内容自身收缩速度 */
+  /* Card content motion */
   --panel-card-motion: 260ms cubic-bezier(0.22, 1, 0.36, 1);
 
 }
 
-/* 项目图片控制区
-   按项目顺序排列。
-   后面如果某个项目要单独调整图片构图，直接改对应项目这两项：
-   --project-frame-image-position：图片在 frame 里的位置
-   --project-frame-anchor-x-expanded / --project-frame-anchor-y-expanded：展开后的 frame 中心标记
-   --project-frame-image-size：图片在 frame 里的缩放大小 */
+/* Project image controls.
+   They follow project order.
+   Use these variables to tune image position, expanded anchor, and image size. */
 
-/* Project 01 - Earth Explorer / 大地探索家 */
+/* Project 01 / Earth Explorer */
 .project-panel[data-project="01"] {
-  /* 图片位置：先写水平，再写垂直 */
+  /* Image position: horizontal then vertical */
   --project-frame-image-position: 113% center;
-  /* 展开态中心标记位置 */
+  /* Expanded center marker */
   --project-frame-anchor-x-expanded: 15%;
   --project-frame-anchor-y-expanded: 50%;
-  /* 图片大小：auto 100% 表示按高度铺满 */
+  /* Image size */
   --project-frame-image-size: auto 100%;
 }
 
-/* Project 02 - Stitch Trace / 针迹 */
+/* Project 02 / Stitch Trace */
 .project-panel[data-project="02"] {
   --project-frame-image-position: 110% center;
   --project-frame-anchor-x-expanded: 50%;
@@ -145,7 +144,7 @@
   --project-frame-image-size: auto 110%;
 }
 
-/* Project 03 - Utopia: Waterside Residence / 乌托邦:水上静居 */
+/* Project 03 / Utopia: Water Residence */
 .project-panel[data-project="03"] {
   --project-frame-image-position: 113% center;
   --project-frame-anchor-x-expanded: 50%;
@@ -153,7 +152,7 @@
   --project-frame-image-size: auto 100%;
 }
 
-/* Project 04 - Qi: Wind-Field Interactive Cockpit / 气:风场交互座舱 */
+/* Project 04 / Qi: Airflow Cockpit */
 .project-panel[data-project="04"] {
   --project-frame-image-position: 113% center;
   --project-frame-anchor-x-expanded: 50%;
@@ -917,7 +916,7 @@ body {
 .archive-primary-nav .index-group-label {
   align-items: center;
   display: inline-flex;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 400;
   line-height: 1;
 }
@@ -951,7 +950,7 @@ body {
 .archive-primary-nav .nav-letter {
   position: relative;
   display: inline-block;
-  width: 1em;
+  width: 0.92em;
   height: 1em;
   overflow: hidden;
   vertical-align: top;
@@ -1074,8 +1073,8 @@ body {
   margin: 0;
   padding: 0;
   list-style: none;
-  border-top: 0.5px solid var(--rule-strong);
-  border-bottom: 0.5px solid var(--rule-strong);
+  border-top: 0.5px solid transparent;
+  border-bottom: 0.5px solid transparent;
   max-height: calc(100dvh - var(--archive-top-nav-height) - 90px);
   overflow-x: hidden;
   overflow-y: auto;
@@ -1099,9 +1098,9 @@ body {
   height: 0.5px;
   background: var(--rule-strong);
   content: "";
-  opacity: 0;
+  opacity: 1;
   pointer-events: none;
-  transform: scaleX(0);
+  transform: scaleX(1);
   transform-origin: left center;
 }
 
@@ -1111,6 +1110,12 @@ body {
 
 .index-list::after {
   bottom: 0;
+}
+
+.index-group.is-project-directory-pre-enter .index-list::before,
+.index-group.is-project-directory-pre-enter .index-list::after {
+  opacity: 0;
+  transform: scaleX(0);
 }
 
 .index-group.is-project-directory-entering .index-list {
@@ -1136,6 +1141,12 @@ body {
   border-top-color: transparent;
   border-bottom-color: transparent;
   opacity: 0;
+}
+
+.index-group.is-collapsed .index-list::before,
+.index-group.is-collapsed .index-list::after {
+  opacity: 0;
+  transform: scaleX(0);
 }
 
 .index-segment {
@@ -3656,7 +3667,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
   }
 
   .archive-primary-nav #index-project-toggle .index-group-label::after {
-    content: " ｜ 产品";
+    content: " | Products";
   }
 
   .home-transition-stage[data-mobile-view="home"] + .archive-top-nav #index-project-toggle .index-group-label::after,
@@ -3818,7 +3829,7 @@ body.is-project-embed-scroll-cursor-active .project-panel.is-expanded .panel-pro
   .mobile-project-number {
     margin: 0 10px 0 0;
     color: #000;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: var(--font-sans);
     font-size: 50px;
     font-weight: 700;
     line-height: 0.783;

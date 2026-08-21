@@ -121,7 +121,7 @@ function buildFloatLayer() {
     item.dataset.project = projectId || "";
     item.setAttribute("role", "button");
     item.setAttribute("tabindex", "0");
-    item.setAttribute("aria-label", projectId ? `打开项目 ${projectId}` : "打开项目");
+    item.setAttribute("aria-label", projectId ? `Open project ${projectId}` : "Open project");
     image.className = "home-float-image";
     image.src = assetPath;
     image.alt = "";

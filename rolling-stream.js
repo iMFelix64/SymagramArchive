@@ -232,19 +232,19 @@ function buildProjects() {
       const detailTitle = formatMultilineText(getProjectDetailTitle(project));
       const mediaMarkup = project.placeholder
         ? `
-          <figure class="rolling-image-media rolling-image-media--placeholder" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
+          <figure class="rolling-image-media rolling-image-media--placeholder" role="button" tabindex="0" aria-label="Open ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
             <div class="rolling-image-placeholder-copy">PLACEHOLDER ${project.displayNumber}</div>
           </figure>
         `
         : leadImage
           ? `
-          <figure class="rolling-image-media rolling-image-media--gallery" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
+          <figure class="rolling-image-media rolling-image-media--gallery" role="button" tabindex="0" aria-label="Open ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
             <div class="rolling-project-gallery" data-rolling-gallery>
               <figure class="rolling-project-gallery-frame">
                 <img
                   class="rolling-gallery-image rolling-gallery-image--hero"
                   ${leadImageAttribute}
-                  alt="${escapeHtml(project.title)}项目主图 01"
+                  alt="${escapeHtml(project.title)} main image 01"
                   loading="${shouldLoadImmediately ? "eager" : "lazy"}"
                   decoding="async"
                   fetchpriority="${shouldLoadImmediately ? "high" : "low"}"
@@ -255,14 +255,14 @@ function buildProjects() {
           </figure>
         `
           : `
-          <figure class="rolling-image-media rolling-image-media--placeholder" role="button" tabindex="0" aria-label="打开 ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
+          <figure class="rolling-image-media rolling-image-media--placeholder" role="button" tabindex="0" aria-label="Open ${project.title}" data-debug-label="figure.rolling-image-media[${project.id}]">
             <div class="rolling-image-placeholder-copy">PLACEHOLDER ${project.displayNumber}</div>
           </figure>
         `;
 
       return `
         <article class="rolling-project" data-project="${project.id}" data-segment="${project.segmentId}" data-debug-label="article.rolling-project[${project.id}]">
-          <aside class="rolling-project-card" aria-label="${project.title} 项目信息" data-debug-label="aside.rolling-project-card[${project.id}]">
+          <aside class="rolling-project-card" aria-label="${project.title} project information" data-debug-label="aside.rolling-project-card[${project.id}]">
             <p class="rolling-project-index">${project.displayNumber}.</p>
             <div class="rolling-project-copy">
               <h2 class="rolling-project-name">${cardTitle}</h2>
@@ -285,7 +285,7 @@ function buildProjects() {
             <p class="rolling-detail-year">${project.year}</p>
             <span class="rolling-detail-rule" aria-hidden="true"></span>
             <div class="rolling-detail-spec">
-              <p class="rolling-detail-label">方向</p>
+              <p class="rolling-detail-label">Direction</p>
               <p class="rolling-detail-value">${project.tagline}</p>
             </div>
           </aside>
@@ -401,7 +401,7 @@ function createRollingGalleryFrame(project, src, index) {
   frame.className = "rolling-project-gallery-frame";
   image.className = "rolling-gallery-image";
   image.dataset.src = src;
-  image.alt = `${project.title}项目图片 ${imageNumber}`;
+  image.alt = `${project.title} project image ${imageNumber}`;
   image.loading = "lazy";
   image.decoding = "async";
   image.fetchPriority = "low";
@@ -1179,6 +1179,61 @@ function scrollRollingProjectGallery(project, deltaY) {
   return true;
 }
 
+function getNormalizedWheelDeltaY(event) {
+  if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) {
+    return event.deltaY * 18;
+  }
+
+  if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) {
+    return event.deltaY * window.innerHeight;
+  }
+
+  return event.deltaY;
+}
+
+function getExpandedProjectForWheelEvent(event) {
+  if (expandedProjectIndex < 0) {
+    return null;
+  }
+
+  const eventTarget = event.target instanceof Element ? event.target : null;
+  const targetProject = eventTarget?.closest(".rolling-project");
+
+  if (targetProject?.classList.contains("is-detail-expanded")) {
+    return targetProject;
+  }
+
+  return projectsList[expandedProjectIndex] || null;
+}
+
+function scrollExpandedProjectFromWheel(event) {
+  const project = getExpandedProjectForWheelEvent(event);
+
+  if (!project) {
+    return false;
+  }
+
+  const deltaX = Number(event.deltaX) || 0;
+  const deltaY = getNormalizedWheelDeltaY(event);
+
+  if (Math.abs(deltaY) < Math.abs(deltaX)) {
+    return false;
+  }
+
+  const didScroll = scrollRollingProjectGallery(project, deltaY);
+
+  if (!didScroll) {
+    return false;
+  }
+
+  if (event.cancelable) {
+    event.preventDefault();
+  }
+
+  event.stopPropagation();
+  return true;
+}
+
 function loadFocusBandTopRatio() {
   if (isPanelEmbed) {
     focusBandTopRatio = 0.5 - FOCUS_BAND_HEIGHT_RATIO * 0.5;
@@ -1238,11 +1293,26 @@ function getCoverflowCenterY() {
 }
 
 function getSegmentColumnWidth() {
-  const value = Number.parseFloat(
-    window.getComputedStyle(projectsRoot).getPropertyValue("--rolling-segment-column"),
-  );
+  const rootWidth = projectsRoot.getBoundingClientRect().width || window.innerWidth;
+
+  if (isPanelEmbed) {
+    return clamp(rootWidth * 0.27, 190, 250);
+  }
+
+  const computedStyle = window.getComputedStyle(projectsRoot);
+  const value = Number.parseFloat(computedStyle.getPropertyValue("--rolling-segment-column"));
 
   return Number.isFinite(value) ? value : 0;
+}
+
+function getNormalExpandedCardWidth() {
+  const rootWidth = projectsRoot.getBoundingClientRect().width || window.innerWidth;
+
+  if (isPanelEmbed) {
+    return clamp(rootWidth * 0.38, 286, CARD_EXPANDED_WIDTH);
+  }
+
+  return CARD_EXPANDED_WIDTH;
 }
 
 function getActiveSegmentRange(position = activeProjectIndex) {
@@ -1440,7 +1510,7 @@ function getProjectCurrentSurfaceHeight(index, target) {
 function getAvailableStreamWidth(isDetailExpanded = false) {
   const rootWidth = projectsRoot.getBoundingClientRect().width || window.innerWidth;
   const segmentWidth = isDetailExpanded ? 0 : getSegmentColumnWidth();
-  const cardWidth = isDetailExpanded ? detailCardWidth : CARD_EXPANDED_WIDTH;
+  const cardWidth = isDetailExpanded ? detailCardWidth : getNormalExpandedCardWidth();
   const detailWidth = isDetailExpanded ? DETAIL_SIDE_WIDTH + DETAIL_SIDE_GAP : 0;
   const reservedWidth = segmentWidth + cardWidth + PROJECT_COLUMN_GAP + detailWidth;
 
@@ -1612,8 +1682,13 @@ function paintProject(project, target, index) {
   const normalHeight = lerp(CARD_COLLAPSED_HEIGHT, normalExpandedHeight, visualProgress);
   const height = Math.round(lerp(normalHeight, detailExpandedHeight, mediaExpandProgress));
   const cardHeight = Math.round(lerp(normalHeight, detailCardHeight, mediaExpandProgress));
-  const normalCardWidth = lerp(CARD_COLLAPSED_WIDTH, CARD_EXPANDED_WIDTH, visualProgress);
+  const normalCardWidth = lerp(CARD_COLLAPSED_WIDTH, getNormalExpandedCardWidth(), visualProgress);
   const cardWidth = lerp(normalCardWidth, detailCardWidth, mediaExpandProgress);
+  const descriptionLineClamp = clamp(
+    Math.floor((cardHeight - 15 - 22.5 - 14 - 10 - 52) / 18),
+    1,
+    8,
+  );
   const indexShift = (cardWidth - CARD_COLLAPSED_WIDTH) * (1 - indexSlideProgress);
   const rootWidth = projectsRoot.getBoundingClientRect().width || window.innerWidth;
   const segmentWidth = getSegmentColumnWidth();
@@ -1647,6 +1722,7 @@ function paintProject(project, target, index) {
   project.style.setProperty("--surface-height", `${height}px`);
   project.style.setProperty("--card-height", `${cardHeight}px`);
   project.style.setProperty("--card-width", `${cardWidth.toFixed(2)}px`);
+  project.style.setProperty("--description-line-clamp", String(descriptionLineClamp));
   project.style.setProperty("--stream-width", `${targetStreamWidth.toFixed(2)}px`);
   project.style.setProperty("--layout-spacer-width", `${layoutSpacerWidth.toFixed(2)}px`);
   project.style.setProperty("--detail-gap-width", `${detailGapWidth.toFixed(2)}px`);
@@ -2271,26 +2347,20 @@ projectsRoot.addEventListener("pointerdown", (event) => {
 projectsRoot.addEventListener(
   "wheel",
   (event) => {
+    if (!scrollExpandedProjectFromWheel(event)) {
+      return;
+    }
+
     const wheelLayer = event.target instanceof Element
       ? event.target.closest(".rolling-image-wheel-layer")
       : null;
-    const project = wheelLayer?.closest(".rolling-project");
 
-    if (!project?.classList.contains("is-detail-expanded")) {
-      return;
-    }
-
-    const didPost = scrollRollingProjectGallery(project, event.deltaY);
-
-    if (!didPost) {
-      return;
-    }
-
-    event.preventDefault();
-    event.stopPropagation();
     rollingScrollCursorX = event.clientX;
     rollingScrollCursorY = event.clientY;
-    window.setTimeout(() => refreshRollingScrollCursor(wheelLayer), 40);
+
+    if (wheelLayer) {
+      window.setTimeout(() => refreshRollingScrollCursor(wheelLayer), 40);
+    }
   },
   { passive: false },
 );
@@ -2357,18 +2427,22 @@ function handleCoverflowWheel(event) {
     }
 
     if (expandedProjectIndex >= 0) {
-      event.preventDefault();
+      if (scrollExpandedProjectFromWheel(event)) {
+        return;
+      }
+
+      if (event.cancelable) {
+        event.preventDefault();
+      }
       return;
     }
 
-    event.preventDefault();
+    if (event.cancelable) {
+      event.preventDefault();
+    }
 
     const rawDelta =
-      event.deltaMode === WheelEvent.DOM_DELTA_LINE
-        ? event.deltaY * 18
-        : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
-          ? event.deltaY * window.innerHeight
-          : event.deltaY;
+      getNormalizedWheelDeltaY(event);
     const normalizedDelta = clamp(rawDelta, -COVERFLOW_WHEEL_DELTA_LIMIT, COVERFLOW_WHEEL_DELTA_LIMIT);
     const adjustedDelta = normalizedDelta * wheelSensitivity;
     const now = performance.now();

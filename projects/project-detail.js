@@ -140,8 +140,8 @@ function createProjectImage(project, src, index) {
 
   image.className = "project-image";
   image.alt = index === 0
-    ? `${project.title}项目主图 ${imageNumber}`
-    : `${project.title}项目图片 ${imageNumber}`;
+    ? `${project.title} main image ${imageNumber}`
+    : `${project.title} project image ${imageNumber}`;
   image.loading = index === 0 ? "eager" : "lazy";
   image.decoding = "async";
 
@@ -173,7 +173,7 @@ function createProjectArticleFigure(project, entry, className = "project-article
 
   figure.className = className;
   image.className = "project-article-image";
-  image.alt = typeof entry === "string" ? `${project.title}文章插图` : entry.alt || `${project.title}文章插图`;
+  image.alt = typeof entry === "string" ? `${project.title} article image` : entry.alt || `${project.title} article image`;
   image.loading = isCover ? "eager" : "lazy";
   image.decoding = "async";
   image.fetchPriority = isCover && shouldPrioritizeHeroImage ? "high" : "low";
@@ -266,7 +266,7 @@ function renderProjectArticle(project) {
       project,
       {
         src: coverSource,
-        alt: `${project.title}文章封面`,
+        alt: `${project.title} article cover`,
         caption: article.coverCaption,
       },
       "project-article-cover",
@@ -296,11 +296,11 @@ function renderProjectStream() {
   pendingProjectImages = [];
 
   document.title = `Project ${project.id} / ${project.title}`;
-  projectPage?.setAttribute("aria-label", `${project.title}项目页面`);
+  projectPage?.setAttribute("aria-label", `${project.title} project page`);
   projectPage?.setAttribute("data-project-id", project.id);
   projectPage?.querySelector(".project-stream-shell")?.setAttribute(
     "aria-label",
-    `${project.title}内容流`,
+    `${project.title} content stream`,
   );
 
   if (project.contentType === "article") {

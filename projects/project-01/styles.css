@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700;800&display=swap");
+
 :root {
   --project-paper: #fbfbf9;
   --project-panel: rgba(255, 255, 255, 0.92);
@@ -22,7 +24,7 @@ body {
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.7), transparent 42%),
     var(--project-paper);
-  font-family: "PingFang SC", "PingFang HK", "PingFang TC", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .project-page {

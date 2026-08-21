@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Project 01 Gallery</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <style>
+      @import url("https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600;700;800&display=swap");
+
       :root {
         --gallery-width: 920px;
         --page-bg: #f3f3f0;
@@ -22,7 +24,7 @@
       body {
         margin: 0;
         min-height: 100vh;
-        font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         color: var(--text);
         background: var(--page-bg);
       }
@@ -129,10 +131,10 @@
       <header class="toolbar">
         <h1>Project 01 / Scroll Gallery</h1>
         <p class="toolbar-copy">
-          这个页面是独立可滚动容器。拖动下面的滑块可以直接调整图片容器宽度。
+          This page is an independent scroll container. Move the slider below to adjust the image container width.
         </p>
         <div class="control-row">
-          <label for="gallery-width">容器宽度</label>
+          <label for="gallery-width">Container width</label>
           <input
             id="gallery-width"
             type="range"
